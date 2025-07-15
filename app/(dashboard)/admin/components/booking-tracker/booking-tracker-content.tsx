@@ -41,6 +41,12 @@ export const BookingTrackerContent = ({
 		}
 	}, [selectedBookingId, startFetching, hasInitiallyFetched]);
 
+	useEffect(() => {
+		if (!isLoading && !hasInitiallyFetched) {
+			setHasInitiallyFetched(true);
+		}
+	}, [isLoading, hasInitiallyFetched]);
+
 	const handleRefresh = async () => {
 		if (!hasInitiallyFetched) {
 			startFetching();
@@ -67,12 +73,18 @@ export const BookingTrackerContent = ({
 			}
 
 			setSelectedBooking(targetBooking || workflowData[0]);
+		} else {
+			setSelectedBooking(null);
 		}
 	}, [workflowData, selectedBookingId]);
 
 	const handleBookingSelect = (booking: WorkflowTrackingData) => {
 		setSelectedBooking(booking);
 	};
+
+	if (isLoading && !hasInitiallyFetched) {
+		return <BookingTrackerSkeleton />;
+	}
 
 	if (isError) {
 		return (
@@ -93,7 +105,7 @@ export const BookingTrackerContent = ({
 		);
 	}
 
-	if (workflowData.length === 0 && !isLoading && hasInitiallyFetched) {
+	if (workflowData.length === 0 && hasInitiallyFetched) {
 		return (
 			<Card className="col-span-3">
 				<CardContent className="p-6">
@@ -102,41 +114,49 @@ export const BookingTrackerContent = ({
 						<p className="mt-2 text-sm text-muted-foreground">
 							Start a booking request to see workflow tracking here.
 						</p>
+						<Button variant="outline" size="sm" className="mt-4" onClick={handleRefresh}>
+							<RefreshCw className="mr-2 size-4" />
+							Refresh
+						</Button>
 					</div>
 				</CardContent>
 			</Card>
 		);
 	}
 
-	if (!selectedBooking) {
+	if (workflowData.length > 0 && !selectedBooking) {
 		return <BookingTrackerSkeleton />;
 	}
 
-	return (
-		<Card className={`col-span-3 ${className || ""}`}>
-			<BookingHeader
-				selectedBooking={selectedBooking}
-				workflowData={workflowData}
-				isLoading={isLoading}
-				onRefetch={handleRefresh}
-				onBookingSelect={handleBookingSelect}
-			/>
-			<CardContent>
-				<div className="flex flex-col space-y-4">
-					<BookingDetails selectedBooking={selectedBooking} />
-					<BookingStepsList
-						steps={selectedBooking.steps}
-						selectedBooking={selectedBooking}
-						onModalOpen={openModal}
-					/>
-				</div>
-			</CardContent>
+	if (selectedBooking) {
+		return (
+			<Card className={`col-span-3 ${className || ""}`}>
+				<BookingHeader
+					selectedBooking={selectedBooking}
+					workflowData={workflowData}
+					isLoading={isLoading}
+					onRefetch={handleRefresh}
+					onBookingSelect={handleBookingSelect}
+				/>
+				<CardContent>
+					<div className="flex flex-col space-y-4">
+						<BookingDetails selectedBooking={selectedBooking} />
+						<BookingStepsList
+							steps={selectedBooking.steps}
+							selectedBooking={selectedBooking}
+							onModalOpen={openModal}
+						/>
+					</div>
+				</CardContent>
 
-			<BookingTrackerModals
-				activeModal={activeModal}
-				modalData={modalData}
-				onCloseModal={closeModal}
-			/>
-		</Card>
-	);
+				<BookingTrackerModals
+					activeModal={activeModal}
+					modalData={modalData}
+					onCloseModal={closeModal}
+				/>
+			</Card>
+		);
+	}
+
+	return <BookingTrackerSkeleton />;
 };
