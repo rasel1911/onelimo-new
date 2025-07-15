@@ -24,6 +24,5 @@ export const config = {
 		"/register",
 		"/booking-request-form/:path*",
 		"/concierge",
-		"/admin/:path*",
 	],
 };
