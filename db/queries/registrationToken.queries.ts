@@ -9,7 +9,7 @@ const TOKEN_SECRET = process.env.TOKEN_SECRET || "default-secret-key-change-in-p
  * Generate a secure random token with HMAC signature
  * that fits within the 100 character limit
  */
-export async function generateToken(): Promise<string> {
+export const generateToken = async (): Promise<string> => {
 	const randomArray = new Uint8Array(16);
 	crypto.getRandomValues(randomArray);
 	const randomData = Array.from(randomArray)
@@ -37,12 +37,12 @@ export async function generateToken(): Promise<string> {
 	const signature = fullSignature.substring(0, 32);
 
 	return `${randomData}.${signature}`;
-}
+};
 
 /**
  * Verify token signature
  */
-async function verifyTokenSignature(token: string): Promise<boolean> {
+export const verifyTokenSignature = async (token: string): Promise<boolean> => {
 	try {
 		const [data, signature] = token.split(".");
 
@@ -75,17 +75,17 @@ async function verifyTokenSignature(token: string): Promise<boolean> {
 		console.error("Error verifying token signature:", error);
 		return false;
 	}
-}
+};
 
 /**
  * Create a new registration token
  * @param email Optional email to associate with the token
  * @param expiryHours Number of hours until token expires (default: 48)
  */
-export async function createRegistrationToken(
+export const createRegistrationToken = async (
 	email?: string,
 	expiryHours: number = 48,
-): Promise<{ token: string; id: string }> {
+): Promise<{ token: string; id: string }> => {
 	const token = await generateToken();
 
 	const expiresAt = new Date();
@@ -102,15 +102,15 @@ export async function createRegistrationToken(
 		.returning({ id: registrationToken.id, token: registrationToken.token });
 
 	return result[0];
-}
+};
 
 /**
  * Validate a registration token
  * @param token The token to validate
  */
-export async function validateToken(
+export const validateToken = async (
 	token: string,
-): Promise<{ isValid: boolean; tokenRecord: RegistrationToken | null; reason?: string }> {
+): Promise<{ isValid: boolean; tokenRecord: RegistrationToken | null; reason?: string }> => {
 	try {
 		if (!(await verifyTokenSignature(token))) {
 			return { isValid: false, tokenRecord: null, reason: "Invalid token signature" };
@@ -142,13 +142,13 @@ export async function validateToken(
 		console.error("Error validating token:", error);
 		return { isValid: false, tokenRecord: null, reason: "Server error during validation" };
 	}
-}
+};
 
 /**
  * Mark a token as used
  * @param token The token to mark as used
  */
-export async function markTokenAsUsed(token: string): Promise<boolean> {
+export const markTokenAsUsed = async (token: string): Promise<boolean> => {
 	try {
 		const result = await db
 			.update(registrationToken)
@@ -164,19 +164,19 @@ export async function markTokenAsUsed(token: string): Promise<boolean> {
 		console.error("Error marking token as used:", error);
 		return false;
 	}
-}
+};
 
 /**
  * Get all registration tokens
  */
-export async function getRegistrationTokens(): Promise<RegistrationToken[]> {
+export const getRegistrationTokens = async (): Promise<RegistrationToken[]> => {
 	return await db.select().from(registrationToken);
-}
+};
 
 /**
  * Delete expired tokens to clean up the database
  */
-export async function deleteExpiredTokens(): Promise<number> {
+export const deleteExpiredTokens = async (): Promise<number> => {
 	const now = new Date();
 
 	const result = await db
@@ -185,4 +185,4 @@ export async function deleteExpiredTokens(): Promise<number> {
 		.returning({ id: registrationToken.id });
 
 	return result.length;
-}
+};
