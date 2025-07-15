@@ -26,6 +26,7 @@
     "@ai-sdk/provider-utils": "^2.2.8",
     "@ai-sdk/react": "^1.2.12",
     "@hookform/resolvers": "^5.0.1",
+    "@neondatabase/serverless": "^1.0.1",
     "@radix-ui/react-alert-dialog": "^1.1.13",
     "@radix-ui/react-avatar": "^1.1.9",
     "@radix-ui/react-collapsible": "^1.1.10",
