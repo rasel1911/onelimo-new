@@ -88,8 +88,11 @@ export const useWorkflowTracking = (
 	}, [enablePolling, fetchWorkflowTracking, fetchingEnabled]);
 
 	const refetch = useCallback(async () => {
+		if (!fetchingEnabled) {
+			setFetchingEnabled(true);
+		}
 		await fetchWorkflowTracking();
-	}, [fetchWorkflowTracking]);
+	}, [fetchWorkflowTracking, fetchingEnabled]);
 
 	const startFetching = useCallback(() => {
 		if (!fetchingEnabled) {

@@ -48,11 +48,13 @@ export const BookingTrackerContent = ({
 	}, [isLoading, hasInitiallyFetched]);
 
 	const handleRefresh = async () => {
-		if (!hasInitiallyFetched) {
-			startFetching();
-			setHasInitiallyFetched(true);
-		} else {
+		try {
+			if (!hasInitiallyFetched) {
+				setHasInitiallyFetched(true);
+			}
 			await refetch();
+		} catch (error) {
+			console.error("Error refreshing data:", error);
 		}
 	};
 
@@ -94,9 +96,15 @@ export const BookingTrackerContent = ({
 						<AlertCircle className="size-4" />
 						<AlertDescription>
 							Failed to load workflow tracking data: {error}
-							<Button variant="outline" size="sm" className="ml-2" onClick={handleRefresh}>
-								<RefreshCw className="mr-2 size-4" />
-								Retry
+							<Button
+								variant="outline"
+								size="sm"
+								className="ml-2"
+								onClick={handleRefresh}
+								disabled={isLoading}
+							>
+								<RefreshCw className={`mr-2 size-4 ${isLoading ? "animate-spin" : ""}`} />
+								{isLoading ? "Retrying..." : "Retry"}
 							</Button>
 						</AlertDescription>
 					</Alert>
@@ -114,9 +122,15 @@ export const BookingTrackerContent = ({
 						<p className="mt-2 text-sm text-muted-foreground">
 							Start a booking request to see workflow tracking here.
 						</p>
-						<Button variant="outline" size="sm" className="mt-4" onClick={handleRefresh}>
-							<RefreshCw className="mr-2 size-4" />
-							Refresh
+						<Button
+							variant="outline"
+							size="sm"
+							className="mt-4"
+							onClick={handleRefresh}
+							disabled={isLoading}
+						>
+							<RefreshCw className={`mr-2 size-4 ${isLoading ? "animate-spin" : ""}`} />
+							{isLoading ? "Refreshing..." : "Refresh"}
 						</Button>
 					</div>
 				</CardContent>
