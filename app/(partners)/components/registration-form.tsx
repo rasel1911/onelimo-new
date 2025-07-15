@@ -1,0 +1,639 @@
+"use client";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ChevronDown, ChevronUp, HelpCircle, Plus, X } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import * as z from "zod";
+
+import { fetchLocations, createLocation } from "@/app/(dashboard)/admin/locations/actions";
+import { registerPartner } from "@/app/(partners)/actions/partner-registration";
+import { Button } from "@/components/ui/button";
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardFooter,
+	CardHeader,
+	CardTitle,
+} from "@/components/ui/card";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+	Form,
+	FormControl,
+	FormDescription,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+
+const SERVICE_TYPES = [
+	{ value: "suv", label: "SUV Service" },
+	{ value: "party_bus", label: "Party Bus" },
+	{ value: "stretch_limousine", label: "Stretch Limousine" },
+	{ value: "sedan", label: "Sedan Service" },
+	{ value: "hummer", label: "Hummer" },
+	{ value: "other", label: "Other Service" },
+];
+
+const formSchema = z.object({
+	name: z
+		.string()
+		.min(1, "Company name is required")
+		.max(100, "Company name must be less than 100 characters"),
+	email: z
+		.string()
+		.email("Invalid email address")
+		.refine((email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email), {
+			message: "Please enter a valid email address",
+		}),
+	phone: z
+		.string()
+		.min(1, "Phone number is required")
+		.refine(
+			(phone) => {
+				const euRegex = /^(\+[1-9]{1}[0-9]{1,2}|00[1-9]{1}[0-9]{1,2})[0-9]{6,12}$/;
+				const ukRegex = /^(\+44|0)7\d{9}$/;
+
+				return euRegex.test(phone.replace(/\s+/g, "")) || ukRegex.test(phone.replace(/\s+/g, ""));
+			},
+			{ message: "Please enter a valid EU or UK phone number" },
+		),
+	locationId: z.string().min(1, "Location is required"),
+	serviceType: z.array(z.string()).min(1, "At least one service type is required"),
+	website: z.string().optional(),
+});
+
+type FormValues = z.infer<typeof formSchema>;
+
+interface Location {
+	id: string;
+	city: string;
+	zipcodes?: string[];
+}
+
+interface PartnerRegistrationFormProps {
+	initialEmail?: string;
+	token?: string | null;
+}
+
+export const PartnerRegistrationForm = ({
+	initialEmail = "",
+	token,
+}: PartnerRegistrationFormProps) => {
+	const [areaCovered, setAreaCovered] = useState<string[]>([]);
+	const [postcodeInput, setPostcodeInput] = useState("");
+	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
+	const [locations, setLocations] = useState<Location[]>([]);
+	const [customServiceTypes, setCustomServiceTypes] = useState<string[]>([]);
+	const [newServiceType, setNewServiceType] = useState("");
+	const [showAddLocation, setShowAddLocation] = useState(false);
+	const [newLocationCity, setNewLocationCity] = useState("");
+	const [isCreatingLocation, setIsCreatingLocation] = useState(false);
+	const router = useRouter();
+
+	const form = useForm<FormValues>({
+		resolver: zodResolver(formSchema),
+		mode: "onChange",
+		defaultValues: {
+			name: "",
+			email: initialEmail,
+			phone: "",
+			locationId: "",
+			serviceType: [],
+			website: "",
+		},
+	});
+
+	const watchedValues = form.watch();
+	const selectedLocation = locations.find((loc) => loc.id === watchedValues.locationId);
+
+	useEffect(() => {
+		const getLocations = async () => {
+			try {
+				const result = await fetchLocations();
+				if (result.success && result.locations) {
+					setLocations(result.locations);
+				}
+			} catch (error) {
+				console.error("Error loading locations:", error);
+				toast.error("Failed to load locations");
+			}
+		};
+
+		getLocations();
+	}, []);
+
+	const handleAddPostcode = (e: React.KeyboardEvent<HTMLInputElement>) => {
+		if (["Enter", "Tab", ","].includes(e.key)) {
+			e.preventDefault();
+			addPostcode();
+		}
+	};
+
+	const addPostcode = () => {
+		if (postcodeInput.trim()) {
+			const postcode = postcodeInput.trim().toUpperCase();
+			if (!areaCovered.includes(postcode)) {
+				setAreaCovered([...areaCovered, postcode]);
+			}
+			setPostcodeInput("");
+		}
+	};
+
+	const removePostcode = (postcode: string) => {
+		setAreaCovered(areaCovered.filter((item) => item !== postcode));
+	};
+
+	const handleAddServiceType = () => {
+		if (newServiceType.trim()) {
+			const serviceType = newServiceType.trim().toLowerCase().replace(/\s+/g, "_");
+			if (!customServiceTypes.includes(serviceType)) {
+				setCustomServiceTypes([...customServiceTypes, serviceType]);
+				const currentTypes = form.getValues("serviceType");
+				form.setValue("serviceType", [...currentTypes, serviceType]);
+			}
+			setNewServiceType("");
+		}
+	};
+
+	const handleRemoveServiceType = (serviceType: string) => {
+		setCustomServiceTypes(customServiceTypes.filter((type) => type !== serviceType));
+		const currentTypes = form.getValues("serviceType");
+		form.setValue(
+			"serviceType",
+			currentTypes.filter((type) => type !== serviceType),
+		);
+	};
+
+	const handleCreateLocation = async () => {
+		if (!newLocationCity.trim()) {
+			toast.error("Please enter a city name");
+			return;
+		}
+
+		setIsCreatingLocation(true);
+		try {
+			const formData = new FormData();
+			formData.append("city", newLocationCity.trim());
+			formData.append("zipcodes", "all");
+
+			const result = await createLocation(formData);
+
+			if (result.success && result.location) {
+				setLocations([...locations, result.location]);
+				form.setValue("locationId", result.location.id);
+				setShowAddLocation(false);
+				setNewLocationCity("");
+				toast.success("Location created successfully");
+			} else {
+				toast.error("Failed to create location");
+			}
+		} catch (error) {
+			console.error("Error creating location:", error);
+			toast.error("Failed to create location");
+		} finally {
+			setIsCreatingLocation(false);
+		}
+	};
+
+	const isFormValid = () => {
+		const errors = form.formState.errors;
+		const values = form.getValues();
+
+		return (
+			Object.keys(errors).length === 0 &&
+			values.name.trim() !== "" &&
+			values.email.trim() !== "" &&
+			values.phone.trim() !== "" &&
+			values.locationId !== "" &&
+			values.serviceType.length > 0
+		);
+	};
+
+	async function onSubmit(values: FormValues) {
+		if (!isFormValid()) {
+			toast.error("Please fill in all required fields correctly");
+			return;
+		}
+
+		try {
+			setIsSubmitting(true);
+
+			const formData = {
+				...values,
+				areaCovered: areaCovered.length > 0 ? areaCovered : ["all"],
+				token: token,
+			};
+
+			const result = await registerPartner(formData);
+
+			if (result.success) {
+				toast.success("Registration submitted successfully!");
+				router.push("/partner-registration/success");
+			} else {
+				const errorMessage =
+					typeof result.error === "string" ? result.error : "Failed to submit registration";
+				toast.error(errorMessage);
+			}
+		} catch (error) {
+			console.error("Registration error:", error);
+			toast.error("An unexpected error occurred. Please try again.");
+		} finally {
+			setIsSubmitting(false);
+		}
+	}
+
+	const availableServiceTypes = [
+		...SERVICE_TYPES,
+		...customServiceTypes.map((type) => ({
+			value: type,
+			label: type.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()),
+		})),
+	];
+
+	return (
+		<div className="container mx-auto py-10">
+			<div className="mx-auto max-w-5xl">
+				<div className="mb-8 text-center">
+					<h1 className="text-3xl font-bold tracking-tight">Partner Registration</h1>
+					<p className="mt-2 text-muted-foreground">
+						Join our network of transportation providers and grow your business
+					</p>
+				</div>
+
+				<div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+					<div className="col-span-1 lg:col-span-2">
+						<Form {...form}>
+							<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+								<Card>
+									<CardHeader>
+										<CardTitle>Company Information</CardTitle>
+										<CardDescription>Provide your business details to get started</CardDescription>
+									</CardHeader>
+									<CardContent className="space-y-6">
+										<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+											<FormField
+												control={form.control}
+												name="name"
+												render={({ field }) => (
+													<FormItem>
+														<FormLabel>Company Name *</FormLabel>
+														<FormControl>
+															<Input placeholder="Your company name" {...field} />
+														</FormControl>
+														<FormMessage />
+													</FormItem>
+												)}
+											/>
+
+											<FormField
+												control={form.control}
+												name="email"
+												render={({ field }) => (
+													<FormItem>
+														<FormLabel>Email Address *</FormLabel>
+														<FormControl>
+															<Input type="email" placeholder="your@email.com" {...field} />
+														</FormControl>
+														<FormMessage />
+													</FormItem>
+												)}
+											/>
+										</div>
+
+										<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+											<FormField
+												control={form.control}
+												name="phone"
+												render={({ field }) => (
+													<FormItem>
+														<FormLabel>Phone Number *</FormLabel>
+														<FormControl>
+															<Input placeholder="+44 7123 456789" {...field} />
+														</FormControl>
+														<FormMessage />
+														<FormDescription>Enter a valid UK or EU phone number</FormDescription>
+													</FormItem>
+												)}
+											/>
+											<FormField
+												control={form.control}
+												name="locationId"
+												render={({ field }) => (
+													<FormItem>
+														<FormLabel>Service Location *</FormLabel>
+														<div className="flex gap-2">
+															<Select onValueChange={field.onChange} value={field.value}>
+																<FormControl>
+																	<SelectTrigger>
+																		<SelectValue placeholder="Select location" />
+																	</SelectTrigger>
+																</FormControl>
+																<SelectContent>
+																	{locations.map((location) => (
+																		<SelectItem key={location.id} value={location.id}>
+																			{location.city}
+																		</SelectItem>
+																	))}
+																</SelectContent>
+															</Select>
+															<Dialog open={showAddLocation} onOpenChange={setShowAddLocation}>
+																<DialogTrigger asChild>
+																	<Button type="button" variant="outline" size="sm">
+																		<Plus className="size-4" />
+																	</Button>
+																</DialogTrigger>
+																<DialogContent>
+																	<DialogHeader>
+																		<DialogTitle>Add New Location</DialogTitle>
+																		<DialogDescription>
+																			Add a new city to the service locations
+																		</DialogDescription>
+																	</DialogHeader>
+																	<div className="space-y-4">
+																		<div>
+																			<label htmlFor="city" className="text-sm font-medium">
+																				City Name
+																			</label>
+																			<Input
+																				id="city"
+																				placeholder="Enter city name"
+																				value={newLocationCity}
+																				onChange={(e) => setNewLocationCity(e.target.value)}
+																			/>
+																		</div>
+																	</div>
+																	<DialogFooter>
+																		<Button
+																			type="button"
+																			variant="outline"
+																			onClick={() => setShowAddLocation(false)}
+																		>
+																			Cancel
+																		</Button>
+																		<Button
+																			type="button"
+																			onClick={handleCreateLocation}
+																			disabled={isCreatingLocation}
+																		>
+																			{isCreatingLocation ? "Creating..." : "Create Location"}
+																		</Button>
+																	</DialogFooter>
+																</DialogContent>
+															</Dialog>
+														</div>
+														<FormMessage />
+														<FormDescription>
+															Choose the primary city you operate in
+														</FormDescription>
+													</FormItem>
+												)}
+											/>
+										</div>
+
+										<Separator />
+
+										{/* Service Types */}
+										<FormField
+											control={form.control}
+											name="serviceType"
+											render={({ field }) => (
+												<FormItem>
+													<FormLabel>Service Types *</FormLabel>
+													<FormDescription>
+														Select the transportation services you provide
+													</FormDescription>
+													<div className="grid grid-cols-2 gap-2 md:grid-cols-3">
+														{availableServiceTypes.map((service) => (
+															<Button
+																key={service.value}
+																type="button"
+																variant={
+																	field.value.includes(service.value) ? "default" : "outline"
+																}
+																className="justify-start"
+																onClick={() => {
+																	const newValue = field.value.includes(service.value)
+																		? field.value.filter((v) => v !== service.value)
+																		: [...field.value, service.value];
+
+																	// Ensure at least one service type remains selected
+																	if (newValue.length > 0) {
+																		field.onChange(newValue);
+																	}
+																}}
+															>
+																{service.label}
+																{customServiceTypes.includes(service.value) && (
+																	<X
+																		className="ml-2 size-3"
+																		onClick={(e) => {
+																			e.stopPropagation();
+																			handleRemoveServiceType(service.value);
+																		}}
+																	/>
+																)}
+															</Button>
+														))}
+													</div>
+													{field.value.length === 0 && (
+														<p className="mt-1 text-sm text-destructive">
+															At least one service type is required
+														</p>
+													)}
+													<FormMessage />
+												</FormItem>
+											)}
+										/>
+
+										<Separator />
+
+										{/* Advanced Section - Collapsible */}
+										<Collapsible
+											open={isAdvancedOpen}
+											onOpenChange={setIsAdvancedOpen}
+											className="w-full space-y-4"
+										>
+											<div className="flex items-center justify-between">
+												<h3 className="text-lg font-medium">Advanced Details</h3>
+												<CollapsibleTrigger asChild>
+													<Button variant="ghost" size="sm">
+														{isAdvancedOpen ? (
+															<>
+																<ChevronUp className="mr-1 size-4" />
+																Hide
+															</>
+														) : (
+															<>
+																<ChevronDown className="mr-1 size-4" />
+																Show
+															</>
+														)}
+													</Button>
+												</CollapsibleTrigger>
+											</div>
+
+											<CollapsibleContent className="space-y-4">
+												<div className="space-y-2">
+													<FormLabel htmlFor="postcodes">Service Areas</FormLabel>
+													<FormDescription>
+														{selectedLocation
+															? `If left blank, all postcodes for ${selectedLocation.city} will be considered`
+															: "Enter the postcodes where you provide service"}
+													</FormDescription>
+													<div className="flex gap-2">
+														<Input
+															id="postcodes"
+															placeholder="e.g. SW1A 1AA"
+															value={postcodeInput}
+															onChange={(e) => setPostcodeInput(e.target.value)}
+															onKeyDown={handleAddPostcode}
+															onBlur={addPostcode}
+														/>
+														<Button
+															type="button"
+															variant="outline"
+															onClick={addPostcode}
+															className="shrink-0"
+														>
+															<Plus className="size-4" />
+														</Button>
+													</div>
+
+													{areaCovered.length > 0 && (
+														<div className="mt-3 flex flex-wrap gap-2">
+															{areaCovered.map((postcode, index) => (
+																<div
+																	key={index}
+																	className="flex items-center gap-1 rounded-full bg-secondary px-3 py-1 text-sm"
+																>
+																	<span>{postcode}</span>
+																	<button
+																		type="button"
+																		onClick={() => removePostcode(postcode)}
+																		className="ml-1 rounded-full text-muted-foreground hover:text-foreground"
+																	>
+																		<X className="size-3" />
+																	</button>
+																</div>
+															))}
+														</div>
+													)}
+												</div>
+											</CollapsibleContent>
+										</Collapsible>
+									</CardContent>
+									<CardFooter className="flex justify-between border-t pt-6">
+										<Button type="button" variant="outline" onClick={() => router.push("/")}>
+											Cancel
+										</Button>
+										<Button
+											type="submit"
+											disabled={isSubmitting || !isFormValid()}
+											size="lg"
+											className="px-8"
+										>
+											{isSubmitting ? "Submitting..." : "Submit Application"}
+										</Button>
+									</CardFooter>
+								</Card>
+							</form>
+						</Form>
+					</div>
+
+					{/* Help Box - Visible on large screens, tooltip on small */}
+					<div className="hidden lg:block">
+						<div className="sticky top-8 rounded-lg border bg-card p-6 shadow-sm">
+							<div className="mb-4 flex items-center gap-2">
+								<HelpCircle className="size-5 text-primary" />
+								<h3 className="font-medium">Registration Guide</h3>
+							</div>
+							<div className="space-y-4 text-sm">
+								<p>
+									<strong>Company Information:</strong> Provide your company name and contact
+									details as they appear on your business documents.
+								</p>
+								<p>
+									<strong>Service Types:</strong> Select all transportation services your company
+									offers to customers. You can add custom service types if needed.
+								</p>
+								<p>
+									<strong>Service Areas:</strong> Add specific postcodes where you provide service,
+									or leave blank to cover all areas in your selected city.
+								</p>
+								<p>
+									<strong>Location:</strong> If your city is not listed, you can add it using the +
+									button.
+								</p>
+								<p>
+									Your application will be reviewed by our team and you&apos;ll receive an email
+									when approved, typically within 1-2 business days.
+								</p>
+							</div>
+						</div>
+					</div>
+
+					{/* Mobile Help Button */}
+					<div className="fixed bottom-6 right-6 lg:hidden">
+						<TooltipProvider>
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<Button size="icon" variant="secondary" className="rounded-full shadow-lg">
+										<HelpCircle className="size-5" />
+									</Button>
+								</TooltipTrigger>
+								<TooltipContent side="left" className="w-80 p-4">
+									<div className="space-y-2">
+										<h3 className="font-medium">Registration Guide</h3>
+										<p className="text-sm">
+											<strong>Company Information:</strong> Provide your company name and contact
+											details.
+										</p>
+										<p className="text-sm">
+											<strong>Service Types:</strong> Select all transportation services you offer.
+											You can add custom types.
+										</p>
+										<p className="text-sm">
+											<strong>Service Areas:</strong> Add specific postcodes or leave blank for all
+											areas.
+										</p>
+										<p className="text-sm">
+											<strong>Location:</strong> Add your city if not listed.
+										</p>
+										<p className="text-sm">
+											Your application will be reviewed within 1-2 business days.
+										</p>
+									</div>
+								</TooltipContent>
+							</Tooltip>
+						</TooltipProvider>
+					</div>
+				</div>
+			</div>
+		</div>
+	);
+};
