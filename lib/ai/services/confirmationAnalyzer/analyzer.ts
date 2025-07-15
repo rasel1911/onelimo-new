@@ -52,4 +52,4 @@ export const analyzeConfirmationMessage = async (
 		console.log("🔄 Using fallback analysis");
 		return fallbackAnalysis(input);
 	}
-}
+};

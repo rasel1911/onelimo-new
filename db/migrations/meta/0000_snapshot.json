@@ -1,1932 +1,1855 @@
 {
-  "id": "17ec25ed-4563-4251-8e87-10d914225843",
-  "prevId": "00000000-0000-0000-0000-000000000000",
-  "version": "7",
-  "dialect": "postgresql",
-  "tables": {
-    "public.User": {
-      "name": "User",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "name": {
-          "name": "name",
-          "type": "varchar(100)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "email": {
-          "name": "email",
-          "type": "varchar(64)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "phone": {
-          "name": "phone",
-          "type": "varchar(20)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "password": {
-          "name": "password",
-          "type": "varchar(64)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "role": {
-          "name": "role",
-          "type": "user_role",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'user'"
-        },
-        "status": {
-          "name": "status",
-          "type": "user_status",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'active'"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
-    },
-    "public.Chat": {
-      "name": "Chat",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "messages": {
-          "name": "messages",
-          "type": "json",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "userId": {
-          "name": "userId",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "Chat_userId_User_id_fk": {
-          "name": "Chat_userId_User_id_fk",
-          "tableFrom": "Chat",
-          "tableTo": "User",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
-    },
-    "public.Reservation": {
-      "name": "Reservation",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "details": {
-          "name": "details",
-          "type": "json",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "hasCompletedPayment": {
-          "name": "hasCompletedPayment",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
-        },
-        "userId": {
-          "name": "userId",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "Reservation_userId_User_id_fk": {
-          "name": "Reservation_userId_User_id_fk",
-          "tableFrom": "Reservation",
-          "tableTo": "User",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
-    },
-    "public.Location": {
-      "name": "Location",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "city": {
-          "name": "city",
-          "type": "varchar(50)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "zipcodes": {
-          "name": "zipcodes",
-          "type": "varchar(20)[]",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updatedAt": {
-          "name": "updatedAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
-    },
-    "public.ServiceProvider": {
-      "name": "ServiceProvider",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "name": {
-          "name": "name",
-          "type": "varchar(100)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "email": {
-          "name": "email",
-          "type": "varchar(64)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "phone": {
-          "name": "phone",
-          "type": "varchar(20)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "locationId": {
-          "name": "locationId",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "serviceType": {
-          "name": "serviceType",
-          "type": "varchar(50)[]",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "areaCovered": {
-          "name": "areaCovered",
-          "type": "varchar(100)[]",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "status": {
-          "name": "status",
-          "type": "varchar(20)",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'pending'"
-        },
-        "role": {
-          "name": "role",
-          "type": "varchar(20)",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'provider'"
-        },
-        "reputation": {
-          "name": "reputation",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "default": 0
-        },
-        "responseTime": {
-          "name": "responseTime",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "default": 0
-        },
-        "pinHash": {
-          "name": "pinHash",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "pinSalt": {
-          "name": "pinSalt",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "pinSetAt": {
-          "name": "pinSetAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "failedPinAttempts": {
-          "name": "failedPinAttempts",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "default": 0
-        },
-        "lastFailedPinAttempt": {
-          "name": "lastFailedPinAttempt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "isBlocked": {
-          "name": "isBlocked",
-          "type": "varchar(10)",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "'false'"
-        },
-        "blockedAt": {
-          "name": "blockedAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "pinResetToken": {
-          "name": "pinResetToken",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "pinResetTokenExpiresAt": {
-          "name": "pinResetTokenExpiresAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "pinResetRequestedAt": {
-          "name": "pinResetRequestedAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updatedAt": {
-          "name": "updatedAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {
-        "sp_email_idx": {
-          "name": "sp_email_idx",
-          "columns": [
-            {
-              "expression": "email",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "sp_location_idx": {
-          "name": "sp_location_idx",
-          "columns": [
-            {
-              "expression": "locationId",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "sp_status_idx": {
-          "name": "sp_status_idx",
-          "columns": [
-            {
-              "expression": "status",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "sp_role_idx": {
-          "name": "sp_role_idx",
-          "columns": [
-            {
-              "expression": "role",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "sp_pin_reset_token_idx": {
-          "name": "sp_pin_reset_token_idx",
-          "columns": [
-            {
-              "expression": "pinResetToken",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "sp_is_blocked_idx": {
-          "name": "sp_is_blocked_idx",
-          "columns": [
-            {
-              "expression": "isBlocked",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "ServiceProvider_locationId_Location_id_fk": {
-          "name": "ServiceProvider_locationId_Location_id_fk",
-          "tableFrom": "ServiceProvider",
-          "tableTo": "Location",
-          "columnsFrom": [
-            "locationId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "ServiceProvider_email_unique": {
-          "name": "ServiceProvider_email_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
-        }
-      }
-    },
-    "public.Communication": {
-      "name": "Communication",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "serviceProviderId": {
-          "name": "serviceProviderId",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "subject": {
-          "name": "subject",
-          "type": "varchar(200)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "status": {
-          "name": "status",
-          "type": "varchar(20)",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'pending'"
-        },
-        "progress": {
-          "name": "progress",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updatedAt": {
-          "name": "updatedAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "Communication_serviceProviderId_ServiceProvider_id_fk": {
-          "name": "Communication_serviceProviderId_ServiceProvider_id_fk",
-          "tableFrom": "Communication",
-          "tableTo": "ServiceProvider",
-          "columnsFrom": [
-            "serviceProviderId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
-    },
-    "public.BookingRequest": {
-      "name": "BookingRequest",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "requestCode": {
-          "name": "requestCode",
-          "type": "varchar(20)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "userId": {
-          "name": "userId",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "customerName": {
-          "name": "customerName",
-          "type": "varchar(100)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "pickupLocation": {
-          "name": "pickupLocation",
-          "type": "json",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "dropoffLocation": {
-          "name": "dropoffLocation",
-          "type": "json",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "pickupTime": {
-          "name": "pickupTime",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "estimatedDropoffTime": {
-          "name": "estimatedDropoffTime",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "estimatedDuration": {
-          "name": "estimatedDuration",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "passengers": {
-          "name": "passengers",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "vehicleType": {
-          "name": "vehicleType",
-          "type": "varchar(80)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "specialRequests": {
-          "name": "specialRequests",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updatedAt": {
-          "name": "updatedAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "BookingRequest_userId_User_id_fk": {
-          "name": "BookingRequest_userId_User_id_fk",
-          "tableFrom": "BookingRequest",
-          "tableTo": "User",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "BookingRequest_requestCode_unique": {
-          "name": "BookingRequest_requestCode_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "requestCode"
-          ]
-        }
-      }
-    },
-    "public.RegistrationToken": {
-      "name": "RegistrationToken",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "token": {
-          "name": "token",
-          "type": "varchar(100)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "email": {
-          "name": "email",
-          "type": "varchar(100)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "isUsed": {
-          "name": "isUsed",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
-        },
-        "expiresAt": {
-          "name": "expiresAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updatedAt": {
-          "name": "updatedAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "RegistrationToken_token_unique": {
-          "name": "RegistrationToken_token_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "token"
-          ]
-        }
-      }
-    },
-    "public.system_settings": {
-      "name": "system_settings",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "category": {
-          "name": "category",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "key": {
-          "name": "key",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "value": {
-          "name": "value",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "data_type": {
-          "name": "data_type",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'string'"
-        },
-        "description": {
-          "name": "description",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
-    },
-    "public.WorkflowRun": {
-      "name": "WorkflowRun",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "workflow_run_id": {
-          "name": "workflow_run_id",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "booking_request_id": {
-          "name": "booking_request_id",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "status": {
-          "name": "status",
-          "type": "varchar(50)",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'analyzing'"
-        },
-        "current_step": {
-          "name": "current_step",
-          "type": "varchar(50)",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'Request'"
-        },
-        "current_step_number": {
-          "name": "current_step_number",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 1
-        },
-        "customer_name": {
-          "name": "customer_name",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "customer_email": {
-          "name": "customer_email",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "customer_phone": {
-          "name": "customer_phone",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "booking_analysis": {
-          "name": "booking_analysis",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "response_analysis": {
-          "name": "response_analysis",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "confirmation_analysis": {
-          "name": "confirmation_analysis",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "providers_contacted": {
-          "name": "providers_contacted",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "total_providers_contacted": {
-          "name": "total_providers_contacted",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "default": 0
-        },
-        "total_quotes_received": {
-          "name": "total_quotes_received",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "default": 0
-        },
-        "selected_provider_id": {
-          "name": "selected_provider_id",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "selected_quote_id": {
-          "name": "selected_quote_id",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "selected_quote_amount": {
-          "name": "selected_quote_amount",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "selected_quote_message": {
-          "name": "selected_quote_message",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "selected_quote_action": {
-          "name": "selected_quote_action",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "quotes_hash": {
-          "name": "quotes_hash",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "quotes_encrypted_data": {
-          "name": "quotes_encrypted_data",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "quotes_expires_at": {
-          "name": "quotes_expires_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "quotes_viewed_at": {
-          "name": "quotes_viewed_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "started_at": {
-          "name": "started_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "completed_at": {
-          "name": "completed_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "WorkflowRun_user_id_User_id_fk": {
-          "name": "WorkflowRun_user_id_User_id_fk",
-          "tableFrom": "WorkflowRun",
-          "tableTo": "User",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "WorkflowRun_workflow_run_id_unique": {
-          "name": "WorkflowRun_workflow_run_id_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "workflow_run_id"
-          ]
-        }
-      }
-    },
-    "public.WorkflowStep": {
-      "name": "WorkflowStep",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "workflow_run_id": {
-          "name": "workflow_run_id",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "step_number": {
-          "name": "step_number",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "step_name": {
-          "name": "step_name",
-          "type": "varchar(50)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "status": {
-          "name": "status",
-          "type": "varchar(50)",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'pending'"
-        },
-        "details": {
-          "name": "details",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "original_message": {
-          "name": "original_message",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "customer_contact": {
-          "name": "customer_contact",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "enhanced_message": {
-          "name": "enhanced_message",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "email_status": {
-          "name": "email_status",
-          "type": "varchar(50)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "sms_status": {
-          "name": "sms_status",
-          "type": "varchar(50)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "email_recipients": {
-          "name": "email_recipients",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "default": 0
-        },
-        "sms_recipients": {
-          "name": "sms_recipients",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "default": 0
-        },
-        "failed_notifications": {
-          "name": "failed_notifications",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "default": 0
-        },
-        "failure_reasons": {
-          "name": "failure_reasons",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "started_at": {
-          "name": "started_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "completed_at": {
-          "name": "completed_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "wait_time": {
-          "name": "wait_time",
-          "type": "varchar(50)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "error_message": {
-          "name": "error_message",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "retry_count": {
-          "name": "retry_count",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "default": 0
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "WorkflowStep_workflow_run_id_WorkflowRun_workflow_run_id_fk": {
-          "name": "WorkflowStep_workflow_run_id_WorkflowRun_workflow_run_id_fk",
-          "tableFrom": "WorkflowStep",
-          "tableTo": "WorkflowRun",
-          "columnsFrom": [
-            "workflow_run_id"
-          ],
-          "columnsTo": [
-            "workflow_run_id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
-    },
-    "public.WorkflowProvider": {
-      "name": "WorkflowProvider",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "workflow_run_id": {
-          "name": "workflow_run_id",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "service_provider_id": {
-          "name": "service_provider_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "contact_status": {
-          "name": "contact_status",
-          "type": "varchar(50)",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'waiting'"
-        },
-        "email_sent": {
-          "name": "email_sent",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "sms_sent": {
-          "name": "sms_sent",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "has_responded": {
-          "name": "has_responded",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
-        },
-        "response_status": {
-          "name": "response_status",
-          "type": "varchar(50)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "response_time": {
-          "name": "response_time",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "response_notes": {
-          "name": "response_notes",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "refined_response": {
-          "name": "refined_response",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "has_quoted": {
-          "name": "has_quoted",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
-        },
-        "quote_amount": {
-          "name": "quote_amount",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "quote_time": {
-          "name": "quote_time",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "quote_notes": {
-          "name": "quote_notes",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "refined_quote": {
-          "name": "refined_quote",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "response": {
-          "name": "response",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "provider_link_hash": {
-          "name": "provider_link_hash",
-          "type": "varchar(500)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "provider_link_encrypted_data": {
-          "name": "provider_link_encrypted_data",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "provider_link_expires_at": {
-          "name": "provider_link_expires_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {
-        "wp_workflow_run_idx": {
-          "name": "wp_workflow_run_idx",
-          "columns": [
-            {
-              "expression": "workflow_run_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "wp_service_provider_idx": {
-          "name": "wp_service_provider_idx",
-          "columns": [
-            {
-              "expression": "service_provider_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "wp_contact_status_idx": {
-          "name": "wp_contact_status_idx",
-          "columns": [
-            {
-              "expression": "contact_status",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "wp_response_status_idx": {
-          "name": "wp_response_status_idx",
-          "columns": [
-            {
-              "expression": "response_status",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "wp_has_responded_idx": {
-          "name": "wp_has_responded_idx",
-          "columns": [
-            {
-              "expression": "has_responded",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "wp_has_quoted_idx": {
-          "name": "wp_has_quoted_idx",
-          "columns": [
-            {
-              "expression": "has_quoted",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "WorkflowProvider_workflow_run_id_WorkflowRun_workflow_run_id_fk": {
-          "name": "WorkflowProvider_workflow_run_id_WorkflowRun_workflow_run_id_fk",
-          "tableFrom": "WorkflowProvider",
-          "tableTo": "WorkflowRun",
-          "columnsFrom": [
-            "workflow_run_id"
-          ],
-          "columnsTo": [
-            "workflow_run_id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "WorkflowProvider_service_provider_id_ServiceProvider_id_fk": {
-          "name": "WorkflowProvider_service_provider_id_ServiceProvider_id_fk",
-          "tableFrom": "WorkflowProvider",
-          "tableTo": "ServiceProvider",
-          "columnsFrom": [
-            "service_provider_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
-    },
-    "public.WorkflowQuote": {
-      "name": "WorkflowQuote",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "workflow_run_id": {
-          "name": "workflow_run_id",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "workflow_provider_id": {
-          "name": "workflow_provider_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "quote_id": {
-          "name": "quote_id",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "provider_id": {
-          "name": "provider_id",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "provider_name": {
-          "name": "provider_name",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "is_selected_by_user": {
-          "name": "is_selected_by_user",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false,
-          "default": false
-        },
-        "selected_by_user_at": {
-          "name": "selected_by_user_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "selected_by_user_message": {
-          "name": "selected_by_user_message",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "status": {
-          "name": "status",
-          "type": "varchar(50)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "amount": {
-          "name": "amount",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "estimated_time": {
-          "name": "estimated_time",
-          "type": "varchar(50)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "rating": {
-          "name": "rating",
-          "type": "numeric(5, 2)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "response_time": {
-          "name": "response_time",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "notes": {
-          "name": "notes",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "reason": {
-          "name": "reason",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "is_selected_by_ai": {
-          "name": "is_selected_by_ai",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
-        },
-        "selected_by_ai_at": {
-          "name": "selected_by_ai_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "valid_until": {
-          "name": "valid_until",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "terms": {
-          "name": "terms",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "overall_score": {
-          "name": "overall_score",
-          "type": "numeric(5, 2)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "viability_score": {
-          "name": "viability_score",
-          "type": "numeric(5, 2)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "seriousness_score": {
-          "name": "seriousness_score",
-          "type": "numeric(5, 2)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "professionalism_score": {
-          "name": "professionalism_score",
-          "type": "numeric(5, 2)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "strengths": {
-          "name": "strengths",
-          "type": "json",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "concerns": {
-          "name": "concerns",
-          "type": "json",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "key_points": {
-          "name": "key_points",
-          "type": "json",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "analysis_notes": {
-          "name": "analysis_notes",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "is_recommended": {
-          "name": "is_recommended",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "recommendation_reason": {
-          "name": "recommendation_reason",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "analysis_type": {
-          "name": "analysis_type",
-          "type": "varchar(50)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "analysis_version": {
-          "name": "analysis_version",
-          "type": "varchar(20)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "analyzed_at": {
-          "name": "analyzed_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "WorkflowQuote_workflow_run_id_WorkflowRun_workflow_run_id_fk": {
-          "name": "WorkflowQuote_workflow_run_id_WorkflowRun_workflow_run_id_fk",
-          "tableFrom": "WorkflowQuote",
-          "tableTo": "WorkflowRun",
-          "columnsFrom": [
-            "workflow_run_id"
-          ],
-          "columnsTo": [
-            "workflow_run_id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "WorkflowQuote_workflow_provider_id_WorkflowProvider_id_fk": {
-          "name": "WorkflowQuote_workflow_provider_id_WorkflowProvider_id_fk",
-          "tableFrom": "WorkflowQuote",
-          "tableTo": "WorkflowProvider",
-          "columnsFrom": [
-            "workflow_provider_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "WorkflowQuote_quote_id_unique": {
-          "name": "WorkflowQuote_quote_id_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "quote_id"
-          ]
-        }
-      }
-    },
-    "public.WorkflowNotification": {
-      "name": "WorkflowNotification",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "workflow_run_id": {
-          "name": "workflow_run_id",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "workflow_provider_id": {
-          "name": "workflow_provider_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "type": {
-          "name": "type",
-          "type": "varchar(50)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "recipient": {
-          "name": "recipient",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "status": {
-          "name": "status",
-          "type": "varchar(50)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "subject": {
-          "name": "subject",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "message_id": {
-          "name": "message_id",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "template_used": {
-          "name": "template_used",
-          "type": "varchar(100)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "sent_at": {
-          "name": "sent_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "delivered_at": {
-          "name": "delivered_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "opened_at": {
-          "name": "opened_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "clicked_at": {
-          "name": "clicked_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "error_code": {
-          "name": "error_code",
-          "type": "varchar(50)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "error_message": {
-          "name": "error_message",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "retry_count": {
-          "name": "retry_count",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "default": 0
-        },
-        "max_retries": {
-          "name": "max_retries",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "default": 3
-        },
-        "has_response": {
-          "name": "has_response",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
-        },
-        "response_at": {
-          "name": "response_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "WorkflowNotification_workflow_run_id_WorkflowRun_workflow_run_id_fk": {
-          "name": "WorkflowNotification_workflow_run_id_WorkflowRun_workflow_run_id_fk",
-          "tableFrom": "WorkflowNotification",
-          "tableTo": "WorkflowRun",
-          "columnsFrom": [
-            "workflow_run_id"
-          ],
-          "columnsTo": [
-            "workflow_run_id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "WorkflowNotification_workflow_provider_id_WorkflowProvider_id_fk": {
-          "name": "WorkflowNotification_workflow_provider_id_WorkflowProvider_id_fk",
-          "tableFrom": "WorkflowNotification",
-          "tableTo": "WorkflowProvider",
-          "columnsFrom": [
-            "workflow_provider_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
-    }
-  },
-  "enums": {
-    "public.user_role": {
-      "name": "user_role",
-      "schema": "public",
-      "values": [
-        "user",
-        "admin",
-        "service_provider",
-        "support"
-      ]
-    },
-    "public.user_status": {
-      "name": "user_status",
-      "schema": "public",
-      "values": [
-        "active",
-        "inactive",
-        "deleted"
-      ]
-    },
-    "public.role_type": {
-      "name": "role_type",
-      "schema": "public",
-      "values": [
-        "user",
-        "customer",
-        "admin",
-        "support",
-        "partner"
-      ]
-    },
-    "public.service_type": {
-      "name": "service_type",
-      "schema": "public",
-      "values": [
-        "suv",
-        "party_bus",
-        "stretch_limousine",
-        "sedan",
-        "hummer",
-        "other",
-        "not_specified"
-      ]
-    }
-  },
-  "schemas": {},
-  "sequences": {},
-  "_meta": {
-    "columns": {},
-    "schemas": {},
-    "tables": {}
-  }
+	"id": "17ec25ed-4563-4251-8e87-10d914225843",
+	"prevId": "00000000-0000-0000-0000-000000000000",
+	"version": "7",
+	"dialect": "postgresql",
+	"tables": {
+		"public.User": {
+			"name": "User",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "uuid",
+					"primaryKey": true,
+					"notNull": true,
+					"default": "gen_random_uuid()"
+				},
+				"name": {
+					"name": "name",
+					"type": "varchar(100)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"email": {
+					"name": "email",
+					"type": "varchar(64)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"phone": {
+					"name": "phone",
+					"type": "varchar(20)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"password": {
+					"name": "password",
+					"type": "varchar(64)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"role": {
+					"name": "role",
+					"type": "user_role",
+					"typeSchema": "public",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "'user'"
+				},
+				"status": {
+					"name": "status",
+					"type": "user_status",
+					"typeSchema": "public",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "'active'"
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {}
+		},
+		"public.Chat": {
+			"name": "Chat",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "uuid",
+					"primaryKey": true,
+					"notNull": true,
+					"default": "gen_random_uuid()"
+				},
+				"createdAt": {
+					"name": "createdAt",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"messages": {
+					"name": "messages",
+					"type": "json",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"userId": {
+					"name": "userId",
+					"type": "uuid",
+					"primaryKey": false,
+					"notNull": true
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {
+				"Chat_userId_User_id_fk": {
+					"name": "Chat_userId_User_id_fk",
+					"tableFrom": "Chat",
+					"tableTo": "User",
+					"columnsFrom": ["userId"],
+					"columnsTo": ["id"],
+					"onDelete": "no action",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {}
+		},
+		"public.Reservation": {
+			"name": "Reservation",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "uuid",
+					"primaryKey": true,
+					"notNull": true,
+					"default": "gen_random_uuid()"
+				},
+				"createdAt": {
+					"name": "createdAt",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"details": {
+					"name": "details",
+					"type": "json",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"hasCompletedPayment": {
+					"name": "hasCompletedPayment",
+					"type": "boolean",
+					"primaryKey": false,
+					"notNull": true,
+					"default": false
+				},
+				"userId": {
+					"name": "userId",
+					"type": "uuid",
+					"primaryKey": false,
+					"notNull": true
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {
+				"Reservation_userId_User_id_fk": {
+					"name": "Reservation_userId_User_id_fk",
+					"tableFrom": "Reservation",
+					"tableTo": "User",
+					"columnsFrom": ["userId"],
+					"columnsTo": ["id"],
+					"onDelete": "no action",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {}
+		},
+		"public.Location": {
+			"name": "Location",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "uuid",
+					"primaryKey": true,
+					"notNull": true,
+					"default": "gen_random_uuid()"
+				},
+				"city": {
+					"name": "city",
+					"type": "varchar(50)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"zipcodes": {
+					"name": "zipcodes",
+					"type": "varchar(20)[]",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"createdAt": {
+					"name": "createdAt",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				},
+				"updatedAt": {
+					"name": "updatedAt",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {}
+		},
+		"public.ServiceProvider": {
+			"name": "ServiceProvider",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "uuid",
+					"primaryKey": true,
+					"notNull": true,
+					"default": "gen_random_uuid()"
+				},
+				"name": {
+					"name": "name",
+					"type": "varchar(100)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"email": {
+					"name": "email",
+					"type": "varchar(64)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"phone": {
+					"name": "phone",
+					"type": "varchar(20)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"locationId": {
+					"name": "locationId",
+					"type": "uuid",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"serviceType": {
+					"name": "serviceType",
+					"type": "varchar(50)[]",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"areaCovered": {
+					"name": "areaCovered",
+					"type": "varchar(100)[]",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"status": {
+					"name": "status",
+					"type": "varchar(20)",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "'pending'"
+				},
+				"role": {
+					"name": "role",
+					"type": "varchar(20)",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "'provider'"
+				},
+				"reputation": {
+					"name": "reputation",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"default": 0
+				},
+				"responseTime": {
+					"name": "responseTime",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"default": 0
+				},
+				"pinHash": {
+					"name": "pinHash",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"pinSalt": {
+					"name": "pinSalt",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"pinSetAt": {
+					"name": "pinSetAt",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"failedPinAttempts": {
+					"name": "failedPinAttempts",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"default": 0
+				},
+				"lastFailedPinAttempt": {
+					"name": "lastFailedPinAttempt",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"isBlocked": {
+					"name": "isBlocked",
+					"type": "varchar(10)",
+					"primaryKey": false,
+					"notNull": false,
+					"default": "'false'"
+				},
+				"blockedAt": {
+					"name": "blockedAt",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"pinResetToken": {
+					"name": "pinResetToken",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"pinResetTokenExpiresAt": {
+					"name": "pinResetTokenExpiresAt",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"pinResetRequestedAt": {
+					"name": "pinResetRequestedAt",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"createdAt": {
+					"name": "createdAt",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				},
+				"updatedAt": {
+					"name": "updatedAt",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				}
+			},
+			"indexes": {
+				"sp_email_idx": {
+					"name": "sp_email_idx",
+					"columns": [
+						{
+							"expression": "email",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": false,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				},
+				"sp_location_idx": {
+					"name": "sp_location_idx",
+					"columns": [
+						{
+							"expression": "locationId",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": false,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				},
+				"sp_status_idx": {
+					"name": "sp_status_idx",
+					"columns": [
+						{
+							"expression": "status",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": false,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				},
+				"sp_role_idx": {
+					"name": "sp_role_idx",
+					"columns": [
+						{
+							"expression": "role",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": false,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				},
+				"sp_pin_reset_token_idx": {
+					"name": "sp_pin_reset_token_idx",
+					"columns": [
+						{
+							"expression": "pinResetToken",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": false,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				},
+				"sp_is_blocked_idx": {
+					"name": "sp_is_blocked_idx",
+					"columns": [
+						{
+							"expression": "isBlocked",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": false,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				}
+			},
+			"foreignKeys": {
+				"ServiceProvider_locationId_Location_id_fk": {
+					"name": "ServiceProvider_locationId_Location_id_fk",
+					"tableFrom": "ServiceProvider",
+					"tableTo": "Location",
+					"columnsFrom": ["locationId"],
+					"columnsTo": ["id"],
+					"onDelete": "no action",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {
+				"ServiceProvider_email_unique": {
+					"name": "ServiceProvider_email_unique",
+					"nullsNotDistinct": false,
+					"columns": ["email"]
+				}
+			}
+		},
+		"public.Communication": {
+			"name": "Communication",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "uuid",
+					"primaryKey": true,
+					"notNull": true,
+					"default": "gen_random_uuid()"
+				},
+				"serviceProviderId": {
+					"name": "serviceProviderId",
+					"type": "uuid",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"subject": {
+					"name": "subject",
+					"type": "varchar(200)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"status": {
+					"name": "status",
+					"type": "varchar(20)",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "'pending'"
+				},
+				"progress": {
+					"name": "progress",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"default": 0
+				},
+				"createdAt": {
+					"name": "createdAt",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				},
+				"updatedAt": {
+					"name": "updatedAt",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {
+				"Communication_serviceProviderId_ServiceProvider_id_fk": {
+					"name": "Communication_serviceProviderId_ServiceProvider_id_fk",
+					"tableFrom": "Communication",
+					"tableTo": "ServiceProvider",
+					"columnsFrom": ["serviceProviderId"],
+					"columnsTo": ["id"],
+					"onDelete": "no action",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {}
+		},
+		"public.BookingRequest": {
+			"name": "BookingRequest",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "uuid",
+					"primaryKey": true,
+					"notNull": true,
+					"default": "gen_random_uuid()"
+				},
+				"requestCode": {
+					"name": "requestCode",
+					"type": "varchar(20)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"userId": {
+					"name": "userId",
+					"type": "uuid",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"customerName": {
+					"name": "customerName",
+					"type": "varchar(100)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"pickupLocation": {
+					"name": "pickupLocation",
+					"type": "json",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"dropoffLocation": {
+					"name": "dropoffLocation",
+					"type": "json",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"pickupTime": {
+					"name": "pickupTime",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"estimatedDropoffTime": {
+					"name": "estimatedDropoffTime",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"estimatedDuration": {
+					"name": "estimatedDuration",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"passengers": {
+					"name": "passengers",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"vehicleType": {
+					"name": "vehicleType",
+					"type": "varchar(80)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"specialRequests": {
+					"name": "specialRequests",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"createdAt": {
+					"name": "createdAt",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				},
+				"updatedAt": {
+					"name": "updatedAt",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {
+				"BookingRequest_userId_User_id_fk": {
+					"name": "BookingRequest_userId_User_id_fk",
+					"tableFrom": "BookingRequest",
+					"tableTo": "User",
+					"columnsFrom": ["userId"],
+					"columnsTo": ["id"],
+					"onDelete": "no action",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {
+				"BookingRequest_requestCode_unique": {
+					"name": "BookingRequest_requestCode_unique",
+					"nullsNotDistinct": false,
+					"columns": ["requestCode"]
+				}
+			}
+		},
+		"public.RegistrationToken": {
+			"name": "RegistrationToken",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "uuid",
+					"primaryKey": true,
+					"notNull": true,
+					"default": "gen_random_uuid()"
+				},
+				"token": {
+					"name": "token",
+					"type": "varchar(100)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"email": {
+					"name": "email",
+					"type": "varchar(100)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"isUsed": {
+					"name": "isUsed",
+					"type": "boolean",
+					"primaryKey": false,
+					"notNull": true,
+					"default": false
+				},
+				"expiresAt": {
+					"name": "expiresAt",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"createdAt": {
+					"name": "createdAt",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				},
+				"updatedAt": {
+					"name": "updatedAt",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {
+				"RegistrationToken_token_unique": {
+					"name": "RegistrationToken_token_unique",
+					"nullsNotDistinct": false,
+					"columns": ["token"]
+				}
+			}
+		},
+		"public.system_settings": {
+			"name": "system_settings",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "uuid",
+					"primaryKey": true,
+					"notNull": true,
+					"default": "gen_random_uuid()"
+				},
+				"category": {
+					"name": "category",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"key": {
+					"name": "key",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"value": {
+					"name": "value",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"data_type": {
+					"name": "data_type",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "'string'"
+				},
+				"description": {
+					"name": "description",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "timestamp with time zone",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "timestamp with time zone",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {}
+		},
+		"public.WorkflowRun": {
+			"name": "WorkflowRun",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "uuid",
+					"primaryKey": true,
+					"notNull": true,
+					"default": "gen_random_uuid()"
+				},
+				"workflow_run_id": {
+					"name": "workflow_run_id",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"booking_request_id": {
+					"name": "booking_request_id",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"user_id": {
+					"name": "user_id",
+					"type": "uuid",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"status": {
+					"name": "status",
+					"type": "varchar(50)",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "'analyzing'"
+				},
+				"current_step": {
+					"name": "current_step",
+					"type": "varchar(50)",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "'Request'"
+				},
+				"current_step_number": {
+					"name": "current_step_number",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"default": 1
+				},
+				"customer_name": {
+					"name": "customer_name",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"customer_email": {
+					"name": "customer_email",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"customer_phone": {
+					"name": "customer_phone",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"booking_analysis": {
+					"name": "booking_analysis",
+					"type": "jsonb",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"response_analysis": {
+					"name": "response_analysis",
+					"type": "jsonb",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"confirmation_analysis": {
+					"name": "confirmation_analysis",
+					"type": "jsonb",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"providers_contacted": {
+					"name": "providers_contacted",
+					"type": "jsonb",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"total_providers_contacted": {
+					"name": "total_providers_contacted",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"default": 0
+				},
+				"total_quotes_received": {
+					"name": "total_quotes_received",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"default": 0
+				},
+				"selected_provider_id": {
+					"name": "selected_provider_id",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"selected_quote_id": {
+					"name": "selected_quote_id",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"selected_quote_amount": {
+					"name": "selected_quote_amount",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"selected_quote_message": {
+					"name": "selected_quote_message",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"selected_quote_action": {
+					"name": "selected_quote_action",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"quotes_hash": {
+					"name": "quotes_hash",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"quotes_encrypted_data": {
+					"name": "quotes_encrypted_data",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"quotes_expires_at": {
+					"name": "quotes_expires_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"quotes_viewed_at": {
+					"name": "quotes_viewed_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"started_at": {
+					"name": "started_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				},
+				"completed_at": {
+					"name": "completed_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {
+				"WorkflowRun_user_id_User_id_fk": {
+					"name": "WorkflowRun_user_id_User_id_fk",
+					"tableFrom": "WorkflowRun",
+					"tableTo": "User",
+					"columnsFrom": ["user_id"],
+					"columnsTo": ["id"],
+					"onDelete": "no action",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {
+				"WorkflowRun_workflow_run_id_unique": {
+					"name": "WorkflowRun_workflow_run_id_unique",
+					"nullsNotDistinct": false,
+					"columns": ["workflow_run_id"]
+				}
+			}
+		},
+		"public.WorkflowStep": {
+			"name": "WorkflowStep",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "uuid",
+					"primaryKey": true,
+					"notNull": true,
+					"default": "gen_random_uuid()"
+				},
+				"workflow_run_id": {
+					"name": "workflow_run_id",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"step_number": {
+					"name": "step_number",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"step_name": {
+					"name": "step_name",
+					"type": "varchar(50)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"status": {
+					"name": "status",
+					"type": "varchar(50)",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "'pending'"
+				},
+				"details": {
+					"name": "details",
+					"type": "jsonb",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"original_message": {
+					"name": "original_message",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"customer_contact": {
+					"name": "customer_contact",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"enhanced_message": {
+					"name": "enhanced_message",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"email_status": {
+					"name": "email_status",
+					"type": "varchar(50)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"sms_status": {
+					"name": "sms_status",
+					"type": "varchar(50)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"email_recipients": {
+					"name": "email_recipients",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"default": 0
+				},
+				"sms_recipients": {
+					"name": "sms_recipients",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"default": 0
+				},
+				"failed_notifications": {
+					"name": "failed_notifications",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"default": 0
+				},
+				"failure_reasons": {
+					"name": "failure_reasons",
+					"type": "jsonb",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"started_at": {
+					"name": "started_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"completed_at": {
+					"name": "completed_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"wait_time": {
+					"name": "wait_time",
+					"type": "varchar(50)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"error_message": {
+					"name": "error_message",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"retry_count": {
+					"name": "retry_count",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"default": 0
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {
+				"WorkflowStep_workflow_run_id_WorkflowRun_workflow_run_id_fk": {
+					"name": "WorkflowStep_workflow_run_id_WorkflowRun_workflow_run_id_fk",
+					"tableFrom": "WorkflowStep",
+					"tableTo": "WorkflowRun",
+					"columnsFrom": ["workflow_run_id"],
+					"columnsTo": ["workflow_run_id"],
+					"onDelete": "no action",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {}
+		},
+		"public.WorkflowProvider": {
+			"name": "WorkflowProvider",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "uuid",
+					"primaryKey": true,
+					"notNull": true,
+					"default": "gen_random_uuid()"
+				},
+				"workflow_run_id": {
+					"name": "workflow_run_id",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"service_provider_id": {
+					"name": "service_provider_id",
+					"type": "uuid",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"contact_status": {
+					"name": "contact_status",
+					"type": "varchar(50)",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "'waiting'"
+				},
+				"email_sent": {
+					"name": "email_sent",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"sms_sent": {
+					"name": "sms_sent",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"has_responded": {
+					"name": "has_responded",
+					"type": "boolean",
+					"primaryKey": false,
+					"notNull": true,
+					"default": false
+				},
+				"response_status": {
+					"name": "response_status",
+					"type": "varchar(50)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"response_time": {
+					"name": "response_time",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"response_notes": {
+					"name": "response_notes",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"refined_response": {
+					"name": "refined_response",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"has_quoted": {
+					"name": "has_quoted",
+					"type": "boolean",
+					"primaryKey": false,
+					"notNull": true,
+					"default": false
+				},
+				"quote_amount": {
+					"name": "quote_amount",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"quote_time": {
+					"name": "quote_time",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"quote_notes": {
+					"name": "quote_notes",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"refined_quote": {
+					"name": "refined_quote",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"response": {
+					"name": "response",
+					"type": "jsonb",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"provider_link_hash": {
+					"name": "provider_link_hash",
+					"type": "varchar(500)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"provider_link_encrypted_data": {
+					"name": "provider_link_encrypted_data",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"provider_link_expires_at": {
+					"name": "provider_link_expires_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				}
+			},
+			"indexes": {
+				"wp_workflow_run_idx": {
+					"name": "wp_workflow_run_idx",
+					"columns": [
+						{
+							"expression": "workflow_run_id",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": false,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				},
+				"wp_service_provider_idx": {
+					"name": "wp_service_provider_idx",
+					"columns": [
+						{
+							"expression": "service_provider_id",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": false,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				},
+				"wp_contact_status_idx": {
+					"name": "wp_contact_status_idx",
+					"columns": [
+						{
+							"expression": "contact_status",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": false,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				},
+				"wp_response_status_idx": {
+					"name": "wp_response_status_idx",
+					"columns": [
+						{
+							"expression": "response_status",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": false,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				},
+				"wp_has_responded_idx": {
+					"name": "wp_has_responded_idx",
+					"columns": [
+						{
+							"expression": "has_responded",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": false,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				},
+				"wp_has_quoted_idx": {
+					"name": "wp_has_quoted_idx",
+					"columns": [
+						{
+							"expression": "has_quoted",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": false,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				}
+			},
+			"foreignKeys": {
+				"WorkflowProvider_workflow_run_id_WorkflowRun_workflow_run_id_fk": {
+					"name": "WorkflowProvider_workflow_run_id_WorkflowRun_workflow_run_id_fk",
+					"tableFrom": "WorkflowProvider",
+					"tableTo": "WorkflowRun",
+					"columnsFrom": ["workflow_run_id"],
+					"columnsTo": ["workflow_run_id"],
+					"onDelete": "no action",
+					"onUpdate": "no action"
+				},
+				"WorkflowProvider_service_provider_id_ServiceProvider_id_fk": {
+					"name": "WorkflowProvider_service_provider_id_ServiceProvider_id_fk",
+					"tableFrom": "WorkflowProvider",
+					"tableTo": "ServiceProvider",
+					"columnsFrom": ["service_provider_id"],
+					"columnsTo": ["id"],
+					"onDelete": "no action",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {}
+		},
+		"public.WorkflowQuote": {
+			"name": "WorkflowQuote",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "uuid",
+					"primaryKey": true,
+					"notNull": true,
+					"default": "gen_random_uuid()"
+				},
+				"workflow_run_id": {
+					"name": "workflow_run_id",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"workflow_provider_id": {
+					"name": "workflow_provider_id",
+					"type": "uuid",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"quote_id": {
+					"name": "quote_id",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"provider_id": {
+					"name": "provider_id",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"provider_name": {
+					"name": "provider_name",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"is_selected_by_user": {
+					"name": "is_selected_by_user",
+					"type": "boolean",
+					"primaryKey": false,
+					"notNull": false,
+					"default": false
+				},
+				"selected_by_user_at": {
+					"name": "selected_by_user_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"selected_by_user_message": {
+					"name": "selected_by_user_message",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"status": {
+					"name": "status",
+					"type": "varchar(50)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"amount": {
+					"name": "amount",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"estimated_time": {
+					"name": "estimated_time",
+					"type": "varchar(50)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"rating": {
+					"name": "rating",
+					"type": "numeric(5, 2)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"response_time": {
+					"name": "response_time",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"notes": {
+					"name": "notes",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"reason": {
+					"name": "reason",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"is_selected_by_ai": {
+					"name": "is_selected_by_ai",
+					"type": "boolean",
+					"primaryKey": false,
+					"notNull": true,
+					"default": false
+				},
+				"selected_by_ai_at": {
+					"name": "selected_by_ai_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"valid_until": {
+					"name": "valid_until",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"terms": {
+					"name": "terms",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"overall_score": {
+					"name": "overall_score",
+					"type": "numeric(5, 2)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"viability_score": {
+					"name": "viability_score",
+					"type": "numeric(5, 2)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"seriousness_score": {
+					"name": "seriousness_score",
+					"type": "numeric(5, 2)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"professionalism_score": {
+					"name": "professionalism_score",
+					"type": "numeric(5, 2)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"strengths": {
+					"name": "strengths",
+					"type": "json",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"concerns": {
+					"name": "concerns",
+					"type": "json",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"key_points": {
+					"name": "key_points",
+					"type": "json",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"analysis_notes": {
+					"name": "analysis_notes",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"is_recommended": {
+					"name": "is_recommended",
+					"type": "boolean",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"recommendation_reason": {
+					"name": "recommendation_reason",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"analysis_type": {
+					"name": "analysis_type",
+					"type": "varchar(50)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"analysis_version": {
+					"name": "analysis_version",
+					"type": "varchar(20)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"analyzed_at": {
+					"name": "analyzed_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {
+				"WorkflowQuote_workflow_run_id_WorkflowRun_workflow_run_id_fk": {
+					"name": "WorkflowQuote_workflow_run_id_WorkflowRun_workflow_run_id_fk",
+					"tableFrom": "WorkflowQuote",
+					"tableTo": "WorkflowRun",
+					"columnsFrom": ["workflow_run_id"],
+					"columnsTo": ["workflow_run_id"],
+					"onDelete": "no action",
+					"onUpdate": "no action"
+				},
+				"WorkflowQuote_workflow_provider_id_WorkflowProvider_id_fk": {
+					"name": "WorkflowQuote_workflow_provider_id_WorkflowProvider_id_fk",
+					"tableFrom": "WorkflowQuote",
+					"tableTo": "WorkflowProvider",
+					"columnsFrom": ["workflow_provider_id"],
+					"columnsTo": ["id"],
+					"onDelete": "no action",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {
+				"WorkflowQuote_quote_id_unique": {
+					"name": "WorkflowQuote_quote_id_unique",
+					"nullsNotDistinct": false,
+					"columns": ["quote_id"]
+				}
+			}
+		},
+		"public.WorkflowNotification": {
+			"name": "WorkflowNotification",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "uuid",
+					"primaryKey": true,
+					"notNull": true,
+					"default": "gen_random_uuid()"
+				},
+				"workflow_run_id": {
+					"name": "workflow_run_id",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"workflow_provider_id": {
+					"name": "workflow_provider_id",
+					"type": "uuid",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"type": {
+					"name": "type",
+					"type": "varchar(50)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"recipient": {
+					"name": "recipient",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"status": {
+					"name": "status",
+					"type": "varchar(50)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"subject": {
+					"name": "subject",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"message_id": {
+					"name": "message_id",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"template_used": {
+					"name": "template_used",
+					"type": "varchar(100)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"sent_at": {
+					"name": "sent_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"delivered_at": {
+					"name": "delivered_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"opened_at": {
+					"name": "opened_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"clicked_at": {
+					"name": "clicked_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"error_code": {
+					"name": "error_code",
+					"type": "varchar(50)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"error_message": {
+					"name": "error_message",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"retry_count": {
+					"name": "retry_count",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"default": 0
+				},
+				"max_retries": {
+					"name": "max_retries",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"default": 3
+				},
+				"has_response": {
+					"name": "has_response",
+					"type": "boolean",
+					"primaryKey": false,
+					"notNull": true,
+					"default": false
+				},
+				"response_at": {
+					"name": "response_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {
+				"WorkflowNotification_workflow_run_id_WorkflowRun_workflow_run_id_fk": {
+					"name": "WorkflowNotification_workflow_run_id_WorkflowRun_workflow_run_id_fk",
+					"tableFrom": "WorkflowNotification",
+					"tableTo": "WorkflowRun",
+					"columnsFrom": ["workflow_run_id"],
+					"columnsTo": ["workflow_run_id"],
+					"onDelete": "no action",
+					"onUpdate": "no action"
+				},
+				"WorkflowNotification_workflow_provider_id_WorkflowProvider_id_fk": {
+					"name": "WorkflowNotification_workflow_provider_id_WorkflowProvider_id_fk",
+					"tableFrom": "WorkflowNotification",
+					"tableTo": "WorkflowProvider",
+					"columnsFrom": ["workflow_provider_id"],
+					"columnsTo": ["id"],
+					"onDelete": "no action",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {}
+		}
+	},
+	"enums": {
+		"public.user_role": {
+			"name": "user_role",
+			"schema": "public",
+			"values": ["user", "admin", "service_provider", "support"]
+		},
+		"public.user_status": {
+			"name": "user_status",
+			"schema": "public",
+			"values": ["active", "inactive", "deleted"]
+		},
+		"public.role_type": {
+			"name": "role_type",
+			"schema": "public",
+			"values": ["user", "customer", "admin", "support", "partner"]
+		},
+		"public.service_type": {
+			"name": "service_type",
+			"schema": "public",
+			"values": [
+				"suv",
+				"party_bus",
+				"stretch_limousine",
+				"sedan",
+				"hummer",
+				"other",
+				"not_specified"
+			]
+		}
+	},
+	"schemas": {},
+	"sequences": {},
+	"_meta": {
+		"columns": {},
+		"schemas": {},
+		"tables": {}
+	}
 }

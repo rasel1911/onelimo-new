@@ -38,13 +38,9 @@ const BookingSuccessContent = () => {
 							<h2 className="mb-6 text-center text-2xl font-semibold">Booking Details</h2>
 
 							{true && (
-								<div className="flex justify-between mb-4 rounded-xl bg-primary/10 p-4">
-									<div className="font-medium text-muted-foreground">
-										Booking Reference
-									</div>
-									<div className="font-mono font-bold text-primary">
-										#{requestCode}
-									</div>
+								<div className="mb-4 flex justify-between rounded-xl bg-primary/10 p-4">
+									<div className="font-medium text-muted-foreground">Booking Reference</div>
+									<div className="font-mono font-bold text-primary">#{requestCode}</div>
 								</div>
 							)}
 

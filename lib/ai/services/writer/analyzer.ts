@@ -50,4 +50,4 @@ export const improveText = async (input: WriterInput): Promise<WriterResult> => 
 			processedAt: new Date(),
 		};
 	}
-}
+};

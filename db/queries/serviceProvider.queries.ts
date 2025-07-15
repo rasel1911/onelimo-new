@@ -1,6 +1,7 @@
 import { eq } from "drizzle-orm";
 
-import { db } from "../connection";
+import db from "@/db/connection";
+
 import { serviceProvider as serviceProviderTable } from "../schema/serviceProvider.schema";
 import { type ServiceProvider } from "../schema/serviceProvider.schema";
 

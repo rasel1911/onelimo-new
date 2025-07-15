@@ -1,7 +1,8 @@
 import { and, eq } from "drizzle-orm";
 import { cache } from "react";
 
-import { db } from "../connection";
+import db from "@/db/connection";
+
 import {
 	AllSettings,
 	defaultSettings,

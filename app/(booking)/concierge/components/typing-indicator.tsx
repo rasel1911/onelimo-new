@@ -78,4 +78,4 @@ export const TypingIndicator = () => {
 			</div>
 		</motion.div>
 	);
-}
+};

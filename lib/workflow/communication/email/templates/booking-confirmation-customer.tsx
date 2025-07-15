@@ -59,9 +59,9 @@ const CustomerConfirmationEmailTemplate: React.FC<CustomerConfirmationEmailProps
 											fontSize: "14px",
 											color: "#6B7280",
 										}}
-										>
-											We&apos;ve matched you with a great service provider. Your {formatStatusText(props.serviceType)}{" "}
-										is all set!
+									>
+										We&apos;ve matched you with a great service provider. Your{" "}
+										{formatStatusText(props.serviceType)} is all set!
 									</Text>
 								</td>
 							</tr>

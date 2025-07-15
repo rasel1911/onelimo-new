@@ -1,6 +1,6 @@
 import { eq, lt } from "drizzle-orm";
 
-import { db } from "@/db";
+import db from "@/db/connection";
 import { registrationToken, RegistrationToken } from "@/db/schema";
 
 const TOKEN_SECRET = process.env.TOKEN_SECRET || "default-secret-key-change-in-production";

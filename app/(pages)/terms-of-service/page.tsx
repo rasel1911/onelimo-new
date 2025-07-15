@@ -6,36 +6,36 @@ export default function TermsOfServicePage() {
 	return (
 		<div className="min-h-screen bg-black text-white">
 			{/* Navigation */}
-			<nav className="bg-black text-white py-4 px-6 flex items-center space-x-8 border-b border-border">
+			<nav className="flex items-center space-x-8 border-b border-border bg-black px-6 py-4 text-white">
 				<Link href="/" className="text-xl font-bold">
 					LR
 				</Link>
 			</nav>
 
 			{/* Main Content */}
-			<main className="container mx-auto px-6 py-12 max-w-4xl">
-				<h1 className="text-4xl font-bold mb-8">Terms of Service</h1>
+			<main className="container mx-auto max-w-4xl px-6 py-12">
+				<h1 className="mb-8 text-4xl font-bold">Terms of Service</h1>
 
 				<div className="space-y-8 text-muted-foreground">
 					<section>
-						<h2 className="text-2xl font-semibold text-white mb-4">Agreement to Terms</h2>
+						<h2 className="mb-4 text-2xl font-semibold text-white">Agreement to Terms</h2>
 						<p className="mb-4">
-							By accessing or using Onelimo&apos;s services, you agree to be bound by these Terms of Service. If you
-							disagree with any part of the terms, you may not access our services.
+							By accessing or using Onelimo&apos;s services, you agree to be bound by these Terms of
+							Service. If you disagree with any part of the terms, you may not access our services.
 						</p>
 					</section>
 
 					<section>
-						<h2 className="text-2xl font-semibold text-white mb-4">Service Description</h2>
+						<h2 className="mb-4 text-2xl font-semibold text-white">Service Description</h2>
 						<p className="mb-4">
-							Onelimo provides a platform for booking luxury transportation services. We facilitate the connection
-							between passengers and professional drivers through our booking system.
+							Onelimo provides a platform for booking luxury transportation services. We facilitate
+							the connection between passengers and professional drivers through our booking system.
 						</p>
 					</section>
 
 					<section>
-						<h2 className="text-2xl font-semibold text-white mb-4">User Responsibilities</h2>
-						<ul className="list-disc pl-6 space-y-2">
+						<h2 className="mb-4 text-2xl font-semibold text-white">User Responsibilities</h2>
+						<ul className="list-disc space-y-2 pl-6">
 							<li>Provide accurate and complete information when making bookings</li>
 							<li>Maintain the security of your account credentials</li>
 							<li>Comply with all applicable laws and regulations</li>
@@ -44,23 +44,24 @@ export default function TermsOfServicePage() {
 					</section>
 
 					<section>
-						<h2 className="text-2xl font-semibold text-white mb-4">Booking and Cancellation</h2>
+						<h2 className="mb-4 text-2xl font-semibold text-white">Booking and Cancellation</h2>
 						<p className="mb-4">
-							All bookings are subject to availability. Cancellation policies vary based on the service type and timing.
-							Please review specific booking terms at the time of reservation.
+							All bookings are subject to availability. Cancellation policies vary based on the
+							service type and timing. Please review specific booking terms at the time of
+							reservation.
 						</p>
 					</section>
 
 					<section>
-						<h2 className="text-2xl font-semibold text-white mb-4">Limitation of Liability</h2>
+						<h2 className="mb-4 text-2xl font-semibold text-white">Limitation of Liability</h2>
 						<p className="mb-4">
-							Onelimo shall not be liable for indirect, incidental, special, exemplary, punitive, or consequential
-							damages, including lost profits, arising from your use of our services.
+							Onelimo shall not be liable for indirect, incidental, special, exemplary, punitive, or
+							consequential damages, including lost profits, arising from your use of our services.
 						</p>
 					</section>
 
 					<section>
-						<h2 className="text-2xl font-semibold text-white mb-4">Contact Information</h2>
+						<h2 className="mb-4 text-2xl font-semibold text-white">Contact Information</h2>
 						<p className="mb-4">
 							For questions about these Terms of Service, please contact us at{" "}
 							<a href="mailto:contact@onelimo.com" className="text-primary hover:underline">
@@ -72,16 +73,16 @@ export default function TermsOfServicePage() {
 			</main>
 
 			{/* Footer */}
-			<footer className="bg-black border-t border-border py-2 px-6 flex justify-between items-center text-xs text-muted-foreground mt-12">
+			<footer className="mt-12 flex items-center justify-between border-t border-border bg-black px-6 py-2 text-xs text-muted-foreground">
 				<div>© 2025 Onelimo. All rights reserved.</div>
 				<div className="flex space-x-6">
-					<Link href="/pages/privacy-policy" className="hover:text-white transition-colors">
+					<Link href="/pages/privacy-policy" className="transition-colors hover:text-white">
 						Privacy Policy
 					</Link>
-					<Link href="/pages/terms-of-service" className="hover:text-white transition-colors">
+					<Link href="/pages/terms-of-service" className="transition-colors hover:text-white">
 						Terms of Service
 					</Link>
-					<a href="mailto:contact@onelimo.com" className="hover:text-white transition-colors">
+					<a href="mailto:contact@onelimo.com" className="transition-colors hover:text-white">
 						Contact
 					</a>
 				</div>

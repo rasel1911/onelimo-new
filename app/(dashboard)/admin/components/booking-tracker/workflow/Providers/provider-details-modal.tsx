@@ -154,7 +154,7 @@ export function ProviderDetailsModal({ isOpen, onCloseAction, data }: ProviderDe
 				<ScrollArea className="max-h-[60vh]">
 					<div className="space-y-4">
 						{data.map((provider, index) => (
-							<Card key={provider.id} className={`hover:shadow-md overflow-hidden transition-all`}>
+							<Card key={provider.id} className={`overflow-hidden transition-all hover:shadow-md`}>
 								<CardHeader className="pb-3">
 									<div className="flex items-start justify-between">
 										<div className="space-y-1">

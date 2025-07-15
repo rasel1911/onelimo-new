@@ -1,4 +1,6 @@
 #!/usr/bin/env sh
 
 echo "Running ESLint checks before push..."
-npx eslint . 
+pnpm type-check
+pnpm format:check
+pnpm lint:fix

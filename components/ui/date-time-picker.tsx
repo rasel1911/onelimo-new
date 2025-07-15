@@ -4,7 +4,13 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 import { addDays, format, setHours, setMinutes, isBefore } from "date-fns";
 import { ChevronLeft, ChevronRight, Clock } from "lucide-react";
 
@@ -49,7 +55,8 @@ export function DateTimePicker({ onSelect }: DateTimePickerProps) {
 			return false;
 		}
 
-		const selectedHour = Number.parseInt(hour) + (amPm === "PM" && Number.parseInt(hour) !== 12 ? 12 : 0);
+		const selectedHour =
+			Number.parseInt(hour) + (amPm === "PM" && Number.parseInt(hour) !== 12 ? 12 : 0);
 		const selectedMinute = Number.parseInt(minute);
 
 		const selectedDateTime = new Date(date);
@@ -74,7 +81,8 @@ export function DateTimePicker({ onSelect }: DateTimePickerProps) {
 		const minuteValue = Number.parseInt(minute);
 
 		// Convert 12-hour format to 24-hour format
-		const hour24 = amPm === "PM" ? (hourValue === 12 ? 12 : hourValue + 12) : hourValue === 12 ? 0 : hourValue;
+		const hour24 =
+			amPm === "PM" ? (hourValue === 12 ? 12 : hourValue + 12) : hourValue === 12 ? 0 : hourValue;
 
 		const selectedDate = setMinutes(setHours(date, hour24), minuteValue);
 		onSelect(selectedDate);
@@ -85,7 +93,7 @@ export function DateTimePicker({ onSelect }: DateTimePickerProps) {
 	};
 
 	return (
-		<div className="bg-card backdrop-blur-sm rounded-lg shadow-md border border-border overflow-hidden max-w-[420px]">
+		<div className="max-w-[420px] overflow-hidden rounded-lg border border-border bg-card shadow-md backdrop-blur-sm">
 			<AnimatePresence mode="wait">
 				<motion.div
 					key={view}
@@ -93,7 +101,8 @@ export function DateTimePicker({ onSelect }: DateTimePickerProps) {
 					animate={{ opacity: 1, x: 0 }}
 					exit={{ opacity: 0, x: view === "date" ? 20 : -20 }}
 					transition={{ duration: 0.2, ease: "easeInOut" }}
-					className="w-full">
+					className="w-full"
+				>
 					{view === "date" ? (
 						<div className="space-y-3 p-3">
 							<Calendar
@@ -101,13 +110,18 @@ export function DateTimePicker({ onSelect }: DateTimePickerProps) {
 								selected={date}
 								onSelect={setDate}
 								disabled={(date) => isBefore(date, new Date().setHours(0, 0, 0, 0))}
-								className="rounded-md border-0 w-full [&_.rdp-nav]:px-0 [&_.rdp-caption]:mb-2 [&_.rdp-cell]:p-0 [&_.rdp-button]:w-8 [&_.rdp-button]:h-8 [&_.rdp-head_cell]:font-normal [&_.rdp-head_cell]:text-xs [&_.rdp-button:hover]:bg-primary/10 [&_.rdp-day_selected]:bg-primary [&_.rdp-day_selected]:text-primary-foreground [&_.rdp-day_selected]:hover:bg-primary [&_.rdp-nav_button]:h-8 [&_.rdp-nav_button]:w-8 [&_.rdp-nav_button]:transition-colors"
+								className="w-full rounded-md border-0 [&_.rdp-button:hover]:bg-primary/10 [&_.rdp-button]:h-8 [&_.rdp-button]:w-8 [&_.rdp-caption]:mb-2 [&_.rdp-cell]:p-0 [&_.rdp-day_selected]:bg-primary [&_.rdp-day_selected]:text-primary-foreground [&_.rdp-day_selected]:hover:bg-primary [&_.rdp-head_cell]:text-xs [&_.rdp-head_cell]:font-normal [&_.rdp-nav]:px-0 [&_.rdp-nav_button]:h-8 [&_.rdp-nav_button]:w-8 [&_.rdp-nav_button]:transition-colors"
 							/>
-							<div className="flex justify-between items-center px-1">
-								<div className="text-xs text-muted-foreground font-medium">
+							<div className="flex items-center justify-between px-1">
+								<div className="text-xs font-medium text-muted-foreground">
 									{date ? format(date, "EEEE, MMMM do") : "Select a date"}
 								</div>
-								<Button onClick={toggleView} variant="ghost" size="sm" className="h-8 gap-1 hover:bg-primary/10">
+								<Button
+									onClick={toggleView}
+									variant="ghost"
+									size="sm"
+									className="h-8 gap-1 hover:bg-primary/10"
+								>
 									<Clock className="h-4 w-4" />
 									<span>Set Time</span>
 									<ChevronRight className="h-4 w-4" />
@@ -116,8 +130,13 @@ export function DateTimePicker({ onSelect }: DateTimePickerProps) {
 						</div>
 					) : (
 						<div className="space-y-4 p-4">
-							<div className="flex justify-between items-center mb-4">
-								<Button onClick={toggleView} variant="ghost" size="sm" className="h-8 gap-1 hover:bg-primary/10">
+							<div className="mb-4 flex items-center justify-between">
+								<Button
+									onClick={toggleView}
+									variant="ghost"
+									size="sm"
+									className="h-8 gap-1 hover:bg-primary/10"
+								>
 									<ChevronLeft className="h-4 w-4" />
 									<span>Back to Date</span>
 								</Button>
@@ -130,7 +149,7 @@ export function DateTimePicker({ onSelect }: DateTimePickerProps) {
 								<div className="text-sm font-medium text-foreground">Select Time</div>
 								<div className="flex items-center justify-center gap-2">
 									<Select value={hour} onValueChange={setHour}>
-										<SelectTrigger className="w-[65px] h-9 border-border/40">
+										<SelectTrigger className="h-9 w-[65px] border-border/40">
 											<SelectValue placeholder="Hour" />
 										</SelectTrigger>
 										<SelectContent>
@@ -142,10 +161,10 @@ export function DateTimePicker({ onSelect }: DateTimePickerProps) {
 										</SelectContent>
 									</Select>
 
-									<span className="text-lg text-muted-foreground font-medium">:</span>
+									<span className="text-lg font-medium text-muted-foreground">:</span>
 
 									<Select value={minute} onValueChange={setMinute}>
-										<SelectTrigger className="w-[65px] h-9 border-border/40">
+										<SelectTrigger className="h-9 w-[65px] border-border/40">
 											<SelectValue placeholder="Min" />
 										</SelectTrigger>
 										<SelectContent>
@@ -158,7 +177,7 @@ export function DateTimePicker({ onSelect }: DateTimePickerProps) {
 									</Select>
 
 									<Select value={amPm} onValueChange={setAmPm}>
-										<SelectTrigger className="w-[65px] h-9 border-border/40">
+										<SelectTrigger className="h-9 w-[65px] border-border/40">
 											<SelectValue placeholder="AM/PM" />
 										</SelectTrigger>
 										<SelectContent>
@@ -172,7 +191,8 @@ export function DateTimePicker({ onSelect }: DateTimePickerProps) {
 									<motion.div
 										initial={{ opacity: 0, y: -10 }}
 										animate={{ opacity: 1, y: 0 }}
-										className="text-sm text-destructive mt-2">
+										className="mt-2 text-sm text-destructive"
+									>
 										{error}
 									</motion.div>
 								)}
@@ -182,7 +202,7 @@ export function DateTimePicker({ onSelect }: DateTimePickerProps) {
 				</motion.div>
 			</AnimatePresence>
 
-			<div className="p-4 pt-0 flex justify-end">
+			<div className="flex justify-end p-4 pt-0">
 				<Button onClick={handleConfirm} disabled={!!error || !date} className="w-full">
 					Confirm Selection
 				</Button>

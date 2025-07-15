@@ -1,9 +1,9 @@
 import { desc, eq, sql } from "drizzle-orm";
 
+import db from "@/db/connection";
 import { CreateBookingRequestInput } from "@/lib/types/booking-request";
 import { DecodedProviderLink } from "@/lib/workflow/types/provider-link";
 
-import { db } from "../connection";
 import { bookingRequest, BookingRequest, LocationType } from "../schema/bookingRequest.schema";
 import { workflowProvider } from "../schema/workflow/workflowProvider.schema";
 import { workflowRun } from "../schema/workflow/workflowRun.schema";

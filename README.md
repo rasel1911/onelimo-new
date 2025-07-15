@@ -41,10 +41,12 @@ Premium AI-powered platform for booking luxury transportation services.
 ## Getting Started
 
 ### Prerequisites
+
 - Node.js 18+
 - PostgreSQL database
 
 ### Installation
+
 ```bash
 # Clone the repository
 $ git clone <repo-url>
@@ -55,7 +57,9 @@ $ pnpm install
 ```
 
 ### Environment Variables
+
 Create a `.env.local` file in the root directory with the following variables:
+
 ```env
 # Database
 POSTGRES_URL=postgresql://user:password@host:port/database
@@ -72,6 +76,7 @@ DATABASE_URL=postgresql://user:password@host:port/database
 ```
 
 ### Database Migration
+
 ```bash
 # Run migrations
 $ npm run db:push
@@ -84,12 +89,15 @@ $ tsx db/migrate.ts
 ## Usage
 
 ### Development
+
 ```bash
 $ pnpm run dev
 ```
+
 Visit [http://localhost:3000](http://localhost:3000) to access the app.
 
 ### Production
+
 ```bash
 $ pnpm run build
 $ pnpm start
@@ -98,6 +106,7 @@ $ pnpm start
 ---
 
 ## Booking & Concierge
+
 - **/booking-request-form**: Guided form for ride booking.
 - **/concierge**: AI-powered chat for booking and recommendations.
 - **Authentication**: Required for booking and concierge features.
@@ -105,6 +114,7 @@ $ pnpm start
 ---
 
 ## Admin Dashboard
+
 - **/admin**: Main dashboard with stats and analytics.
 - **/admin/booking-tracker**: Track and manage all booking requests.
 - **/admin/service-providers**: Manage service providers.
@@ -112,13 +122,17 @@ $ pnpm start
 - **/admin/settings**: System settings.
 
 ### Admin Management Script
+
 See [`scripts/README.md`](scripts/README.md) for full documentation.
 
 Quick start:
+
 ```bash
 npm run admin:manage
 ```
+
 Features:
+
 - Create, promote, and manage admin users
 - Reset admin passwords
 - List all admins
@@ -127,6 +141,7 @@ Features:
 ---
 
 ## Project Structure
+
 - `app/` — Next.js app directory (routes, pages, API)
 - `db/` — Database schema, migrations, and queries
 - `lib/` — Business logic, AI services, workflow
@@ -136,9 +151,11 @@ Features:
 ---
 
 ## License
+
 Copyright 2025 By Jade&Sterling and M Nobinur
 
 ---
 
 ## Contact
-For support or inquiries, email: [contact@onelimo.com](mailto:contact@onelimo.com) 
+
+For support or inquiries, email: [contact@onelimo.com](mailto:contact@onelimo.com)

@@ -1,5 +1,8 @@
 import { formatStatusText } from "@/lib/utils/formatting";
-import { BookingRequestEmailProps, ProviderEmailTemplateContext } from "@/lib/workflow/types/communication";
+import {
+	BookingRequestEmailProps,
+	ProviderEmailTemplateContext,
+} from "@/lib/workflow/types/communication";
 
 /**
  * Booking Email Builder

@@ -1,7 +1,7 @@
 import { genSaltSync, hashSync } from "bcrypt-ts";
 import { eq, and, or } from "drizzle-orm";
 
-import { db } from "@/db";
+import db from "@/db/connection";
 import { User, user } from "@/db/schema";
 
 /**

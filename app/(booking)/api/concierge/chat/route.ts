@@ -5,7 +5,6 @@ import { APP_CONFIG, ERROR_MESSAGES } from "@/app/(booking)/concierge/constants"
 import { agentTools } from "@/app/(booking)/concierge/tools";
 import { buildSystemPrompt } from "@/app/(booking)/concierge/utils/booking-system-prompt";
 
-
 export const POST = async (req: Request) => {
 	try {
 		const { messages, bookingContext, userName } = await req.json();

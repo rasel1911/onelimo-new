@@ -89,7 +89,8 @@ const ProviderConfirmationEmailTemplate: React.FC<ProviderConfirmationEmailProps
 											color: "#6B7280",
 										}}
 									>
-										{props.customerName || "Customer"} has confirmed their {formatStatusText(props.serviceType)} booking with you.
+										{props.customerName || "Customer"} has confirmed their{" "}
+										{formatStatusText(props.serviceType)} booking with you.
 									</Text>
 								</td>
 							</tr>

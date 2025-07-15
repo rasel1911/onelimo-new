@@ -1,6 +1,7 @@
 import { and, count, desc, eq, gte, sql } from "drizzle-orm";
 
-import { db } from "../connection";
+import db from "@/db/connection";
+
 import { bookingRequest } from "../schema/bookingRequest.schema";
 import { location } from "../schema/location.schema";
 import { registrationToken } from "../schema/registrationToken.schema";
@@ -31,10 +32,7 @@ export const getBasicStats = async () => {
 			.select({ count: count() })
 			.from(user)
 			.where(and(eq(user.status, "active"), eq(user.role, "admin"))),
-		db
-			.select({ count: count() })
-			.from(registrationToken)
-			
+		db.select({ count: count() }).from(registrationToken),
 	]);
 
 	return {

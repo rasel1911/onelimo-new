@@ -51,7 +51,7 @@ export const performBookingAnalysis = async (
 	const bookingDetails = formatBookingDetails(bookingRequest, contactAnalysis.cleanedMessage);
 
 	const result = await generateObject({
-		model: Gemini(MODEL_IDS.GEMINI_FLASH_2_5	),
+		model: Gemini(MODEL_IDS.GEMINI_FLASH_2_5),
 		temperature: modelSettings.temperature,
 		maxRetries: CONTACT_ANALYSIS_CONFIG.MAX_RETRIES,
 		schema: BookingAnalysisSchema,

@@ -106,8 +106,7 @@ export const ERROR_MESSAGES = {
 	BOOKING_TOO_EARLY: "The booking time must be at least 30 minutes from now.",
 	BOOKING_TOO_FAR:
 		"The booking time is too far in the future. Please choose a date within the next year.",
-	CUSTOMER_CONFIRMATION_REQUIRED:
-		"Confirmation is required before finalizing the booking.",
+	CUSTOMER_CONFIRMATION_REQUIRED: "Confirmation is required before finalizing the booking.",
 	INTERNAL_SERVER_ERROR: "Internal Server Error",
 } as const;
 

@@ -223,4 +223,4 @@ export const AnalysisDisplay = ({ analysis, className }: AnalysisDisplayProps) =
 			</Card>
 		</div>
 	);
-}
+};

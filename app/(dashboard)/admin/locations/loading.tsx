@@ -7,7 +7,6 @@ import { LocationTableSkeleton } from "@/app/(dashboard)/admin/components/locati
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
-
 const LocationsLoading = () => {
 	return (
 		<motion.div

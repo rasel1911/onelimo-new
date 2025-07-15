@@ -1,6 +1,7 @@
 import { eq } from "drizzle-orm";
 
-import { db } from "../connection";
+import db from "@/db/connection";
+
 import { Location, location } from "../schema/location.schema";
 import { serviceProvider } from "../schema/serviceProvider.schema";
 

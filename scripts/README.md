@@ -96,6 +96,7 @@ npm run admin:manage
 ### Error Handling
 
 The script includes comprehensive error handling for:
+
 - Database connection issues
 - Invalid email/phone formats
 - Password requirements
@@ -109,15 +110,15 @@ The script works with the following user schema:
 
 ```typescript
 interface User {
-  id: string;           // UUID primary key
-  name: string;         // Full name (max 100 chars)
-  email: string;        // Email address (max 64 chars)
-  phone: string;        // Phone number (max 20 chars)
-  password?: string;    // Hashed password (max 64 chars)
-  role: 'user' | 'admin' | 'service_provider' | 'support';
-  status: 'active' | 'inactive' | 'deleted';
-  created_at: Date;
-  updated_at: Date;
+	id: string; // UUID primary key
+	name: string; // Full name (max 100 chars)
+	email: string; // Email address (max 64 chars)
+	phone: string; // Phone number (max 20 chars)
+	password?: string; // Hashed password (max 64 chars)
+	role: "user" | "admin" | "service_provider" | "support";
+	status: "active" | "inactive" | "deleted";
+	created_at: Date;
+	updated_at: Date;
 }
 ```
 
@@ -146,32 +147,40 @@ For production deployment on Vercel, see the [Vercel deployment guide](../TODO/a
 #### Common Issues
 
 1. **Database Connection Error**
+
    ```bash
    ❌ Failed to connect to database
    ```
+
    - Check your DATABASE_URL or individual DB variables
    - Ensure database server is running
    - Verify network connectivity
 
 2. **Module Not Found Error**
+
    ```bash
    ❌ Cannot find module
    ```
+
    - Run `npm install` to install dependencies
    - Ensure tsx is installed: `npm install -g tsx`
 
 3. **Permission Denied**
+
    ```bash
    ❌ Permission denied
    ```
+
    - Check database user permissions
    - Ensure user can create/update User table
 
 4. **Invalid Input Format**
+
    ```bash
    ❌ Invalid email format
    ❌ Invalid phone number format
    ```
+
    - Email must be in format: user@domain.com
    - Phone must be numeric, can include country code
 
@@ -195,4 +204,4 @@ When modifying the admin management script:
 
 ---
 
-**⚠️ Security Warning**: This script has powerful administrative capabilities. Use only in secure environments and follow your organization's security policies. 
+**⚠️ Security Warning**: This script has powerful administrative capabilities. Use only in secure environments and follow your organization's security policies.
