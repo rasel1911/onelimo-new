@@ -22,8 +22,13 @@ const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
 const ServiceProviderDetailsSection = async ({ id }: { id: string }) => {
 	try {
-		const response = await fetch(`${BASE_URL}/api/service-providers/${id}`, {
+		const timestamp = new Date().getTime();
+		const response = await fetch(`${BASE_URL}/api/service-providers/${id}?t=${timestamp}`, {
 			cache: "no-store",
+			headers: {
+				"Cache-Control": "no-cache",
+				Pragma: "no-cache",
+			},
 		});
 
 		if (response.status === 404) {

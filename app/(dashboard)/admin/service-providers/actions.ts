@@ -113,6 +113,7 @@ export const createServiceProviderAction = async (formData: FormData) => {
 			pinResetRequestedAt: null,
 		});
 		revalidatePath("/admin/service-providers");
+		revalidatePath("/api/service-providers");
 
 		return {
 			success: true,
@@ -220,6 +221,9 @@ export const updateServiceProviderAction = async (id: string, formData: FormData
 
 		await updateServiceProvider(id, dataToUpdate);
 		revalidatePath("/admin/service-providers");
+		revalidatePath("/admin/service-providers/[id]", "page");
+		revalidatePath("/api/service-providers");
+		revalidatePath(`/api/service-providers/${id}`);
 
 		return {
 			success: true,
@@ -244,6 +248,8 @@ export const deleteServiceProviderAction = async (id: string) => {
 	try {
 		await deleteServiceProvider(id);
 		revalidatePath("/admin/service-providers");
+		revalidatePath("/api/service-providers");
+		revalidatePath(`/api/service-providers/${id}`);
 		return { success: true };
 	} catch (error) {
 		return {

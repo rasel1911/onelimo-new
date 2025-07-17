@@ -24,8 +24,13 @@ const ServiceProvidersSection = () => {
 			setIsLoading(true);
 			setError(null);
 
-			const response = await fetch(`${BASE_URL}/api/service-providers`, {
+			const timestamp = new Date().getTime();
+			const response = await fetch(`${BASE_URL}/api/service-providers?t=${timestamp}`, {
 				cache: "no-store",
+				headers: {
+					"Cache-Control": "no-cache",
+					Pragma: "no-cache",
+				},
 			});
 
 			if (!response.ok) {
@@ -44,6 +49,17 @@ const ServiceProvidersSection = () => {
 
 	useEffect(() => {
 		fetchServiceProviders();
+
+		// Listen for focus events to refresh data when user comes back to the page
+		const handleFocus = () => {
+			fetchServiceProviders();
+		};
+
+		window.addEventListener("focus", handleFocus);
+
+		return () => {
+			window.removeEventListener("focus", handleFocus);
+		};
 	}, []);
 
 	if (error) {
