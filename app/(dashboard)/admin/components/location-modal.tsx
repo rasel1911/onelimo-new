@@ -94,9 +94,7 @@ export const LocationModal = ({ open, onOpenChange, onLocationAdded }: LocationM
 				formData.append("zipcodes", zipcode);
 			});
 
-			console.log("Submitting location:", values.city, zipCodes);
 			const result = await createLocation(formData);
-			console.log("Location creation result:", result);
 
 			if (result.success && result.location) {
 				toast.success("Location added successfully");

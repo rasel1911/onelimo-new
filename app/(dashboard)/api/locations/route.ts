@@ -18,11 +18,11 @@ export const GET = async () => {
 			updatedAt: location.updatedAt.toISOString(),
 		}));
 
-		const response = NextResponse.json(transformedLocations);
-
-		response.headers.set("Cache-Control", "public, max-age=300, stale-while-revalidate=60");
-
-		return response;
+		return NextResponse.json(transformedLocations, {
+			headers: {
+				"Cache-Control": "private, max-age=600",
+			},
+		});
 	} catch (error) {
 		console.error("Error fetching locations:", error);
 		return NextResponse.json({ error: "Failed to load locations" }, { status: 500 });

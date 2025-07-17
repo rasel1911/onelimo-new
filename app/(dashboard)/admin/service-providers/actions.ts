@@ -1,7 +1,5 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-
 import {
 	createServiceProvider,
 	updateServiceProvider,
@@ -112,8 +110,6 @@ export const createServiceProviderAction = async (formData: FormData) => {
 			pinResetTokenExpiresAt: null,
 			pinResetRequestedAt: null,
 		});
-		revalidatePath("/admin/service-providers");
-		revalidatePath("/api/service-providers");
 
 		return {
 			success: true,
@@ -220,10 +216,6 @@ export const updateServiceProviderAction = async (id: string, formData: FormData
 		};
 
 		await updateServiceProvider(id, dataToUpdate);
-		revalidatePath("/admin/service-providers");
-		revalidatePath("/admin/service-providers/[id]", "page");
-		revalidatePath("/api/service-providers");
-		revalidatePath(`/api/service-providers/${id}`);
 
 		return {
 			success: true,
@@ -247,9 +239,7 @@ export const updateServiceProviderAction = async (id: string, formData: FormData
 export const deleteServiceProviderAction = async (id: string) => {
 	try {
 		await deleteServiceProvider(id);
-		revalidatePath("/admin/service-providers");
-		revalidatePath("/api/service-providers");
-		revalidatePath(`/api/service-providers/${id}`);
+
 		return { success: true };
 	} catch (error) {
 		return {

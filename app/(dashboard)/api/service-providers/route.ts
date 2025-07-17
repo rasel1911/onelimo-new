@@ -27,9 +27,7 @@ export const GET = async () => {
 
 		return NextResponse.json(transformedProviders, {
 			headers: {
-				"Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
-				Pragma: "no-cache",
-				Expires: "0",
+				"Cache-Control": "private, max-age=600",
 			},
 		});
 	} catch (error) {

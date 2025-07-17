@@ -35,9 +35,7 @@ const LocationEditSection = ({ id }: { id: string }) => {
 				setIsLoading(true);
 				setError(null);
 
-				const response = await fetch(`${BASE_URL}/api/locations/${id}`, {
-					cache: "no-store",
-				});
+				const response = await fetch(`${BASE_URL}/api/locations/${id}`);
 
 				if (response.status === 404) {
 					notFound();

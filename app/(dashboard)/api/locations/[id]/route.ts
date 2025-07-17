@@ -22,11 +22,11 @@ export const GET = async (request: Request, { params }: { params: { id: string }
 			updatedAt: location.updatedAt.toISOString(),
 		};
 
-		const response = NextResponse.json(transformedLocation);
-
-		response.headers.set("Cache-Control", "public, max-age=300, stale-while-revalidate=60");
-
-		return response;
+		return NextResponse.json(transformedLocation, {
+			headers: {
+				"Cache-Control": "private, max-age=600",
+			},
+		});
 	} catch (error) {
 		console.error("Error fetching location:", error);
 		return NextResponse.json({ error: "Failed to load location" }, { status: 500 });

@@ -126,7 +126,6 @@ export const POST = async (request: NextRequest) => {
 		console.error("Error updating settings:", error);
 
 		if (error instanceof z.ZodError) {
-			// Format validation errors for client-side form handling
 			const fieldErrors: Record<string, string[]> = {};
 
 			error.errors.forEach((err) => {

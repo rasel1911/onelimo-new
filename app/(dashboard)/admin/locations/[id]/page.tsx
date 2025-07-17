@@ -45,9 +45,7 @@ const LocationPage = ({ params }: LocationPageProps) => {
 				setIsLoading(true);
 				setError(null);
 
-				const response = await fetch(`${BASE_URL}/api/locations/${params.id}`, {
-					cache: "no-store",
-				});
+				const response = await fetch(`${BASE_URL}/api/locations/${params.id}`);
 
 				if (response.status === 404) {
 					notFound();

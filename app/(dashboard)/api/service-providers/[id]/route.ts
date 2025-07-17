@@ -31,9 +31,7 @@ export const GET = async (request: Request, { params }: { params: { id: string }
 
 		return NextResponse.json(transformedProvider, {
 			headers: {
-				"Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
-				Pragma: "no-cache",
-				Expires: "0",
+				"Cache-Control": "private, max-age=600",
 			},
 		});
 	} catch (error) {

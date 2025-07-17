@@ -24,14 +24,7 @@ const ServiceProvidersSection = () => {
 			setIsLoading(true);
 			setError(null);
 
-			const timestamp = new Date().getTime();
-			const response = await fetch(`${BASE_URL}/api/service-providers?t=${timestamp}`, {
-				cache: "no-store",
-				headers: {
-					"Cache-Control": "no-cache",
-					Pragma: "no-cache",
-				},
-			});
+			const response = await fetch(`${BASE_URL}/api/service-providers`);
 
 			if (!response.ok) {
 				throw new Error("Failed to fetch service providers");
@@ -50,7 +43,6 @@ const ServiceProvidersSection = () => {
 	useEffect(() => {
 		fetchServiceProviders();
 
-		// Listen for focus events to refresh data when user comes back to the page
 		const handleFocus = () => {
 			fetchServiceProviders();
 		};

@@ -32,9 +32,7 @@ const LocationsSection = () => {
 			setIsLoading(true);
 			setError(null);
 
-			const response = await fetch(`${BASE_URL}/api/locations`, {
-				cache: "no-store",
-			});
+			const response = await fetch(`${BASE_URL}/api/locations`);
 
 			if (!response.ok) {
 				throw new Error("Failed to fetch locations");
@@ -52,6 +50,16 @@ const LocationsSection = () => {
 
 	useEffect(() => {
 		fetchLocations();
+
+		const handleFocus = () => {
+			fetchLocations();
+		};
+
+		window.addEventListener("focus", handleFocus);
+
+		return () => {
+			window.removeEventListener("focus", handleFocus);
+		};
 	}, []);
 
 	if (error) {
