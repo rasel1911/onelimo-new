@@ -250,7 +250,7 @@ export const ServiceProviderForm = ({
 				);
 			}
 
-			router.push("/admin/service-providers");
+			router.push("/admin/service-providers?refresh=true");
 			router.refresh();
 		} catch (error) {
 			console.error("Form submission error:", error);

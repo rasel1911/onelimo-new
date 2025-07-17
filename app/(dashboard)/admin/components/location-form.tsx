@@ -113,7 +113,7 @@ export const LocationForm = ({ initialData, mode }: LocationFormProps) => {
 			}
 
 			if (response?.success) {
-				router.push("/admin/locations");
+				router.push("/admin/locations?refresh=true");
 				router.refresh();
 			} else {
 				if (response?.error) {

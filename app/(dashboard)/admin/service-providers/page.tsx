@@ -19,13 +19,17 @@ const ServiceProvidersSection = () => {
 	const [showStaticFirst, setShowStaticFirst] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
-	const fetchServiceProviders = async () => {
+	const fetchServiceProviders = async (bypassCache = false) => {
 		try {
 			setIsLoading(true);
 			setError(null);
 
+			const url = bypassCache
+				? `/api/service-providers?_t=${Date.now()}`
+				: "/api/service-providers";
+
 			const [response] = await Promise.all([
-				fetch("/api/service-providers"),
+				fetch(url, bypassCache ? { cache: "no-store" } : {}),
 				new Promise((resolve) => setTimeout(resolve, 800)),
 			]);
 
@@ -47,10 +51,16 @@ const ServiceProvidersSection = () => {
 	};
 
 	useEffect(() => {
-		fetchServiceProviders();
+		const urlParams = new URLSearchParams(window.location.search);
+		const forceRefresh =
+			urlParams.has("refresh") ||
+			document.referrer.includes("/edit") ||
+			document.referrer.includes("/new");
+
+		fetchServiceProviders(forceRefresh);
 
 		const handleFocus = () => {
-			fetchServiceProviders();
+			fetchServiceProviders(true);
 		};
 
 		window.addEventListener("focus", handleFocus);
@@ -110,7 +120,7 @@ const ServiceProvidersSection = () => {
 						<ServiceProviderError
 							title="Error Loading Service Providers"
 							message={error}
-							onRetry={fetchServiceProviders}
+							onRetry={() => fetchServiceProviders(true)}
 						/>
 					</CardContent>
 				</Card>

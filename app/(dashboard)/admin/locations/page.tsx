@@ -26,13 +26,15 @@ const LocationsSection = () => {
 	const [showStaticFirst, setShowStaticFirst] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
-	const fetchLocations = async () => {
+	const fetchLocations = async (bypassCache = false) => {
 		try {
 			setIsLoading(true);
 			setError(null);
 
+			const url = bypassCache ? `/api/locations?_t=${Date.now()}` : "/api/locations";
+
 			const [response] = await Promise.all([
-				fetch("/api/locations"),
+				fetch(url, bypassCache ? { cache: "no-store" } : {}),
 				new Promise((resolve) => setTimeout(resolve, 800)),
 			]);
 
@@ -54,10 +56,16 @@ const LocationsSection = () => {
 	};
 
 	useEffect(() => {
-		fetchLocations();
+		const urlParams = new URLSearchParams(window.location.search);
+		const forceRefresh =
+			urlParams.has("refresh") ||
+			document.referrer.includes("/edit") ||
+			document.referrer.includes("/new");
+
+		fetchLocations(forceRefresh);
 
 		const handleFocus = () => {
-			fetchLocations();
+			fetchLocations(true);
 		};
 
 		window.addEventListener("focus", handleFocus);
