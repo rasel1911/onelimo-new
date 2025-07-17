@@ -6,9 +6,11 @@ import { ServiceProviderForm } from "@/app/(dashboard)/admin/components/service-
 import { ServiceProviderError } from "../../../components/service-provider-error";
 import { ServiceProviderFormSkeleton } from "../../../components/service-provider-form-skeleton";
 
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
 const ServiceProviderEditSection = async ({ id }: { id: string }) => {
 	try {
-		const response = await fetch(`/api/service-providers/${id}`);
+		const response = await fetch(`${BASE_URL}/api/service-providers/${id}`);
 
 		if (response.status === 404) {
 			notFound();
