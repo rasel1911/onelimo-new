@@ -20,7 +20,7 @@ export const improveText = async (input: WriterInput): Promise<WriterResult> => 
 		const prompt = generateWriterPrompt(input);
 
 		const result = await generateObject({
-			model: Gemini(MODEL_IDS.GEMINI_FLASH_2_5),
+			model: Gemini(MODEL_IDS.GEMINI_FLASH_2_0),
 			prompt,
 			schema: WriterResponseSchema,
 			temperature: WRITER_CONFIG.TEMPERATURE,

@@ -62,9 +62,23 @@ const createBookingRequestInternal = async (
 		specialRequests: bookingData.specialRequests || undefined,
 	});
 
-	triggerBookingWorkflow(bookingRequest, currentUser).catch((error) => {
-		console.error("Workflow trigger failed:", error);
-	});
+	// Trigger workflow and handle failures more explicitly
+	try {
+		const workflowResult = await triggerBookingWorkflow(bookingRequest, currentUser);
+		if (!workflowResult.success) {
+			console.error("❌ Workflow trigger failed:", workflowResult.error);
+			console.error("📋 Booking request created but workflow not triggered:", bookingRequest.id);
+		} else {
+			console.log("✅ Workflow triggered successfully:", workflowResult.workflowRunId);
+		}
+	} catch (error) {
+		console.error("❌ Critical workflow trigger error:", error);
+		console.error("📋 Booking request details:", {
+			id: bookingRequest.id,
+			requestCode: bookingRequest.requestCode,
+			customerName: bookingRequest.customerName,
+		});
+	}
 
 	return bookingRequest;
 };
