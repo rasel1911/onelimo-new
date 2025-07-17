@@ -24,13 +24,13 @@ export default async function RootLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<html lang="en">
+		<html lang="en" className="dark">
 			<body className="antialiased">
 				<SessionProvider>
 					<ThemeProvider
 						attribute="class"
-						defaultTheme="system"
-						enableSystem
+						defaultTheme="dark"
+						enableSystem={false}
 						disableTransitionOnChange
 					>
 						<Toaster position="top-center" />
