@@ -1,21 +1,14 @@
 "use client";
 
-import { notFound } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import { notFound, useParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
-import { LocationError } from "@/app/(dashboard)/admin/components/location-error";
 import { LocationForm } from "@/app/(dashboard)/admin/components/location-form";
-import LocationFormSkeleton from "@/app/(dashboard)/admin/components/location-form-skeleton";
 
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+import { LocationError } from "../../../components/location-error";
+import LocationFormSkeleton from "../../../components/location-form-skeleton";
 
-interface EditLocationPageProps {
-	params: {
-		id: string;
-	};
-}
-
-type Location = {
+export type Location = {
 	id: string;
 	city: string;
 	zipcodes: string[];
@@ -23,7 +16,6 @@ type Location = {
 	updatedAt: string;
 };
 
-// Async component for location edit form
 const LocationEditSection = ({ id }: { id: string }) => {
 	const [location, setLocation] = useState<Location | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
@@ -35,7 +27,7 @@ const LocationEditSection = ({ id }: { id: string }) => {
 				setIsLoading(true);
 				setError(null);
 
-				const response = await fetch(`${BASE_URL}/api/locations/${id}`);
+				const response = await fetch(`/api/locations/${id}`);
 
 				if (response.status === 404) {
 					notFound();
@@ -85,10 +77,8 @@ const LocationEditSection = ({ id }: { id: string }) => {
 	);
 };
 
-export default function EditLocationPage({ params }: EditLocationPageProps) {
-	return (
-		<Suspense fallback={<LocationFormSkeleton />}>
-			<LocationEditSection id={params.id} />
-		</Suspense>
-	);
+export default function EditLocationPage() {
+	const params = useParams<{ id: string }>();
+
+	return <LocationEditSection id={params.id} />;
 }

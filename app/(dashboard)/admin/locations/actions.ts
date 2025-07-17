@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import {
@@ -46,6 +47,8 @@ export const createLocation = async (formData: FormData) => {
 		});
 
 		clearCityNamesCache();
+
+		revalidatePath("/admin/locations");
 
 		return {
 			success: true,
@@ -134,6 +137,8 @@ export const updateLocationAction = async (id: string, formData: FormData) => {
 
 		clearCityNamesCache();
 
+		revalidatePath("/admin/locations");
+
 		return { success: true };
 	} catch (error) {
 		console.error("Failed to update location:", error);
@@ -154,6 +159,8 @@ export const deleteLocationAction = async (id: string) => {
 		await deleteLocation(id);
 
 		clearCityNamesCache();
+
+		revalidatePath("/admin/locations");
 
 		return { success: true };
 	} catch (error) {

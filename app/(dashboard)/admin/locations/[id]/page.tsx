@@ -18,8 +18,6 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-
 interface LocationPageProps {
 	params: {
 		id: string;
@@ -45,7 +43,7 @@ const LocationPage = ({ params }: LocationPageProps) => {
 				setIsLoading(true);
 				setError(null);
 
-				const response = await fetch(`${BASE_URL}/api/locations/${params.id}`);
+				const response = await fetch(`/api/locations/${params.id}`);
 
 				if (response.status === 404) {
 					notFound();
