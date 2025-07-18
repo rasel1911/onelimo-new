@@ -2,14 +2,14 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useActionState, useEffect, useState } from "react";
+import { Suspense, useActionState, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { LoginForm } from "@/app/(auth)/components/login-form";
 
 import { login, LoginActionState } from "../actions";
 
-export default function Page() {
+const LoginPageContent = () => {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 
@@ -62,4 +62,40 @@ export default function Page() {
 			</div>
 		</div>
 	);
-}
+};
+
+const LoginPage = () => {
+	return (
+		<Suspense
+			fallback={
+				<div className="flex min-h-screen w-full items-center justify-center bg-gradient-to-br from-background via-background to-muted/20 p-4">
+					<div className="w-full max-w-md">
+						<div className="mx-auto w-full max-w-md rounded-lg border-0 bg-card/50 p-6 shadow-2xl backdrop-blur-sm">
+							<div className="space-y-1 pb-4 text-center">
+								<div className="text-2xl font-bold tracking-tight">Welcome back</div>
+								<div className="text-muted-foreground">Sign in to your account to continue</div>
+							</div>
+							<div className="space-y-4">
+								<div className="animate-pulse">
+									<div className="mb-2 h-4 w-1/4 rounded bg-muted"></div>
+									<div className="h-11 rounded bg-muted"></div>
+								</div>
+								<div className="animate-pulse">
+									<div className="mb-2 h-4 w-1/4 rounded bg-muted"></div>
+									<div className="h-11 rounded bg-muted"></div>
+								</div>
+								<div className="animate-pulse">
+									<div className="h-11 rounded bg-muted"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			}
+		>
+			<LoginPageContent />
+		</Suspense>
+	);
+};
+
+export default LoginPage;

@@ -19,7 +19,7 @@ All notable changes to this project will be documented in this file.
 - Updated login page to handle callback URL redirection after successful authentication.
 - Simplified and clarified logic in `auth.config.ts` for route protection and redirection.
 
-### Fixed 
+### Fixed
 
 - Fixed bug where admin users were redirected to unauthorized due to missing role in middleware.
 - Fixed issue where users were redirected to home instead of their intended destination after login.
