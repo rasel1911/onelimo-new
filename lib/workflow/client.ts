@@ -12,7 +12,7 @@ const validateEnvironmentVariables = () => {
 		errors.push("QSTASH_TOKEN environment variable is required");
 	}
 
-	if (!process.env.NEXT_PUBLIC_APP_URL) {
+	if (!process.env.NEXT_PUBLIC_APP_URL && process.env.NODE_ENV === "production") {
 		errors.push("NEXT_PUBLIC_APP_URL environment variable is required for production");
 	}
 

@@ -7,13 +7,13 @@ export default function PrivacyPolicyPage() {
 		<div className="min-h-screen bg-black text-white">
 			{/* Navigation */}
 			<nav className="flex items-center space-x-8 border-b border-border bg-black px-6 py-4 text-white">
-				<Link href="/" className="text-xl font-bold">
-					LR
+				<Link href="/" className="text-xl font-bold text-primary">
+					Onelimo
 				</Link>
 			</nav>
 
 			{/* Main Content */}
-			<main className="container mx-auto max-w-4xl px-6 py-12">
+			<main className="container px-10 py-12">
 				<h1 className="mb-8 text-4xl font-bold">Privacy Policy</h1>
 
 				<div className="space-y-8 text-muted-foreground">
@@ -71,10 +71,10 @@ export default function PrivacyPolicyPage() {
 			<footer className="mt-12 flex items-center justify-between border-t border-border bg-black px-6 py-2 text-xs text-muted-foreground">
 				<div>© 2025 Onelimo. All rights reserved.</div>
 				<div className="flex space-x-6">
-					<Link href="/pages/privacy-policy" className="transition-colors hover:text-white">
+					<Link href="/privacy-policy" className="transition-colors hover:text-white">
 						Privacy Policy
 					</Link>
-					<Link href="/pages/terms-of-service" className="transition-colors hover:text-white">
+					<Link href="/terms-of-service" className="transition-colors hover:text-white">
 						Terms of Service
 					</Link>
 					<a href="mailto:contact@onelimo.com" className="transition-colors hover:text-white">

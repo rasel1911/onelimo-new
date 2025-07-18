@@ -15,10 +15,10 @@ const ChatPanel = dynamic(() => import("./components/chat-window").then((m) => m
 	loading: () => <div className="w-2/5 border-l border-border bg-card" />,
 });
 
-export default function OnelimoConciergePage() {
+const OnelimoConciergePage = () => {
 	const { setUserData } = useAgentStore();
 	const [conversationId] = useState(() => `main-conversation-${Date.now()}`);
-	const { user, isLoading, error, isAuthenticated } = useUserData();
+	const { user, isLoading, error } = useUserData();
 
 	useEffect(() => {
 		if (user) {
@@ -29,26 +29,6 @@ export default function OnelimoConciergePage() {
 			});
 		}
 	}, [user, setUserData]);
-
-	if (!isAuthenticated && !isLoading) {
-		return (
-			<div className="flex h-screen items-center justify-center bg-black text-white">
-				<div className="text-center">
-					<div className="mb-4 text-6xl">🚗</div>
-					<h1 className="mb-4 text-3xl font-bold">Welcome to Onelimo</h1>
-					<p className="mb-6 text-muted-foreground">
-						Please login to start booking your luxury car
-					</p>
-					<Link
-						href="/login"
-						className="inline-block rounded-lg bg-primary px-6 py-3 text-primary-foreground transition-colors hover:bg-primary/90"
-					>
-						Login to Continue
-					</Link>
-				</div>
-			</div>
-		);
-	}
 
 	if (error) {
 		return (
@@ -98,4 +78,6 @@ export default function OnelimoConciergePage() {
 			</footer>
 		</div>
 	);
-}
+};
+
+export default OnelimoConciergePage;

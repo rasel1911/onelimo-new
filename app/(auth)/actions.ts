@@ -95,6 +95,7 @@ export const login = async (_: LoginActionState, formData: FormData): Promise<Lo
 			});
 
 			if (result?.error) {
+				console.log("❌ Authentication failed:", result.error);
 				return {
 					status: "failed",
 					errors: {

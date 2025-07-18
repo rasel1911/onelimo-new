@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -11,12 +11,15 @@ import { login, LoginActionState } from "../actions";
 
 export default function Page() {
 	const router = useRouter();
+	const searchParams = useSearchParams();
 
 	const [email, setEmail] = useState("");
 
 	const [state, formAction] = useActionState<LoginActionState, FormData>(login, {
 		status: "idle",
 	});
+
+	const callbackUrl = searchParams.get("callbackUrl") || "/";
 
 	useEffect(() => {
 		if (state.status === "failed") {
@@ -28,9 +31,13 @@ export default function Page() {
 		} else if (state.status === "invalid_data") {
 			toast.error("Please check the form and try again");
 		} else if (state.status === "success") {
-			router.refresh();
+			if (callbackUrl && callbackUrl !== "/login") {
+				router.push(callbackUrl);
+			} else {
+				router.refresh();
+			}
 		}
-	}, [state.status, state.errors, router]);
+	}, [state.status, state.errors, router, callbackUrl]);
 
 	const handleSubmit = (formData: FormData) => {
 		setEmail(formData.get("email") as string);

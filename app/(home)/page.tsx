@@ -89,7 +89,7 @@ export default function LandingPage() {
 					</div>
 
 					{/* Features */}
-					<div className="mx-auto grid max-w-3xl gap-8 pt-24 md:grid-cols-3">
+					<div className="mx-auto grid max-w-3xl gap-8 pt-28 md:grid-cols-3">
 						<div className="group space-y-4 text-center transition-transform hover:scale-105">
 							<div className="mx-auto flex size-16 items-center justify-center rounded-full bg-gradient-to-br from-primary/20 to-primary/10 transition-all group-hover:shadow-lg">
 								<Calendar className="size-8 text-primary" />
@@ -127,16 +127,10 @@ export default function LandingPage() {
 					<div className="flex flex-col items-center justify-between space-y-4 text-sm text-muted-foreground sm:flex-row sm:space-y-0">
 						<div>© 2025 OneLimo. All rights reserved.</div>
 						<div className="flex space-x-6">
-							<Link
-								href="/pages/privacy-policy"
-								className="transition-colors hover:text-foreground"
-							>
+							<Link href="/privacy-policy" className="transition-colors hover:text-foreground">
 								Privacy Policy
 							</Link>
-							<Link
-								href="/pages/terms-of-service"
-								className="transition-colors hover:text-foreground"
-							>
+							<Link href="/terms-of-service" className="transition-colors hover:text-foreground">
 								Terms of Service
 							</Link>
 							<a

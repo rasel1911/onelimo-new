@@ -18,7 +18,7 @@ export interface EmailTemplate {
  * @param from - Sender email address (optional, uses default if not provided)
  * @returns Promise with the send result
  */
-export async function sendEmail({
+export const sendEmail = async ({
 	to,
 	template,
 	from = DEFAULT_FROM_EMAIL,
@@ -26,7 +26,7 @@ export async function sendEmail({
 	to: string;
 	template: EmailTemplate;
 	from?: string;
-}) {
+}) => {
 	try {
 		if (!resendApiKey) {
 			console.error("RESEND_API_KEY is not defined");
@@ -46,4 +46,4 @@ export async function sendEmail({
 		console.error("Failed to send email:", error);
 		return { success: false, error };
 	}
-}
+};

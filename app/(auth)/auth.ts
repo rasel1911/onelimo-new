@@ -19,15 +19,20 @@ export const {
 			async authorize({ email, phone, password, loginType }: any) {
 				let users: any[] = [];
 
-				if (loginType === "phone" && phone) {
-					users = await getUserByPhone(phone);
-				} else if (loginType === "email" && email) {
-					users = await getUser(email);
-				} else {
-					const identifier = email || phone;
-					if (identifier) {
-						users = await getUserByEmailOrPhone(identifier);
+				try {
+					if (loginType === "phone" && phone) {
+						users = await getUserByPhone(phone);
+					} else if (loginType === "email" && email) {
+						users = await getUser(email);
+					} else {
+						const identifier = email || phone;
+						if (identifier) {
+							users = await getUserByEmailOrPhone(identifier);
+						}
 					}
+				} catch (dbError) {
+					console.error("❌ Database error during user lookup:", dbError);
+					return null;
 				}
 
 				if (users.length === 0) {
@@ -38,11 +43,16 @@ export const {
 					return null;
 				}
 
-				let passwordsMatch = await compare(password, users[0].password);
+				try {
+					let passwordsMatch = await compare(password, users[0].password);
 
-				if (passwordsMatch) return users[0] as any;
+					if (passwordsMatch) return users[0] as any;
 
-				return null;
+					return null;
+				} catch (passwordError) {
+					console.error("❌ Password comparison error:", passwordError);
+					return null;
+				}
 			},
 		}),
 	],
@@ -58,9 +68,14 @@ export const {
 			if (session.user && token.id) {
 				session.user.id = token.id as string;
 
-				const userFromDb = await getUserById(token.id as string);
-				if (userFromDb.length > 0) {
-					session.user.role = userFromDb[0].role;
+				try {
+					const userFromDb = await getUserById(token.id as string);
+
+					if (userFromDb.length > 0) {
+						session.user.role = userFromDb[0].role;
+					}
+				} catch (dbError) {
+					console.error("❌ Database error in session callback:", dbError);
 				}
 			}
 

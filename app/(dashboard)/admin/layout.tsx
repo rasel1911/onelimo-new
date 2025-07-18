@@ -14,6 +14,7 @@ const AdminLayout = async ({ children }: { children: React.ReactNode }) => {
 	}
 
 	const isAdmin = await checkAdminRole(session.user.id);
+
 	if (!isAdmin) {
 		redirect("/unauthorized");
 	}
