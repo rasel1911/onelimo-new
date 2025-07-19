@@ -7,6 +7,7 @@ export * from "./serviceProvider.schema";
 export * from "./communication.schema";
 export * from "./bookingRequest.schema";
 export * from "./registrationToken.schema";
+export * from "./persistentRegistrationLink.schema";
 export * from "./settings.schema";
 
 // Workflow schemas
