@@ -2,7 +2,10 @@
 
 import { z } from "zod";
 
-import { fetchLocations } from "@/app/(dashboard)/admin/locations/actions";
+import {
+	validatePersistentLink,
+	incrementLinkUsage,
+} from "@/db/queries/persistentRegistrationLink.queries";
 import { markTokenAsUsed, validateToken } from "@/db/queries/registrationToken.queries";
 import { createServiceProvider } from "@/db/queries/serviceProvider.queries";
 
@@ -44,14 +47,14 @@ const PartnerRegistrationSchema = z.object({
 	locationId: z.string().min(1, "Location is required"),
 	serviceType: z.array(z.string()).min(1, "At least one service type is required"),
 	areaCovered: z.array(z.string()).optional(),
-	token: z.string().nullable().optional(), // The registration token
+	token: z.string().nullable().optional(),
+	persistentLinkId: z.string().nullable().optional(),
 });
 
 export type PartnerRegistrationFormData = z.infer<typeof PartnerRegistrationSchema>;
 
-export async function registerPartner(formData: PartnerRegistrationFormData) {
+export const registerPartner = async (formData: PartnerRegistrationFormData) => {
 	try {
-		// Validate form data
 		const validatedFields = PartnerRegistrationSchema.safeParse(formData);
 
 		if (!validatedFields.success) {
@@ -61,7 +64,6 @@ export async function registerPartner(formData: PartnerRegistrationFormData) {
 			};
 		}
 
-		// Validate token if provided
 		if (validatedFields.data.token) {
 			const tokenValidation = await validateToken(validatedFields.data.token);
 
@@ -69,6 +71,15 @@ export async function registerPartner(formData: PartnerRegistrationFormData) {
 				return {
 					success: false,
 					error: tokenValidation.reason || "Invalid registration token",
+				};
+			}
+		} else if (validatedFields.data.persistentLinkId) {
+			const linkValidation = await validatePersistentLink(validatedFields.data.persistentLinkId);
+
+			if (!linkValidation.isValid) {
+				return {
+					success: false,
+					error: linkValidation.reason || "Invalid registration link",
 				};
 			}
 		}
@@ -79,7 +90,6 @@ export async function registerPartner(formData: PartnerRegistrationFormData) {
 			if (SERVICE_TYPES.includes(type as any)) {
 				return type;
 			}
-			// For custom service types, use "other" as the enum value
 			return "other";
 		});
 
@@ -115,6 +125,8 @@ export async function registerPartner(formData: PartnerRegistrationFormData) {
 
 		if (validatedFields.data.token) {
 			await markTokenAsUsed(validatedFields.data.token);
+		} else if (validatedFields.data.persistentLinkId) {
+			await incrementLinkUsage(validatedFields.data.persistentLinkId);
 		}
 
 		return {
@@ -127,4 +139,4 @@ export async function registerPartner(formData: PartnerRegistrationFormData) {
 			error: "Failed to register. Please try again later.",
 		};
 	}
-}
+};

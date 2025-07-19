@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Mail, Plus, Users } from "lucide-react";
+import { Link2, Mail, Plus, Users } from "lucide-react";
 import Link from "next/link";
 import { Suspense, useEffect, useState } from "react";
 
@@ -144,6 +144,12 @@ const ServiceProvidersSection = () => {
 							<Link href="/admin/service-providers/invites">
 								<Users className="mr-2 size-4" />
 								View Invites
+							</Link>
+						</Button>
+						<Button variant="ghost" asChild>
+							<Link href="/admin/service-providers/persistent-links">
+								<Link2 className="mr-2 size-4" />
+								Persistent Links
 							</Link>
 						</Button>
 						<InviteModal

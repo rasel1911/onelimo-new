@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { validatePersistentLink } from "@/db/queries/persistentRegistrationLink.queries";
 import { validateToken } from "@/db/queries/registrationToken.queries";
 
 /**
@@ -10,22 +11,40 @@ export const middleware = async (request: NextRequest) => {
 	try {
 		const searchParams = new URL(request.url).searchParams;
 		const token = searchParams.get("token");
+		const persistentLinkId = searchParams.get("ref");
 
-		if (!token) {
+		if (!token && !persistentLinkId) {
 			return NextResponse.redirect(new URL("/", request.url));
 		}
 
-		const validation = await validateToken(token);
+		if (token) {
+			const validation = await validateToken(token);
 
-		if (!validation.isValid) {
-			console.warn(`Invalid token attempt: ${token}`, {
-				ip: request.ip,
-				geo: request.geo,
-				userAgent: request.headers.get("user-agent"),
-				reason: validation.reason,
-			});
+			if (!validation.isValid) {
+				console.warn(`Invalid token attempt: ${token}`, {
+					ip: request.ip,
+					geo: request.geo,
+					userAgent: request.headers.get("user-agent"),
+					reason: validation.reason,
+				});
 
-			return NextResponse.redirect(new URL("/", request.url));
+				return NextResponse.redirect(new URL("/", request.url));
+			}
+		}
+
+		if (persistentLinkId) {
+			const validation = await validatePersistentLink(persistentLinkId);
+
+			if (!validation.isValid) {
+				console.warn(`Invalid persistent link attempt: ${persistentLinkId}`, {
+					ip: request.ip,
+					geo: request.geo,
+					userAgent: request.headers.get("user-agent"),
+					reason: validation.reason,
+				});
+
+				return NextResponse.redirect(new URL("/", request.url));
+			}
 		}
 
 		return NextResponse.next();

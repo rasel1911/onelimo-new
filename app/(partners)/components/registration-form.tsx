@@ -97,11 +97,13 @@ interface Location {
 interface PartnerRegistrationFormProps {
 	initialEmail?: string;
 	token?: string | null;
+	persistentLinkId?: string | null;
 }
 
 export const PartnerRegistrationForm = ({
 	initialEmail = "",
 	token,
+	persistentLinkId,
 }: PartnerRegistrationFormProps) => {
 	const [areaCovered, setAreaCovered] = useState<string[]>([]);
 	const [postcodeInput, setPostcodeInput] = useState("");
@@ -247,6 +249,7 @@ export const PartnerRegistrationForm = ({
 				...values,
 				areaCovered: areaCovered.length > 0 ? areaCovered : ["all"],
 				token: token,
+				persistentLinkId: persistentLinkId,
 			};
 
 			const result = await registerPartner(formData);

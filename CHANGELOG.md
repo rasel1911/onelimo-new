@@ -2,6 +2,42 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.1] - 2025-07-20
+
+### Added
+
+- **Persistent Registration Links System**: Implemented a comprehensive system for creating permanent service provider registration links that never expire
+  - Added database schema for persistent registration links with usage tracking
+  - Created admin interface for managing persistent links (create, edit, delete, activate/deactivate)
+  - Added server-side data fetching with Suspense for optimal loading performance
+  - Implemented real-time updates using Next.js `revalidatePath()` for immediate UI updates
+- **URL Parameter Optimization**: Changed registration link parameter from `persistent=` to `ref=` for cleaner, shorter URLs
+- **Performance Optimizations**: Refactored components following Next.js best practices
+  - Separated server and client components for better performance
+  - Added Suspense boundaries for non-blocking data loading
+  - Created dedicated loading and error components with skeleton UI
+  - Implemented optimistic updates for better user experience
+
+### Changed
+
+- **Partner Registration Flow**: Updated to support both temporary tokens and persistent links
+- **Database Migration**: Added `PersistentRegistrationLink` table with proper indexing and constraints
+- **Component Architecture**: Refactored persistent links page to use server components with client-side interactions only where needed
+- **State Management**: Removed client-side state management in favor of server-side revalidation for better consistency
+
+### Fixed
+
+- **URL Generation Bug**: Fixed issue where persistent link URLs showed "[object Promise]" instead of actual URLs
+- **Real-time Updates**: Fixed table not updating immediately after create/edit/delete operations
+- **Loading States**: Improved loading experience with proper skeleton components and Suspense boundaries
+
+### Technical Improvements
+
+- Updated drizzle-kit from 0.25.0 to 0.31.4 for latest features and bug fixes
+- Added proper error boundaries and loading states for better user experience
+- Implemented server actions with automatic cache revalidation
+- Created utility functions for URL generation that work in both server and client contexts
+
 ## [0.1.0] - 2025-07-18
 
 ### Added
