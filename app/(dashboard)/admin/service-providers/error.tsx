@@ -8,10 +8,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 
 const ServiceProvidersError = ({
 	error,
-	resetAction,
+	reset,
 }: {
 	error: Error & { digest?: string };
-	resetAction: () => void;
+	reset: () => void;
 }) => {
 	useEffect(() => {
 		console.error(error);
@@ -39,7 +39,7 @@ const ServiceProvidersError = ({
 						</CardDescription>
 					</CardHeader>
 					<CardContent className="text-center">
-						<Button onClick={() => resetAction()} className="w-full">
+						<Button onClick={() => reset()} className="w-full">
 							<RefreshCw className="mr-2 size-4" />
 							Try again
 						</Button>

@@ -181,7 +181,10 @@ const ServiceProvidersSection = () => {
 							<CardDescription>A list of all service providers with their details.</CardDescription>
 						</CardHeader>
 						<CardContent>
-							<ServiceProviderTable data={serviceProviders} />
+							<ServiceProviderTable
+								data={serviceProviders}
+								onServiceProviderDeleted={() => fetchServiceProviders(true)}
+							/>
 						</CardContent>
 					</Card>
 				</motion.div>

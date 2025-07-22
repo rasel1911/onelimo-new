@@ -76,7 +76,7 @@ const formSchema = z.object({
 			},
 			{ message: "Please enter a valid EU or UK phone number" },
 		),
-	status: z.boolean(),
+	status: z.enum(["active", "inactive", "pending"]),
 	role: z.enum(ROLES),
 	serviceType: z.array(z.enum(SERVICE_TYPES)).min(1, "At least one service type is required"),
 	reputation: z.number().min(0).max(5),
@@ -90,7 +90,7 @@ const defaultValues = {
 	name: "",
 	email: "",
 	phone: "",
-	status: true,
+	status: "active" as const,
 	role: "partner" as const,
 	locationIds: [] as string[],
 	areaCovered: [] as string[],
@@ -132,7 +132,6 @@ export const ServiceProviderForm = ({
 	const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
 	const router = useRouter();
 
-	// Check if the provider is pending and form is in edit mode
 	const isPendingProvider =
 		mode === "edit" &&
 		((typeof initialData.status === "string" && initialData.status === "pending") ||
@@ -146,10 +145,7 @@ export const ServiceProviderForm = ({
 			name: initialData.name,
 			email: initialData.email,
 			phone: initialData.phone,
-			status:
-				typeof initialData.status === "boolean"
-					? initialData.status
-					: initialData.status === "active",
+			status: typeof initialData.status === "string" ? initialData.status : "active",
 			role: initialData.role || "partner",
 			locationIds: initialData.locationIds || [],
 			serviceType: initialData.serviceType || ["stretch_limousine"],
@@ -194,11 +190,6 @@ export const ServiceProviderForm = ({
 		}
 	};
 
-	const handleApproveProvider = () => {
-		form.setValue("status", true);
-		toast.success("Provider status set to active");
-	};
-
 	async function onSubmit(values: FormValues) {
 		try {
 			setIsSubmitting(true);
@@ -206,11 +197,7 @@ export const ServiceProviderForm = ({
 			const formData = new FormData();
 			Object.entries(values).forEach(([key, value]) => {
 				if (value !== undefined && key !== "serviceType" && key !== "locationIds") {
-					if (key === "status") {
-						formData.append(key, (value as boolean) ? "active" : "inactive");
-					} else {
-						formData.append(key, String(value));
-					}
+					formData.append(key, String(value));
 				}
 			});
 
@@ -294,8 +281,8 @@ export const ServiceProviderForm = ({
 								</div>
 								<FormControl>
 									<Switch
-										checked={field.value}
-										onCheckedChange={field.onChange}
+										checked={field.value === "active"}
+										onCheckedChange={(checked) => field.onChange(checked ? "active" : "inactive")}
 										className="data-[state=checked]:bg-green-500 data-[state=unchecked]:bg-gray-300"
 									/>
 								</FormControl>

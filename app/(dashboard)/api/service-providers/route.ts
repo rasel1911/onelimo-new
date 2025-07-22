@@ -20,7 +20,7 @@ export const GET = async () => {
 			role: provider.role,
 			reputation: provider.reputation ?? undefined,
 			responseTime: provider.responseTime ?? undefined,
-			locationId: provider.locationId,
+			locationIds: provider.locationIds,
 			createdAt: provider.createdAt.toISOString(),
 			updatedAt: provider.updatedAt.toISOString(),
 		}));

@@ -21,9 +21,13 @@ import { Button } from "@/components/ui/button";
 
 interface DeleteServiceProviderButtonProps {
 	id: string;
+	onServiceProviderDeleted?: () => void;
 }
 
-export const DeleteServiceProviderButton = ({ id }: DeleteServiceProviderButtonProps) => {
+export const DeleteServiceProviderButton = ({
+	id,
+	onServiceProviderDeleted,
+}: DeleteServiceProviderButtonProps) => {
 	const [isDeleting, setIsDeleting] = useState(false);
 	const router = useRouter();
 
@@ -34,7 +38,11 @@ export const DeleteServiceProviderButton = ({ id }: DeleteServiceProviderButtonP
 
 			if (result.success) {
 				toast.success("Service provider deleted successfully");
-				router.push("/admin/service-providers");
+				if (onServiceProviderDeleted) {
+					onServiceProviderDeleted();
+				} else {
+					router.push("/admin/service-providers");
+				}
 			} else {
 				toast.error(result.error || "Failed to delete service provider");
 			}

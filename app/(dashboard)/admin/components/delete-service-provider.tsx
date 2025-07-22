@@ -19,12 +19,15 @@ import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
 interface DeleteServiceProviderProps {
 	id: string;
+	onServiceProviderDeleted?: () => void;
 }
 
-export const DeleteServiceProvider = ({ id }: DeleteServiceProviderProps) => {
+export const DeleteServiceProvider = ({
+	id,
+	onServiceProviderDeleted,
+}: DeleteServiceProviderProps) => {
 	const [open, setOpen] = useState(false);
 	const [isDeleting, setIsDeleting] = useState(false);
-	const router = useRouter();
 
 	async function handleDelete() {
 		try {
@@ -33,7 +36,7 @@ export const DeleteServiceProvider = ({ id }: DeleteServiceProviderProps) => {
 
 			if (result.success) {
 				toast.success("Service provider deleted successfully");
-				router.refresh();
+				onServiceProviderDeleted?.();
 			} else {
 				toast.error(result.error || "Failed to delete service provider");
 			}
