@@ -36,12 +36,10 @@ export const workflowProvider = pgTable(
 		responseNotes: text("response_notes"),
 		refinedResponse: text("refined_response"), // FIXME: This is not used
 
-		// Quote tracking:
 		hasQuoted: boolean("has_quoted").notNull().default(false),
 		quoteAmount: integer("quote_amount"), // in cents
 		quoteTime: timestamp("quote_time"),
 		quoteNotes: text("quote_notes"),
-		refinedQuote: text("refined_quote"), // FIXME: This is not used
 
 		response: jsonb("response"),
 
@@ -52,16 +50,14 @@ export const workflowProvider = pgTable(
 		createdAt: timestamp("created_at").notNull().defaultNow(),
 		updatedAt: timestamp("updated_at").notNull().defaultNow(),
 	},
-	(table) => {
-		return {
-			workflowRunIdx: index("wp_workflow_run_idx").on(table.workflowRunId),
-			serviceProviderIdx: index("wp_service_provider_idx").on(table.serviceProviderId),
-			contactStatusIdx: index("wp_contact_status_idx").on(table.contactStatus),
-			responseStatusIdx: index("wp_response_status_idx").on(table.responseStatus),
-			hasRespondedIdx: index("wp_has_responded_idx").on(table.hasResponded),
-			hasQuotedIdx: index("wp_has_quoted_idx").on(table.hasQuoted),
-		};
-	},
+	(table) => [
+		index("wp_workflow_run_idx").on(table.workflowRunId),
+		index("wp_service_provider_idx").on(table.serviceProviderId),
+		index("wp_contact_status_idx").on(table.contactStatus),
+		index("wp_response_status_idx").on(table.responseStatus),
+		index("wp_has_responded_idx").on(table.hasResponded),
+		index("wp_has_quoted_idx").on(table.hasQuoted),
+	],
 );
 
 export type WorkflowProvider = InferSelectModel<typeof workflowProvider>;

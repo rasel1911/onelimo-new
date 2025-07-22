@@ -1,4 +1,4 @@
-import { eq, and, desc, asc, inArray } from "drizzle-orm";
+import { eq, and, asc, inArray } from "drizzle-orm";
 
 import { db } from "@/db";
 import {
@@ -18,43 +18,6 @@ export async function createWorkflowProviders(
 ): Promise<WorkflowProvider[]> {
 	const providers = await db.insert(workflowProvider).values(data).returning();
 	return providers;
-}
-
-// FIXME: Can be deprecated
-export async function getWorkflowProvidersByWorkflowRunId(workflowRunId: string) {
-	return db
-		.select({
-			id: workflowProvider.id,
-			workflowRunId: workflowProvider.workflowRunId,
-			serviceProviderId: workflowProvider.serviceProviderId,
-			contactStatus: workflowProvider.contactStatus,
-			emailSent: workflowProvider.emailSent,
-			smsSent: workflowProvider.smsSent,
-			hasResponded: workflowProvider.hasResponded,
-			responseStatus: workflowProvider.responseStatus,
-			responseTime: workflowProvider.responseTime,
-			responseNotes: workflowProvider.responseNotes,
-			refinedResponse: workflowProvider.refinedResponse,
-			hasQuoted: workflowProvider.hasQuoted,
-			quoteAmount: workflowProvider.quoteAmount,
-			quoteTime: workflowProvider.quoteTime,
-			quoteNotes: workflowProvider.quoteNotes,
-			refinedQuote: workflowProvider.refinedQuote,
-			response: workflowProvider.response,
-			createdAt: workflowProvider.createdAt,
-			updatedAt: workflowProvider.updatedAt,
-			providerName: serviceProvider.name,
-			providerEmail: serviceProvider.email,
-			providerPhone: serviceProvider.phone,
-			serviceType: serviceProvider.serviceType,
-			areaCovered: serviceProvider.areaCovered,
-			status: serviceProvider.status,
-			reputation: serviceProvider.reputation,
-		})
-		.from(workflowProvider)
-		.innerJoin(serviceProvider, eq(workflowProvider.serviceProviderId, serviceProvider.id))
-		.where(eq(workflowProvider.workflowRunId, workflowRunId))
-		.orderBy(desc(workflowProvider.createdAt));
 }
 
 /**

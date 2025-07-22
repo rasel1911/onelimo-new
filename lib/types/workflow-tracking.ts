@@ -31,7 +31,6 @@ export interface WorkflowProvider {
 	quoteAmount?: number;
 	quoteTime?: string;
 	quoteNotes?: string;
-	refinedQuote?: string;
 	estimatedTime?: string;
 }
 

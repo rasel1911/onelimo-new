@@ -34,7 +34,7 @@ export const ServiceProviderSchema = z.object({
 		),
 	status: z.enum(["active", "inactive", "pending"]).default("pending"),
 	role: z.enum(ROLES).default("user"),
-	locationId: z.string().min(1, "Service location is required"),
+	locationIds: z.array(z.string()).min(1, "At least one service location is required"),
 	areaCovered: z.array(z.string()).optional(),
 	serviceType: z.array(z.string()).min(1, "At least one service type is required"),
 	reputation: z.coerce.number().min(0).max(5).default(0),

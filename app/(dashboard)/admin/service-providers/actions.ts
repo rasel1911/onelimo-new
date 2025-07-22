@@ -85,9 +85,12 @@ export const createServiceProviderAction = async (formData: FormData) => {
 			return "not_specified";
 		});
 
+		const locationIds = validatedFields.data.locationIds;
+
 		const dataToInsert = {
 			...validatedFields.data,
-			locationId: validatedFields.data.locationId,
+			locationId: locationIds[0],
+			locationIds: locationIds,
 			areaCovered:
 				validatedFields.data.areaCovered && validatedFields.data.areaCovered.length > 0
 					? validatedFields.data.areaCovered
@@ -111,9 +114,11 @@ export const createServiceProviderAction = async (formData: FormData) => {
 			pinResetToken: null,
 			pinResetTokenExpiresAt: null,
 			pinResetRequestedAt: null,
+			locationIds: [],
 		});
 
 		revalidatePath("/admin/service-providers");
+		revalidatePath("/api/service-providers");
 
 		return {
 			success: true,
@@ -206,9 +211,12 @@ export const updateServiceProviderAction = async (id: string, formData: FormData
 			return "not_specified";
 		});
 
+		const locationIds = validatedFields.data.locationIds;
+
 		const dataToUpdate = {
 			...validatedFields.data,
-			locationId: validatedFields.data.locationId,
+			locationId: locationIds[0], // Use first location for backward compatibility
+			locationIds: locationIds,
 			areaCovered:
 				validatedFields.data.areaCovered && validatedFields.data.areaCovered.length > 0
 					? validatedFields.data.areaCovered
@@ -222,6 +230,7 @@ export const updateServiceProviderAction = async (id: string, formData: FormData
 		await updateServiceProvider(id, dataToUpdate);
 
 		revalidatePath("/admin/service-providers");
+		revalidatePath("/api/service-providers");
 
 		return {
 			success: true,
@@ -247,6 +256,7 @@ export const deleteServiceProviderAction = async (id: string) => {
 		await deleteServiceProvider(id);
 
 		revalidatePath("/admin/service-providers");
+		revalidatePath("/api/service-providers");
 
 		return { success: true };
 	} catch (error) {

@@ -13,8 +13,6 @@ export const serviceTypeEnum = pgEnum("service_type", [
 	"not_specified",
 ]);
 
-export const roleEnum = pgEnum("role_type", ["user", "customer", "admin", "support", "partner"]);
-
 export const serviceProvider = pgTable(
 	"ServiceProvider",
 	{
@@ -22,11 +20,12 @@ export const serviceProvider = pgTable(
 		name: varchar("name", { length: 100 }).notNull(),
 		email: varchar("email", { length: 64 }).notNull().unique(),
 		phone: varchar("phone", { length: 20 }).notNull(),
-		locationId: uuid("locationId").references(() => location.id),
+		locationId: uuid("locationId").references(() => location.id), // deprecated
+		locationIds: uuid("locationIds").array(),
 		serviceType: varchar("serviceType", { length: 50 }).array(),
 		areaCovered: varchar("areaCovered", { length: 100 }).array(),
 		status: varchar("status", { length: 20 }).notNull().default("pending"),
-		role: varchar("role", { length: 20 }).notNull().default("provider"), // remove this with ENUM, delete from db
+		role: varchar("role", { length: 20 }).notNull().default("provider"),
 		reputation: integer("reputation").default(0),
 		responseTime: integer("responseTime").default(0),
 
@@ -45,16 +44,15 @@ export const serviceProvider = pgTable(
 		createdAt: timestamp("createdAt").notNull().defaultNow(),
 		updatedAt: timestamp("updatedAt").notNull().defaultNow(),
 	},
-	(table) => {
-		return {
-			emailIdx: index("sp_email_idx").on(table.email),
-			locationIdx: index("sp_location_idx").on(table.locationId),
-			statusIdx: index("sp_status_idx").on(table.status),
-			roleIdx: index("sp_role_idx").on(table.role),
-			pinResetTokenIdx: index("sp_pin_reset_token_idx").on(table.pinResetToken),
-			isBlockedIdx: index("sp_is_blocked_idx").on(table.isBlocked),
-		};
-	},
+	(table) => [
+		index("sp_email_idx").on(table.email),
+		index("sp_location_idx").on(table.locationId),
+		index("sp_locations_idx").on(table.locationIds),
+		index("sp_status_idx").on(table.status),
+		index("sp_role_idx").on(table.role),
+		index("sp_pin_reset_token_idx").on(table.pinResetToken),
+		index("sp_is_blocked_idx").on(table.isBlocked),
+	],
 );
 
 export type ServiceProvider = InferSelectModel<typeof serviceProvider>;

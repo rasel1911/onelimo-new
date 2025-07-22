@@ -107,7 +107,6 @@ export const deleteLocation = async (id: string) => {
 			.from(serviceProvider)
 			.where(eq(serviceProvider.locationId, id));
 
-		// If service providers are using this location, update them to use the "Unavailable Location"
 		if (serviceProvidersUsingLocation.length > 0) {
 			const unavailableLocation = await getOrCreateUnavailableLocation();
 
