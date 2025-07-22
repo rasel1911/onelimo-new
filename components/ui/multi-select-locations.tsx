@@ -266,7 +266,7 @@ export function MultiSelectLocations({
 															<span className="flex-1">{location.city}</span>
 															{location.zipcodes && location.zipcodes.length > 0 && (
 																<span className="text-xs text-muted-foreground">
-																	{location.zipcodes.length} postcodes
+																	all postcodes
 																</span>
 															)}
 														</div>
