@@ -16,7 +16,6 @@ const SERVICE_TYPES = [
 	"sedan",
 	"hummer",
 	"other",
-	"not_specified",
 ] as const;
 
 const PartnerRegistrationSchema = z.object({
@@ -44,7 +43,7 @@ const PartnerRegistrationSchema = z.object({
 			},
 			{ message: "Please enter a valid EU or UK phone number" },
 		),
-	locationId: z.string().min(1, "Location is required"),
+	locationIds: z.array(z.string()).min(1, "At least one location is required"),
 	serviceType: z.array(z.string()).min(1, "At least one service type is required"),
 	areaCovered: z.array(z.string()).optional(),
 	token: z.string().nullable().optional(),
@@ -84,7 +83,7 @@ export const registerPartner = async (formData: PartnerRegistrationFormData) => 
 			}
 		}
 
-		const locationId = validatedFields.data.locationId;
+		const locationIds = validatedFields.data.locationIds;
 
 		const normalizedServiceTypes = validatedFields.data.serviceType.map((type) => {
 			if (SERVICE_TYPES.includes(type as any)) {
@@ -97,7 +96,8 @@ export const registerPartner = async (formData: PartnerRegistrationFormData) => 
 			name: validatedFields.data.name,
 			email: validatedFields.data.email,
 			phone: validatedFields.data.phone,
-			locationId: locationId,
+			locationId: locationIds[0], // For backward compatibility, deprecated
+			locationIds: locationIds,
 			serviceType: normalizedServiceTypes,
 			areaCovered:
 				validatedFields.data.areaCovered && validatedFields.data.areaCovered.length > 0

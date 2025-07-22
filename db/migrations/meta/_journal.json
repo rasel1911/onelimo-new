@@ -15,6 +15,20 @@
 			"when": 1752946583963,
 			"tag": "0001_long_yellowjacket",
 			"breakpoints": true
+		},
+		{
+			"idx": 2,
+			"version": "7",
+			"when": 1753051144497,
+			"tag": "0002_busy_wallflower",
+			"breakpoints": true
+		},
+		{
+			"idx": 3,
+			"version": "7",
+			"when": 1753051935726,
+			"tag": "0003_windy_daimon_hellstrom",
+			"breakpoints": true
 		}
 	]
 }

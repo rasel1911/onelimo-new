@@ -21,15 +21,6 @@ import {
 } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import {
-	Dialog,
-	DialogContent,
-	DialogDescription,
-	DialogFooter,
-	DialogHeader,
-	DialogTitle,
-	DialogTrigger,
-} from "@/components/ui/dialog";
-import {
 	Form,
 	FormControl,
 	FormDescription,
@@ -39,13 +30,7 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
+import { MultiSelectLocations } from "@/components/ui/multi-select-locations";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
@@ -81,7 +66,7 @@ const formSchema = z.object({
 			},
 			{ message: "Please enter a valid EU or UK phone number" },
 		),
-	locationId: z.string().min(1, "Location is required"),
+	locationIds: z.array(z.string()).min(1, "At least one location is required"),
 	serviceType: z.array(z.string()).min(1, "At least one service type is required"),
 	website: z.string().optional(),
 });
@@ -111,10 +96,7 @@ export const PartnerRegistrationForm = ({
 	const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
 	const [locations, setLocations] = useState<Location[]>([]);
 	const [customServiceTypes, setCustomServiceTypes] = useState<string[]>([]);
-	const [newServiceType, setNewServiceType] = useState("");
-	const [showAddLocation, setShowAddLocation] = useState(false);
-	const [newLocationCity, setNewLocationCity] = useState("");
-	const [isCreatingLocation, setIsCreatingLocation] = useState(false);
+
 	const router = useRouter();
 
 	const form = useForm<FormValues>({
@@ -124,14 +106,14 @@ export const PartnerRegistrationForm = ({
 			name: "",
 			email: initialEmail,
 			phone: "",
-			locationId: "",
+			locationIds: [],
 			serviceType: [],
 			website: "",
 		},
 	});
 
 	const watchedValues = form.watch();
-	const selectedLocation = locations.find((loc) => loc.id === watchedValues.locationId);
+	const selectedLocations = locations.filter((loc) => watchedValues.locationIds?.includes(loc.id));
 
 	useEffect(() => {
 		const getLocations = async () => {
@@ -170,18 +152,6 @@ export const PartnerRegistrationForm = ({
 		setAreaCovered(areaCovered.filter((item) => item !== postcode));
 	};
 
-	const handleAddServiceType = () => {
-		if (newServiceType.trim()) {
-			const serviceType = newServiceType.trim().toLowerCase().replace(/\s+/g, "_");
-			if (!customServiceTypes.includes(serviceType)) {
-				setCustomServiceTypes([...customServiceTypes, serviceType]);
-				const currentTypes = form.getValues("serviceType");
-				form.setValue("serviceType", [...currentTypes, serviceType]);
-			}
-			setNewServiceType("");
-		}
-	};
-
 	const handleRemoveServiceType = (serviceType: string) => {
 		setCustomServiceTypes(customServiceTypes.filter((type) => type !== serviceType));
 		const currentTypes = form.getValues("serviceType");
@@ -189,37 +159,6 @@ export const PartnerRegistrationForm = ({
 			"serviceType",
 			currentTypes.filter((type) => type !== serviceType),
 		);
-	};
-
-	const handleCreateLocation = async () => {
-		if (!newLocationCity.trim()) {
-			toast.error("Please enter a city name");
-			return;
-		}
-
-		setIsCreatingLocation(true);
-		try {
-			const formData = new FormData();
-			formData.append("city", newLocationCity.trim());
-			formData.append("zipcodes", "all");
-
-			const result = await createLocation(formData);
-
-			if (result.success && result.location) {
-				setLocations([...locations, result.location]);
-				form.setValue("locationId", result.location.id);
-				setShowAddLocation(false);
-				setNewLocationCity("");
-				toast.success("Location created successfully");
-			} else {
-				toast.error("Failed to create location");
-			}
-		} catch (error) {
-			console.error("Error creating location:", error);
-			toast.error("Failed to create location");
-		} finally {
-			setIsCreatingLocation(false);
-		}
 	};
 
 	const isFormValid = () => {
@@ -231,7 +170,7 @@ export const PartnerRegistrationForm = ({
 			values.name.trim() !== "" &&
 			values.email.trim() !== "" &&
 			values.phone.trim() !== "" &&
-			values.locationId !== "" &&
+			values.locationIds.length > 0 &&
 			values.serviceType.length > 0
 		);
 	};
@@ -345,73 +284,33 @@ export const PartnerRegistrationForm = ({
 											/>
 											<FormField
 												control={form.control}
-												name="locationId"
+												name="locationIds"
 												render={({ field }) => (
 													<FormItem>
-														<FormLabel>Service Location *</FormLabel>
-														<div className="flex gap-2">
-															<Select onValueChange={field.onChange} value={field.value}>
-																<FormControl>
-																	<SelectTrigger>
-																		<SelectValue placeholder="Select location" />
-																	</SelectTrigger>
-																</FormControl>
-																<SelectContent>
-																	{locations.map((location) => (
-																		<SelectItem key={location.id} value={location.id}>
-																			{location.city}
-																		</SelectItem>
-																	))}
-																</SelectContent>
-															</Select>
-															<Dialog open={showAddLocation} onOpenChange={setShowAddLocation}>
-																<DialogTrigger asChild>
-																	<Button type="button" variant="outline" size="sm">
-																		<Plus className="size-4" />
-																	</Button>
-																</DialogTrigger>
-																<DialogContent>
-																	<DialogHeader>
-																		<DialogTitle>Add New Location</DialogTitle>
-																		<DialogDescription>
-																			Add a new city to the service locations
-																		</DialogDescription>
-																	</DialogHeader>
-																	<div className="space-y-4">
-																		<div>
-																			<label htmlFor="city" className="text-sm font-medium">
-																				City Name
-																			</label>
-																			<Input
-																				id="city"
-																				placeholder="Enter city name"
-																				value={newLocationCity}
-																				onChange={(e) => setNewLocationCity(e.target.value)}
-																			/>
-																		</div>
-																	</div>
-																	<DialogFooter>
-																		<Button
-																			type="button"
-																			variant="outline"
-																			onClick={() => setShowAddLocation(false)}
-																		>
-																			Cancel
-																		</Button>
-																		<Button
-																			type="button"
-																			onClick={handleCreateLocation}
-																			disabled={isCreatingLocation}
-																		>
-																			{isCreatingLocation ? "Creating..." : "Create Location"}
-																		</Button>
-																	</DialogFooter>
-																</DialogContent>
-															</Dialog>
-														</div>
+														<FormLabel>Service Locations *</FormLabel>
+														<FormControl>
+															<MultiSelectLocations
+																value={field.value}
+																onChange={field.onChange}
+																placeholder="Select locations..."
+																required
+																onCreateLocation={async (cityName) => {
+																	const formData = new FormData();
+																	formData.append("city", cityName);
+																	formData.append("zipcodes", "all");
+
+																	const result = await createLocation(formData);
+																	if (result.success && result.location) {
+																		setLocations([...locations, result.location]);
+																		return { success: true, location: result.location };
+																	}
+																	return { success: false };
+																}}
+															/>
+														</FormControl>
 														<FormMessage />
 														<FormDescription>
-															Choose the primary city you operate in
+															Select all cities/regions where you provide service
 														</FormDescription>
 													</FormItem>
 												)}
@@ -444,7 +343,6 @@ export const PartnerRegistrationForm = ({
 																		? field.value.filter((v) => v !== service.value)
 																		: [...field.value, service.value];
 
-																	// Ensure at least one service type remains selected
 																	if (newValue.length > 0) {
 																		field.onChange(newValue);
 																	}
@@ -504,8 +402,8 @@ export const PartnerRegistrationForm = ({
 												<div className="space-y-2">
 													<FormLabel htmlFor="postcodes">Service Areas</FormLabel>
 													<FormDescription>
-														{selectedLocation
-															? `If left blank, all postcodes for ${selectedLocation.city} will be considered`
+														{selectedLocations.length > 0
+															? `If left blank, all postcodes for ${selectedLocations.map((loc) => loc.city).join(", ")} will be considered`
 															: "Enter the postcodes where you provide service"}
 													</FormDescription>
 													<div className="flex gap-2">

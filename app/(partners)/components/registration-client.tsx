@@ -1,4 +1,7 @@
+import { Suspense } from "react";
+
 import { PartnerRegistrationForm } from "@/app/(partners)/components/registration-form";
+import { RegistrationFormSkeleton } from "@/app/(partners)/components/registration-form-skeleton";
 
 interface PartnerRegistrationClientProps {
 	initialEmail: string;
@@ -12,10 +15,12 @@ export const PartnerRegistrationClient = ({
 	persistentLinkId,
 }: PartnerRegistrationClientProps) => {
 	return (
-		<PartnerRegistrationForm
-			initialEmail={initialEmail}
-			token={token}
-			persistentLinkId={persistentLinkId}
-		/>
+		<Suspense fallback={<RegistrationFormSkeleton />}>
+			<PartnerRegistrationForm
+				initialEmail={initialEmail}
+				token={token}
+				persistentLinkId={persistentLinkId}
+			/>
+		</Suspense>
 	);
 };
