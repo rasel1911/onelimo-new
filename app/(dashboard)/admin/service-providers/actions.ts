@@ -21,6 +21,7 @@ export const createServiceProviderAction = async (formData: FormData) => {
 
 	const areaCovered = formData.getAll("areaCovered").map((area) => area.toString());
 	const serviceType = formData.getAll("serviceType").map((type) => type.toString());
+	const locationIds = formData.getAll("locationIds").map((id) => id.toString());
 
 	if (serviceType.length === 0) {
 		return {
@@ -38,6 +39,7 @@ export const createServiceProviderAction = async (formData: FormData) => {
 		...rawData,
 		areaCovered,
 		serviceType,
+		locationIds,
 		reputation,
 		responseTime,
 	});
@@ -114,7 +116,6 @@ export const createServiceProviderAction = async (formData: FormData) => {
 			pinResetToken: null,
 			pinResetTokenExpiresAt: null,
 			pinResetRequestedAt: null,
-			locationIds: [],
 		});
 
 		revalidatePath("/admin/service-providers");
@@ -145,6 +146,7 @@ export const updateServiceProviderAction = async (id: string, formData: FormData
 
 	const areaCovered = formData.getAll("areaCovered").map((area) => area.toString());
 	const serviceType = formData.getAll("serviceType").map((type) => type.toString());
+	const locationIds = formData.getAll("locationIds").map((id) => id.toString());
 
 	if (serviceType.length === 0) {
 		return {
@@ -162,6 +164,7 @@ export const updateServiceProviderAction = async (id: string, formData: FormData
 		...rawData,
 		areaCovered,
 		serviceType,
+		locationIds,
 		reputation,
 		responseTime,
 	});
@@ -215,7 +218,7 @@ export const updateServiceProviderAction = async (id: string, formData: FormData
 
 		const dataToUpdate = {
 			...validatedFields.data,
-			locationId: locationIds[0], // Use first location for backward compatibility
+			locationId: locationIds[0], // FIXME: Use first location for backward compatibility, deprecated
 			locationIds: locationIds,
 			areaCovered:
 				validatedFields.data.areaCovered && validatedFields.data.areaCovered.length > 0
@@ -264,5 +267,33 @@ export const deleteServiceProviderAction = async (id: string) => {
 			success: false,
 			error: "Failed to delete service provider. Please try again.",
 		};
+	}
+};
+
+/**
+ * Toggle service provider status between active and inactive
+ * @param id - The service provider ID
+ * @param currentStatus - The current status to toggle from
+ * @returns The result of the toggle operation
+ */
+export const toggleServiceProviderStatusAction = async (id: string, currentStatus: string) => {
+	try {
+		const newStatus = currentStatus === "active" ? "inactive" : "active";
+
+		await updateServiceProvider(id, {
+			status: newStatus,
+		});
+
+		revalidatePath("/admin/service-providers");
+		revalidatePath("/api/service-providers");
+
+		return {
+			success: true,
+			newStatus,
+			message: `Service provider ${newStatus === "active" ? "activated" : "deactivated"} successfully`,
+		};
+	} catch (error) {
+		console.error("Failed to toggle service provider status:", error);
+		return { success: false, error: "Failed to update service provider status" };
 	}
 };

@@ -14,11 +14,13 @@ import { useState } from "react";
 
 import { DeleteServiceProvider } from "@/app/(dashboard)/admin/components/delete-service-provider";
 import { ServiceProviderSearch } from "@/app/(dashboard)/admin/components/service-provider-search";
+import { ToggleServiceProviderStatus } from "@/app/(dashboard)/admin/components/toggle-service-provider-status";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
+	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -49,9 +51,13 @@ export type ServiceProvider = {
 
 interface ServiceProviderTableProps {
 	data: ServiceProvider[];
+	onServiceProviderDeleted?: () => void;
 }
 
-export const ServiceProviderTable = ({ data }: ServiceProviderTableProps) => {
+export const ServiceProviderTable = ({
+	data,
+	onServiceProviderDeleted,
+}: ServiceProviderTableProps) => {
 	const [globalFilter, setGlobalFilter] = useState("");
 
 	const columns: ColumnDef<ServiceProvider>[] = [
@@ -117,7 +123,17 @@ export const ServiceProviderTable = ({ data }: ServiceProviderTableProps) => {
 								Edit
 							</Link>
 						</DropdownMenuItem>
-						<DeleteServiceProvider id={row.original.id} />
+						<DropdownMenuSeparator />
+						<ToggleServiceProviderStatus
+							id={row.original.id}
+							currentStatus={row.original.status}
+							onStatusChanged={onServiceProviderDeleted}
+						/>
+						<DropdownMenuSeparator />
+						<DeleteServiceProvider
+							id={row.original.id}
+							onServiceProviderDeleted={onServiceProviderDeleted}
+						/>
 					</DropdownMenuContent>
 				</DropdownMenu>
 			),
