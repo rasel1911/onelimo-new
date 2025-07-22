@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 
 interface LocationFormProps {
 	initialData?: {
@@ -38,11 +39,23 @@ export const LocationForm = ({ initialData, mode }: LocationFormProps) => {
 	const [newZipcode, setNewZipcode] = useState("");
 	const [formErrors, setFormErrors] = useState<{ [key: string]: string[] }>({});
 	const [serverError, setServerError] = useState<string | null>(null);
+	const [specifyPostcodes, setSpecifyPostcodes] = useState(
+		// If editing and zipcodes exist and it's not just "all", show the postcodes field
+		mode === "edit" &&
+			initialData?.zipcodes &&
+			!initialData.zipcodes.includes("all") &&
+			initialData.zipcodes.length > 0,
+	);
 
 	useEffect(() => {
 		if (initialData) {
 			setCity(initialData.city);
-			setZipcodes(initialData.zipcodes);
+			// Only set zipcodes if they're not just "all"
+			if (initialData.zipcodes && !initialData.zipcodes.includes("all")) {
+				setZipcodes(initialData.zipcodes);
+			} else {
+				setZipcodes([]);
+			}
 		}
 	}, [initialData]);
 
@@ -79,14 +92,17 @@ export const LocationForm = ({ initialData, mode }: LocationFormProps) => {
 			errors.city = cityErrors;
 		}
 
-		if (zipcodes.length === 0) {
-			errors.zipcodes = ["At least one postcode is required"];
-		} else {
-			const invalidPostcodes = zipcodes.filter((zip) => !validatePostcode(zip));
-			if (invalidPostcodes.length > 0) {
-				errors.zipcodes = [
-					"One or more postcodes are in an invalid format. Please use UK or EU format.",
-				];
+		// If specifyPostcodes is true, validate postcodes
+		if (specifyPostcodes) {
+			if (zipcodes.length === 0) {
+				errors.zipcodes = ["At least one postcode is required when specifying postcodes"];
+			} else {
+				const invalidPostcodes = zipcodes.filter((zip) => !validatePostcode(zip));
+				if (invalidPostcodes.length > 0) {
+					errors.zipcodes = [
+						"One or more postcodes are in an invalid format. Please use UK or EU format.",
+					];
+				}
 			}
 		}
 
@@ -100,9 +116,14 @@ export const LocationForm = ({ initialData, mode }: LocationFormProps) => {
 			const formData = new FormData();
 			formData.append("city", city);
 
-			zipcodes.forEach((zipcode) => {
-				formData.append("zipcodes", zipcode);
-			});
+			// If not specifying postcodes, use "all" as the default value
+			if (!specifyPostcodes) {
+				formData.append("zipcodes", "all");
+			} else {
+				zipcodes.forEach((zipcode) => {
+					formData.append("zipcodes", zipcode);
+				});
+			}
 
 			let response;
 
@@ -155,8 +176,19 @@ export const LocationForm = ({ initialData, mode }: LocationFormProps) => {
 		}
 	};
 
+	const handleSpecifyPostcodesChange = (checked: boolean) => {
+		setSpecifyPostcodes(checked);
+		if (formErrors.zipcodes) {
+			setFormErrors({ ...formErrors, zipcodes: [] });
+		}
+		if (!checked) {
+			setZipcodes([]);
+			setNewZipcode("");
+		}
+	};
+
 	return (
-		<Card className="w-full max-w-xl">
+		<Card className="w-full max-w-2xl">
 			<CardHeader>
 				<CardTitle>{mode === "create" ? "Add New Location" : "Edit Location"}</CardTitle>
 				<CardDescription>
@@ -186,58 +218,82 @@ export const LocationForm = ({ initialData, mode }: LocationFormProps) => {
 					</div>
 
 					<div className="space-y-4">
-						<div>
-							<Label>Postcodes</Label>
-							<p className="mt-1 text-xs text-muted-foreground">
-								Enter UK (e.g., SW1A 1AA) or EU format postcodes. Press Enter or Tab to add.
-							</p>
-						</div>
-
-						{formErrors.zipcodes && (
-							<p className="text-sm text-red-500">{formErrors.zipcodes[0]}</p>
-						)}
-
-						<div className="rounded-lg border bg-muted/30 p-4">
-							<div className="flex gap-2">
-								<Input
-									placeholder="Add postcode (UK or EU format)"
-									value={newZipcode}
-									onChange={(e) => setNewZipcode(e.target.value)}
-									className="flex-1"
-									onKeyDown={handleZipcodeKeyDown}
+						<div className="flex items-center justify-between">
+							<div className="space-y-1">
+								<Label>Service Area Coverage</Label>
+								<p className="text-xs text-muted-foreground">
+									{specifyPostcodes
+										? "Enter specific postcodes where service is available"
+										: "All postcodes of the city will be considered for service coverage"}
+								</p>
+							</div>
+							<div className="flex items-center space-x-2">
+								<Label htmlFor="specify-postcodes" className="text-sm font-normal">
+									Specify postcodes
+								</Label>
+								<Switch
+									id="specify-postcodes"
+									checked={specifyPostcodes}
+									onCheckedChange={handleSpecifyPostcodesChange}
 									disabled={isSubmitting}
 								/>
-								<Button
-									type="button"
-									variant="outline"
-									onClick={handleAddZipcode}
-									disabled={isSubmitting}
-								>
-									<PlusCircle className="size-4" />
-								</Button>
 							</div>
-
-							{zipcodes.length > 0 && (
-								<div className="mt-4 flex flex-wrap gap-2">
-									{zipcodes.map((zipcode, index) => (
-										<div
-											key={index}
-											className="flex items-center gap-1 rounded-md bg-primary/10 px-2 py-1 text-primary"
-										>
-											<span>{zipcode}</span>
-											<button
-												type="button"
-												onClick={() => handleRemoveZipcode(index)}
-												className="text-primary hover:text-primary/70"
-												disabled={isSubmitting}
-											>
-												<X className="size-3" />
-											</button>
-										</div>
-									))}
-								</div>
-							)}
 						</div>
+
+						{specifyPostcodes && (
+							<div className="space-y-4">
+								{formErrors.zipcodes && (
+									<p className="text-sm text-red-500">{formErrors.zipcodes[0]}</p>
+								)}
+
+								<div className="rounded-lg border bg-muted/30 p-4">
+									<div className="mb-2">
+										<p className="text-sm text-muted-foreground">
+											Enter UK (e.g., SW1A 1AA) or EU format postcodes. Press Enter or Tab to add.
+										</p>
+									</div>
+									<div className="flex gap-2">
+										<Input
+											placeholder="Add postcode (UK or EU format)"
+											value={newZipcode}
+											onChange={(e) => setNewZipcode(e.target.value)}
+											className="flex-1"
+											onKeyDown={handleZipcodeKeyDown}
+											disabled={isSubmitting}
+										/>
+										<Button
+											type="button"
+											variant="outline"
+											onClick={handleAddZipcode}
+											disabled={isSubmitting}
+										>
+											<PlusCircle className="size-4" />
+										</Button>
+									</div>
+
+									{zipcodes.length > 0 && (
+										<div className="mt-4 flex flex-wrap gap-2">
+											{zipcodes.map((zipcode, index) => (
+												<div
+													key={index}
+													className="flex items-center gap-1 rounded-md bg-primary/10 px-2 py-1 text-primary"
+												>
+													<span>{zipcode}</span>
+													<button
+														type="button"
+														onClick={() => handleRemoveZipcode(index)}
+														className="text-primary hover:text-primary/70"
+														disabled={isSubmitting}
+													>
+														<X className="size-3" />
+													</button>
+												</div>
+											))}
+										</div>
+									)}
+								</div>
+							</div>
+						)}
 					</div>
 				</CardContent>
 

@@ -9,7 +9,6 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 import AdminForm from "@/app/(dashboard)/admin/components/admin-form";
-import { LocationModal } from "@/app/(dashboard)/admin/components/location-modal";
 import { createLocation } from "@/app/(dashboard)/admin/locations/actions";
 import {
 	createServiceProviderAction,
@@ -127,7 +126,6 @@ export const ServiceProviderForm = ({
 		initialData.serviceType?.map((type) => type.toString()) || ["stretch_limousine"],
 	);
 	const [newArea, setNewArea] = useState("");
-	const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
 	const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
 	const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
 	const router = useRouter();
@@ -554,12 +552,6 @@ export const ServiceProviderForm = ({
 					</div>
 				</div>
 			</AdminForm>
-
-			<LocationModal
-				open={isLocationModalOpen}
-				onOpenChange={setIsLocationModalOpen}
-				onLocationAdded={handleLocationAdded}
-			/>
 
 			{/* Fixed Help Button - Bottom Right */}
 			<div className="fixed bottom-6 right-6 z-50">
