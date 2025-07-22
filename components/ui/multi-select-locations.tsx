@@ -265,9 +265,7 @@ export function MultiSelectLocations({
 															<MapPin className="h-4 w-4 text-muted-foreground" />
 															<span className="flex-1">{location.city}</span>
 															{location.zipcodes && location.zipcodes.length > 0 && (
-																<span className="text-xs text-muted-foreground">
-																	all postcodes
-																</span>
+																<span className="text-xs text-muted-foreground">all postcodes</span>
 															)}
 														</div>
 													</div>
