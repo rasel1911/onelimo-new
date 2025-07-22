@@ -36,9 +36,10 @@ import { type Location } from "../locations/page";
 interface LocationsTableProps {
 	data: Location[];
 	isLoading: boolean;
+	onLocationDeleted?: () => void;
 }
 
-const LocationsTable = ({ data, isLoading }: LocationsTableProps) => {
+const LocationsTable = ({ data, isLoading, onLocationDeleted }: LocationsTableProps) => {
 	const [globalFilter, setGlobalFilter] = useState("");
 
 	const columns: ColumnDef<Location>[] = [
@@ -110,7 +111,11 @@ const LocationsTable = ({ data, isLoading }: LocationsTableProps) => {
 								<Link href={`/admin/locations/${location.id}/edit`} passHref>
 									<DropdownMenuItem>Edit</DropdownMenuItem>
 								</Link>
-								<DeleteLocation id={location.id} cityName={location.city} />
+								<DeleteLocation
+									id={location.id}
+									cityName={location.city}
+									onLocationDeleted={onLocationDeleted}
+								/>
 							</DropdownMenuContent>
 						</DropdownMenu>
 					</div>

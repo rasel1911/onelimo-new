@@ -49,6 +49,7 @@ export const createLocation = async (formData: FormData) => {
 		clearCityNamesCache();
 
 		revalidatePath("/admin/locations");
+		revalidatePath("/api/locations");
 
 		return {
 			success: true,
@@ -138,6 +139,7 @@ export const updateLocationAction = async (id: string, formData: FormData) => {
 		clearCityNamesCache();
 
 		revalidatePath("/admin/locations");
+		revalidatePath("/api/locations");
 
 		return { success: true };
 	} catch (error) {
@@ -161,6 +163,7 @@ export const deleteLocationAction = async (id: string) => {
 		clearCityNamesCache();
 
 		revalidatePath("/admin/locations");
+		revalidatePath("/api/locations");
 
 		return { success: true };
 	} catch (error) {

@@ -18,9 +18,10 @@ import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 interface DeleteLocationProps {
 	id: string;
 	cityName: string;
+	onLocationDeleted?: () => void;
 }
 
-export const DeleteLocation = ({ id, cityName }: DeleteLocationProps) => {
+export const DeleteLocation = ({ id, cityName, onLocationDeleted }: DeleteLocationProps) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [isDeleting, setIsDeleting] = useState(false);
 	const [error, setError] = useState<string | null>(null);
@@ -32,12 +33,13 @@ export const DeleteLocation = ({ id, cityName }: DeleteLocationProps) => {
 
 			const response = await deleteLocationAction(id);
 
-			if (!response.success) {
+			if (response?.success) {
+				setIsOpen(false);
+				onLocationDeleted?.();
+			} else {
 				setError(response.error as string);
 				return;
 			}
-
-			setIsOpen(false);
 		} catch (e) {
 			setError("An unexpected error occurred. Please try again.");
 		} finally {

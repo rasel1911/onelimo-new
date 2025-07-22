@@ -147,7 +147,11 @@ const LocationsSection = () => {
 							</CardDescription>
 						</CardHeader>
 						<CardContent>
-							<LocationsTable data={locations} isLoading={isLoading} />
+							<LocationsTable
+								data={locations}
+								isLoading={isLoading}
+								onLocationDeleted={() => fetchLocations(true)}
+							/>
 						</CardContent>
 					</Card>
 				</motion.div>
