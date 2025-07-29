@@ -43,6 +43,7 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useLocations } from "@/hooks/use-locations";
+import { parseCustomServiceTypes } from "@/lib/utils/formatting";
 
 const SERVICE_TYPES = [
 	"suv",
@@ -200,13 +201,12 @@ export const ServiceProviderForm = ({
 
 	const addCustomService = () => {
 		if (customServiceInput.trim()) {
-			const serviceTypes = customServiceInput
-				.split(/[,\t\n]/)
-				.map((type) => type.trim().toLowerCase().replace(/\s+/g, "_"))
-				.filter(
-					(type) =>
-						type && !customServiceTypes.includes(type) && !SERVICE_TYPES.some((s) => s === type),
-				);
+			const standardTypes = SERVICE_TYPES.map((s) => s.toString());
+			const serviceTypes = parseCustomServiceTypes(
+				customServiceInput,
+				customServiceTypes,
+				standardTypes,
+			);
 
 			if (serviceTypes.length > 0) {
 				const newCustomTypes = [...customServiceTypes, ...serviceTypes];

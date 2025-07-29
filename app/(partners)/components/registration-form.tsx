@@ -33,6 +33,7 @@ import { Input } from "@/components/ui/input";
 import { MultiSelectLocations } from "@/components/ui/multi-select-locations";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { parseCustomServiceTypes } from "@/lib/utils/formatting";
 
 const SERVICE_TYPES = [
 	{ value: "suv", label: "SUV Service" },
@@ -172,15 +173,12 @@ export const PartnerRegistrationForm = ({
 
 	const addCustomService = () => {
 		if (customServiceInput.trim()) {
-			const serviceTypes = customServiceInput
-				.split(/[,\t\n]/)
-				.map((type) => type.trim().toLowerCase().replace(/\s+/g, "_"))
-				.filter(
-					(type) =>
-						type &&
-						!customServiceTypes.includes(type) &&
-						!SERVICE_TYPES.some((s) => s.value === type),
-				);
+			const standardTypes = SERVICE_TYPES.map((s) => s.value);
+			const serviceTypes = parseCustomServiceTypes(
+				customServiceInput,
+				customServiceTypes,
+				standardTypes,
+			);
 
 			if (serviceTypes.length > 0) {
 				const newCustomTypes = [...customServiceTypes, ...serviceTypes];
