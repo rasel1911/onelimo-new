@@ -1,15 +1,5 @@
 import { z } from "zod";
 
-export const SERVICE_TYPES = [
-	"suv",
-	"party_bus",
-	"stretch_limousine",
-	"sedan",
-	"hummer",
-	"other",
-	"not_specified",
-] as const;
-
 export const ROLES = ["user", "customer", "admin", "support", "partner"] as const;
 
 export const ServiceProviderSchema = z.object({

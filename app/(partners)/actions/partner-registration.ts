@@ -9,15 +9,6 @@ import {
 import { markTokenAsUsed, validateToken } from "@/db/queries/registrationToken.queries";
 import { createServiceProvider } from "@/db/queries/serviceProvider.queries";
 
-const SERVICE_TYPES = [
-	"suv",
-	"party_bus",
-	"stretch_limousine",
-	"sedan",
-	"hummer",
-	"other",
-] as const;
-
 const PartnerRegistrationSchema = z.object({
 	name: z
 		.string()
@@ -85,11 +76,8 @@ export const registerPartner = async (formData: PartnerRegistrationFormData) => 
 
 		const locationIds = validatedFields.data.locationIds;
 
-		const normalizedServiceTypes = validatedFields.data.serviceType.map((type) => {
-			if (SERVICE_TYPES.includes(type as any)) {
-				return type;
-			}
-			return "other";
+		const normalizedServiceTypes = validatedFields.data.serviceType.filter((type) => {
+			return type !== "other";
 		});
 
 		const dataToInsert = {

@@ -33,6 +33,7 @@ import { Input } from "@/components/ui/input";
 import { MultiSelectLocations } from "@/components/ui/multi-select-locations";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { parseCustomServiceTypes } from "@/lib/utils/formatting";
 
 const SERVICE_TYPES = [
 	{ value: "suv", label: "SUV Service" },
@@ -96,6 +97,8 @@ export const PartnerRegistrationForm = ({
 	const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
 	const [locations, setLocations] = useState<Location[]>([]);
 	const [customServiceTypes, setCustomServiceTypes] = useState<string[]>([]);
+	const [customServiceInput, setCustomServiceInput] = useState("");
+	const [showCustomServiceInput, setShowCustomServiceInput] = useState(false);
 
 	const router = useRouter();
 
@@ -161,6 +164,59 @@ export const PartnerRegistrationForm = ({
 		);
 	};
 
+	const handleAddCustomService = (e: React.KeyboardEvent<HTMLInputElement>) => {
+		if (["Enter", "Tab", ","].includes(e.key)) {
+			e.preventDefault();
+			addCustomService();
+		}
+	};
+
+	const addCustomService = () => {
+		if (customServiceInput.trim()) {
+			const standardTypes = SERVICE_TYPES.map((s) => s.value);
+			const serviceTypes = parseCustomServiceTypes(
+				customServiceInput,
+				customServiceTypes,
+				standardTypes,
+			);
+
+			if (serviceTypes.length > 0) {
+				const newCustomTypes = [...customServiceTypes, ...serviceTypes];
+				setCustomServiceTypes(newCustomTypes);
+
+				const currentFormTypes = form.getValues("serviceType");
+				const updatedFormTypes = [...currentFormTypes, ...serviceTypes];
+				form.setValue("serviceType", updatedFormTypes);
+			}
+			setCustomServiceInput("");
+		}
+	};
+
+	const handleServiceTypeClick = (serviceValue: string) => {
+		const field = form.getValues("serviceType");
+		const isSelected = field.includes(serviceValue);
+
+		if (serviceValue === "other") {
+			if (!showCustomServiceInput) {
+				setShowCustomServiceInput(true);
+			} else {
+				const newValue = field.filter((v) => !customServiceTypes.includes(v));
+				form.setValue("serviceType", newValue);
+				setShowCustomServiceInput(false);
+				setCustomServiceTypes([]);
+				setCustomServiceInput("");
+			}
+		} else {
+			const newValue = isSelected
+				? field.filter((v) => v !== serviceValue)
+				: [...field, serviceValue];
+
+			if (newValue.length > 0) {
+				form.setValue("serviceType", newValue);
+			}
+		}
+	};
+
 	const isFormValid = () => {
 		const errors = form.formState.errors;
 		const values = form.getValues();
@@ -210,7 +266,9 @@ export const PartnerRegistrationForm = ({
 	}
 
 	const availableServiceTypes = [
-		...SERVICE_TYPES,
+		...SERVICE_TYPES.filter(
+			(service) => !(service.value === "other" && customServiceTypes.length > 0),
+		),
 		...customServiceTypes.map((type) => ({
 			value: type,
 			label: type.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()),
@@ -335,29 +393,18 @@ export const PartnerRegistrationForm = ({
 																key={service.value}
 																type="button"
 																variant={
-																	field.value.includes(service.value) ? "default" : "outline"
+																	service.value === "other"
+																		? showCustomServiceInput
+																			? "default"
+																			: "outline"
+																		: field.value.includes(service.value)
+																			? "default"
+																			: "outline"
 																}
 																className="justify-start"
-																onClick={() => {
-																	const newValue = field.value.includes(service.value)
-																		? field.value.filter((v) => v !== service.value)
-																		: [...field.value, service.value];
-
-																	if (newValue.length > 0) {
-																		field.onChange(newValue);
-																	}
-																}}
+																onClick={() => handleServiceTypeClick(service.value)}
 															>
 																{service.label}
-																{customServiceTypes.includes(service.value) && (
-																	<X
-																		className="ml-2 size-3"
-																		onClick={(e) => {
-																			e.stopPropagation();
-																			handleRemoveServiceType(service.value);
-																		}}
-																	/>
-																)}
 															</Button>
 														))}
 													</div>
@@ -370,6 +417,58 @@ export const PartnerRegistrationForm = ({
 												</FormItem>
 											)}
 										/>
+
+										{showCustomServiceInput && (
+											<div className="mt-2">
+												<FormLabel>Specify Service Type</FormLabel>
+												<div className="mt-1 flex gap-3">
+													<Input
+														placeholder="e.g., Executive Van"
+														value={customServiceInput}
+														onChange={(e) => setCustomServiceInput(e.target.value)}
+														onKeyDown={handleAddCustomService}
+														onBlur={addCustomService}
+													/>
+													<Button
+														type="button"
+														variant="outline"
+														onClick={addCustomService}
+														className="shrink-0"
+													>
+														<Plus className="size-4" />
+													</Button>
+												</div>
+												<FormDescription>
+													You can add multiple service types by separating them with a comma.
+												</FormDescription>
+
+												{customServiceTypes.length > 0 && (
+													<div className="mt-3">
+														<div className="flex flex-wrap gap-2">
+															{customServiceTypes.map((serviceType, index) => (
+																<div
+																	key={index}
+																	className="flex items-center gap-1 rounded-full bg-secondary px-3 py-1 text-sm"
+																>
+																	<span>
+																		{serviceType
+																			.replace(/_/g, " ")
+																			.replace(/\b\w/g, (l) => l.toUpperCase())}
+																	</span>
+																	<button
+																		type="button"
+																		onClick={() => handleRemoveServiceType(serviceType)}
+																		className="ml-1 rounded-full text-muted-foreground hover:text-foreground"
+																	>
+																		<X className="size-3" />
+																	</button>
+																</div>
+															))}
+														</div>
+													</div>
+												)}
+											</div>
+										)}
 
 										<Separator />
 

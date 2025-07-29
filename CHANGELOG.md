@@ -2,6 +2,100 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.3] - 2025-01-16
+
+### Added
+
+- **Custom Service Types Support**: Implemented comprehensive custom service type functionality across partner registration and admin forms
+  - Added custom service type input field with support for comma, tab, and enter key separation
+  - Implemented real-time custom service type tags with individual remove functionality
+  - Added smart deduplication to prevent duplicate service types and filter out standard types from custom input
+  - Enhanced form validation to properly handle both standard and custom service types
+
+### Enhanced
+
+- **Partner Registration Form**: Improved service type selection with custom type support
+  - When "Other Service" is selected, users can now specify multiple custom service types
+  - Custom service types are displayed as removable tags for better user experience
+  - "Other Service" button is automatically hidden when custom types are added for cleaner UI
+  - Added proper handling of blur events to automatically add custom types when input loses focus
+
+- **Admin Service Provider Form**: Extended custom service type functionality to admin interface
+  - Admins can now add custom service types when creating or editing service providers
+  - Existing service providers with custom types are properly loaded and displayed
+  - Consistent UI/UX with partner registration form for familiar user experience
+  - Added initialization logic to detect and display existing custom service types
+
+### Changed
+
+- **Service Type Data Handling**: Updated backend processing to properly support custom service types
+  - Modified partner registration action to exclude "other" placeholder from submitted values
+  - Updated admin service provider actions to preserve custom service types instead of converting to "not_specified"
+  - Enhanced service type normalization to filter out placeholder values while keeping custom types
+  - Improved form submission logic to include custom service types in database storage
+
+- **Database Schema Compatibility**: Leveraged existing varchar array field to store custom service types
+  - No database migrations required as schema already supports custom string values
+  - Custom service types are stored alongside standard service types in the same array field
+  - Maintained backward compatibility with existing service provider records
+
+### Fixed
+
+- **Service Type Selection Logic**: Resolved issues with "other" service type deselection
+  - Fixed bug where "other" button couldn't be deselected when no custom types were added
+  - Improved state management for custom service type input visibility
+  - Enhanced button selection logic to properly handle "other" service type state
+
+## [0.1.2] - 2025-01-15
+
+### Enhanced
+
+- **Service Provider Matching Algorithm**: Significantly improved the accuracy of provider selection
+  - Refactored `findMatchingServiceProviders` to include location data in the matching process
+  - Updated `calculateMatchScore` and `calculateLocationScore` functions to utilize a location map for better location matching
+  - Introduced helper functions `checkLocationMatch` and `checkPostcodeMatch` to streamline location and postcode validation
+  - Improved scoring logic for service type and provider quality, enhancing the overall matching algorithm
+  - Updated `MultiSelectLocations` component to display "all postcodes" instead of a count, improving user clarity in location selection
+
+### Changed
+
+- **Service Provider Components Refactor**: Improved state management and error handling across service provider components
+  - Updated `AdminDashboardError` and `ServiceProvidersError` components to use a consistent `reset` prop instead of `resetAction`
+  - Enhanced `DeleteServiceProviderButton` and `DeleteServiceProvider` components to accept an optional `onServiceProviderDeleted` callback
+  - Refactored `ServiceProviderForm` to change the status field from a boolean to an enum, improving validation and clarity
+  - Introduced `ServiceProviderDetailsClient` component to encapsulate service provider details rendering
+  - Updated API routes to reflect changes in service provider data structure
+
+- **Service Provider Status Management**: Implemented toggle functionality for better status control
+  - Added `ToggleServiceProviderStatus` component to allow toggling between active and inactive states
+  - Integrated the new toggle component into the `ServiceProviderTable` for seamless user experience
+  - Updated `service-providers/actions.ts` to include `toggleServiceProviderStatusAction` with proper revalidation
+  - Enhanced `ServiceProviderTableProps` to support callback for status changes
+
+- **Partner Registration Form Enhancement**: Improved location handling and user experience
+  - Refactored `PartnerRegistrationForm` to utilize an array for `locationIds`, allowing multiple location selections
+  - Introduced `MultiSelectLocations` component for better user experience in selecting service locations
+  - Updated form validation to ensure at least one location is selected, enhancing data integrity
+  - Added a loading skeleton component for improved user feedback during form loading states
+
+- **Service Provider Form Improvements**: Enhanced location handling and user guidance
+  - Updated `ServiceProviderForm` to utilize a multi-select component for service locations
+  - Modified form validation to require at least one service location and updated schema from `locationId` to `locationIds`
+  - Enhanced `createServiceProviderAction` and `updateServiceProviderAction` to handle multiple location IDs with backward compatibility
+  - Adjusted the edit page to accommodate the new structure for location IDs
+  - Added a help dialog to guide users in filling out the service provider form
+
+- **Location Management**: Enhanced deletion functionality in admin dashboard
+  - Updated `DeleteLocation` component to accept an `onLocationDeleted` callback
+  - Modified `LocationsTable` to pass the `onLocationDeleted` callback to `DeleteLocation`
+  - Adjusted `locations/page.tsx` to trigger a fetch for updated locations after deletion
+  - Added revalidation paths for API calls in location actions to ensure data integrity
+
+### Added
+
+- **Package Dependencies**: Updated dependencies for improved functionality
+  - Upgraded `@radix-ui/react-dialog` to version 1.1.14 for improved dialog functionality
+
 ## [0.1.1] - 2025-07-20
 
 ### Added
