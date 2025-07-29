@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ChevronDown, ChevronUp, Plus, X, HelpCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -77,7 +77,7 @@ const formSchema = z.object({
 		),
 	status: z.enum(["active", "inactive", "pending"]),
 	role: z.enum(ROLES),
-	serviceType: z.array(z.enum(SERVICE_TYPES)).min(1, "At least one service type is required"),
+	serviceType: z.array(z.string()).min(1, "At least one service type is required"),
 	reputation: z.number().min(0).max(5),
 	responseTime: z.number().min(0).max(5),
 	locationIds: z.array(z.string()).min(1, "At least one service location is required"),
@@ -128,6 +128,9 @@ export const ServiceProviderForm = ({
 	const [newArea, setNewArea] = useState("");
 	const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
 	const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
+	const [customServiceTypes, setCustomServiceTypes] = useState<string[]>([]);
+	const [customServiceInput, setCustomServiceInput] = useState("");
+	const [showCustomServiceInput, setShowCustomServiceInput] = useState(false);
 	const router = useRouter();
 
 	const isPendingProvider =
@@ -156,6 +159,20 @@ export const ServiceProviderForm = ({
 	const submitLabel = mode === "create" ? "Create Service Provider" : "Update Service Provider";
 	const submittingLabel = mode === "create" ? "Creating..." : "Updating...";
 
+	useEffect(() => {
+		if (initialData.serviceType) {
+			const standardTypes = SERVICE_TYPES.map((t) => t.toString());
+			const customTypes = initialData.serviceType
+				.map((type) => type.toString())
+				.filter((type) => !standardTypes.includes(type) && type !== "other");
+
+			if (customTypes.length > 0) {
+				setCustomServiceTypes(customTypes);
+				setShowCustomServiceInput(true);
+			}
+		}
+	}, [initialData.serviceType]);
+
 	const handleAddArea = () => {
 		if (newArea.trim() && !areaCovered.includes(newArea.trim())) {
 			setAreaCovered([...areaCovered, newArea.trim()]);
@@ -174,17 +191,60 @@ export const ServiceProviderForm = ({
 		setAreaCovered(areaCovered.filter((_, i) => i !== index));
 	};
 
-	const handleLocationAdded = (locationId: string) => {
-		form.setValue("locationIds", [...form.getValues("locationIds"), locationId]);
+	const handleAddCustomService = (e: React.KeyboardEvent<HTMLInputElement>) => {
+		if (["Enter", "Tab", ","].includes(e.key)) {
+			e.preventDefault();
+			addCustomService();
+		}
+	};
+
+	const addCustomService = () => {
+		if (customServiceInput.trim()) {
+			const serviceTypes = customServiceInput
+				.split(/[,\t\n]/)
+				.map((type) => type.trim().toLowerCase().replace(/\s+/g, "_"))
+				.filter(
+					(type) =>
+						type && !customServiceTypes.includes(type) && !SERVICE_TYPES.some((s) => s === type),
+				);
+
+			if (serviceTypes.length > 0) {
+				const newCustomTypes = [...customServiceTypes, ...serviceTypes];
+				setCustomServiceTypes(newCustomTypes);
+
+				const updatedSelectedTypes = [...selectedServiceTypes, ...serviceTypes];
+				setSelectedServiceTypes(updatedSelectedTypes);
+			}
+			setCustomServiceInput("");
+		}
+	};
+
+	const handleRemoveServiceType = (serviceType: string) => {
+		setCustomServiceTypes(customServiceTypes.filter((type) => type !== serviceType));
+		setSelectedServiceTypes(selectedServiceTypes.filter((type) => type !== serviceType));
 	};
 
 	const handleToggleServiceType = (type: string) => {
-		if (selectedServiceTypes.includes(type)) {
-			if (selectedServiceTypes.length > 1) {
-				setSelectedServiceTypes(selectedServiceTypes.filter((t) => t !== type));
+		if (type === "other") {
+			if (!showCustomServiceInput) {
+				setShowCustomServiceInput(true);
+			} else {
+				const newSelectedTypes = selectedServiceTypes.filter(
+					(t) => !customServiceTypes.includes(t),
+				);
+				setSelectedServiceTypes(newSelectedTypes);
+				setShowCustomServiceInput(false);
+				setCustomServiceTypes([]);
+				setCustomServiceInput("");
 			}
 		} else {
-			setSelectedServiceTypes([...selectedServiceTypes, type]);
+			if (selectedServiceTypes.includes(type)) {
+				if (selectedServiceTypes.length > 1) {
+					setSelectedServiceTypes(selectedServiceTypes.filter((t) => t !== type));
+				}
+			} else {
+				setSelectedServiceTypes([...selectedServiceTypes, type]);
+			}
 		}
 	};
 
@@ -250,6 +310,11 @@ export const ServiceProviderForm = ({
 	}
 
 	const selectedLocations = getLocationsByIds(form.watch("locationIds"));
+
+	const availableServiceTypes = [
+		...SERVICE_TYPES.filter((service) => !(service === "other" && customServiceTypes.length > 0)),
+		...customServiceTypes.map((type) => type),
+	];
 
 	return (
 		<>
@@ -380,11 +445,19 @@ export const ServiceProviderForm = ({
 						<FormItem>
 							<FormLabel>Service Types *</FormLabel>
 							<div className="flex flex-wrap gap-2 rounded-md border p-3">
-								{SERVICE_TYPES.map((type) => (
+								{availableServiceTypes.map((type) => (
 									<Button
 										key={type}
 										type="button"
-										variant={selectedServiceTypes.includes(type) ? "default" : "outline"}
+										variant={
+											type === "other"
+												? showCustomServiceInput
+													? "default"
+													: "outline"
+												: selectedServiceTypes.includes(type)
+													? "default"
+													: "outline"
+										}
 										onClick={() => handleToggleServiceType(type)}
 										className="mb-1 capitalize"
 									>
@@ -395,7 +468,58 @@ export const ServiceProviderForm = ({
 							{selectedServiceTypes.length === 0 && (
 								<p className="mt-1 text-sm text-red-500">At least one service type is required</p>
 							)}
-							<FormDescription>Select all vehicle types that your service provides</FormDescription>
+							<FormDescription>Select all vehicle types</FormDescription>
+
+							{showCustomServiceInput && (
+								<div className="mt-4">
+									<FormLabel>Specify Service Type</FormLabel>
+									<div className="mt-1 flex gap-2">
+										<Input
+											placeholder="e.g., Luxury Sedan, Executive Van"
+											value={customServiceInput}
+											onChange={(e) => setCustomServiceInput(e.target.value)}
+											onKeyDown={handleAddCustomService}
+											onBlur={addCustomService}
+										/>
+										<Button
+											type="button"
+											variant="outline"
+											onClick={addCustomService}
+											className="shrink-0"
+										>
+											<Plus className="size-4" />
+										</Button>
+									</div>
+									<FormDescription>
+										Separate service types by comma, tab, or enter (e.g., &quot;Luxury Sedan&quot;)
+									</FormDescription>
+									{customServiceTypes.length > 0 && (
+										<div className="mt-3">
+											<div className="flex flex-wrap gap-2">
+												{customServiceTypes.map((serviceType, index) => (
+													<div
+														key={index}
+														className="flex items-center gap-1 rounded-full bg-secondary px-3 py-1 text-sm"
+													>
+														<span>
+															{serviceType
+																.replace(/_/g, " ")
+																.replace(/\b\w/g, (l) => l.toUpperCase())}
+														</span>
+														<button
+															type="button"
+															onClick={() => handleRemoveServiceType(serviceType)}
+															className="ml-1 rounded-full text-muted-foreground hover:text-foreground"
+														>
+															<X className="size-3" />
+														</button>
+													</div>
+												))}
+											</div>
+										</div>
+									)}
+								</div>
+							)}
 						</FormItem>
 					</div>
 
@@ -594,7 +718,7 @@ export const ServiceProviderForm = ({
 									<ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
 										<li>Service locations indicate which cities/regions the provider covers</li>
 										<li>Service types indicate what transportation services the provider offers</li>
-										<li>Select all vehicle types that your service provides</li>
+										<li>Select all vehicle types of the service provided</li>
 									</ul>
 								</div>
 

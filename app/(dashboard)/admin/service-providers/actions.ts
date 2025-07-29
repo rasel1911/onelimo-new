@@ -9,7 +9,7 @@ import {
 	getAllServiceProviders,
 } from "@/db/queries/serviceProvider.queries";
 
-import { SERVICE_TYPES, ServiceProviderSchema } from "./validations";
+import { ServiceProviderSchema } from "./validations";
 
 /**
  * Create a new service provider
@@ -80,11 +80,8 @@ export const createServiceProviderAction = async (formData: FormData) => {
 			};
 		}
 
-		const normalizedServiceTypes = validatedFields.data.serviceType.map((type) => {
-			if (SERVICE_TYPES.includes(type as any)) {
-				return type;
-			}
-			return "not_specified";
+		const normalizedServiceTypes = validatedFields.data.serviceType.filter((type) => {
+			return type !== "other";
 		});
 
 		const locationIds = validatedFields.data.locationIds;
@@ -207,11 +204,8 @@ export const updateServiceProviderAction = async (id: string, formData: FormData
 			};
 		}
 
-		const normalizedServiceTypes = validatedFields.data.serviceType.map((type) => {
-			if (SERVICE_TYPES.includes(type as any)) {
-				return type;
-			}
-			return "not_specified";
+		const normalizedServiceTypes = validatedFields.data.serviceType.filter((type) => {
+			return type !== "other";
 		});
 
 		const locationIds = validatedFields.data.locationIds;
