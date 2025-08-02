@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Added
+
+- **Location Autocomplete System**: Integrated Geoapify API for real-time location suggestions
+  - Added `LocationAutocomplete` component with address and city-only modes
+  - Implemented `useLocationSearch` hook with React Query for optimized API calls
+  - Added Geoapify service with client-side filtering for accurate city results
+  - Supports UK-specific location search with proper address formatting
+  - Features smooth animations, keyboard navigation, and full accessibility support
+  - Added comprehensive test page for both booking and partner registration use cases
+
 ## [0.1.3] - 2025-01-16
 
 ### Added

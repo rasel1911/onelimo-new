@@ -21,6 +21,8 @@ build
 .DS_Store
 *.pem
 deprecated/
+test-location/
+*.tsbuildinfo
 
 # debug
 npm-debug.log*
