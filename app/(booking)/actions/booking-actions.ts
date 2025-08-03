@@ -10,6 +10,7 @@ import {
 import { createNewBookingRequest } from "@/db/queries/bookingRequest.queries";
 import { getUserById } from "@/db/queries/user.queries";
 import { User } from "@/db/schema/user.schema";
+import { type LocationSuggestion } from "@/lib/services/geoapify";
 import { triggerBookingWorkflow } from "@/lib/workflow/client";
 
 import { SUCCESS_MESSAGES } from "../concierge/constants";
@@ -167,7 +168,12 @@ export const createBookingAction = async (bookingData: BookingActionData) => {
 	}
 };
 
-export const createBookingFromForm = async (data: BookingFormData) => {
+export const createBookingFromForm = async (
+	data: BookingFormData & {
+		pickupLocationDetails?: LocationSuggestion;
+		dropoffLocationDetails?: LocationSuggestion;
+	},
+) => {
 	try {
 		const authResult = await getAuthenticatedUser();
 		if (!authResult.success || !authResult.user) {
@@ -206,10 +212,16 @@ export const createBookingFromForm = async (data: BookingFormData) => {
 			{
 				userId: validatedData.userId,
 				customerName: validatedData.customerName,
-				pickupCity: validatedData.pickupCity,
-				pickupPostcode: validatedData.pickupPostcode,
-				dropoffCity: validatedData.dropoffCity,
-				dropoffPostcode: validatedData.dropoffPostcode,
+				pickupCity:
+					data.pickupLocationDetails?.city ||
+					data.pickupLocationDetails?.address_line1 ||
+					validatedData.pickupLocation,
+				pickupPostcode: data.pickupLocationDetails?.postcode || "",
+				dropoffCity:
+					data.dropoffLocationDetails?.city ||
+					data.dropoffLocationDetails?.address_line1 ||
+					validatedData.dropoffLocation,
+				dropoffPostcode: data.dropoffLocationDetails?.postcode || "",
 				pickupTime: validatedData.pickupTime,
 				estimatedDropoffTime: validatedData.estimatedDropoffTime,
 				estimatedDuration: validatedData.estimatedDuration,
