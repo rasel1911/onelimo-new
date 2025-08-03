@@ -14,6 +14,7 @@ interface AdminFormProps<T> {
 	submitLabel: string;
 	submittingLabel: string;
 	children: ReactNode;
+	disabled?: boolean;
 }
 
 export default function AdminForm<T>({
@@ -25,6 +26,7 @@ export default function AdminForm<T>({
 	submitLabel = "Submit",
 	submittingLabel = "Submitting...",
 	children,
+	disabled = false,
 }: AdminFormProps<T>) {
 	return (
 		<div className="flex flex-col gap-6">
@@ -46,11 +48,15 @@ export default function AdminForm<T>({
 
 							<div className="flex justify-end gap-4">
 								<Link href={backUrl}>
-									<Button variant="outline" type="button">
+									<Button className="text-md px-10 py-6" variant="outline" type="button">
 										Cancel
 									</Button>
 								</Link>
-								<Button type="submit" disabled={isSubmitting}>
+								<Button
+									className="text-md px-10 py-6"
+									type="submit"
+									disabled={isSubmitting || disabled}
+								>
 									{isSubmitting ? submittingLabel : submitLabel}
 								</Button>
 							</div>

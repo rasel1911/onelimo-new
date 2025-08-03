@@ -1,15 +1,23 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ChevronDown, ChevronUp, HelpCircle, Plus, X } from "lucide-react";
+import { ChevronDown, ChevronUp, HelpCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import * as z from "zod";
 
-import { fetchLocations, createLocation } from "@/app/(dashboard)/admin/locations/actions";
+import {
+	registrationFormSchema,
+	type RegistrationFormData,
+} from "@/app/(dashboard)/admin/service-providers/validations";
 import { registerPartner } from "@/app/(partners)/actions/partner-registration";
+import { AreaCoverageInput } from "@/components/custom/area-coverage-input";
+import {
+	MultiSelectLocationSuggestions,
+	type LocationWithCoords,
+} from "@/components/custom/multi-select-location-suggestions";
+import { ServiceTypeSelector } from "@/components/custom/service-type-selector";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -30,55 +38,10 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { MultiSelectLocations } from "@/components/ui/multi-select-locations";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { parseCustomServiceTypes } from "@/lib/utils/formatting";
 
-const SERVICE_TYPES = [
-	{ value: "suv", label: "SUV Service" },
-	{ value: "party_bus", label: "Party Bus" },
-	{ value: "stretch_limousine", label: "Stretch Limousine" },
-	{ value: "sedan", label: "Sedan Service" },
-	{ value: "hummer", label: "Hummer" },
-	{ value: "other", label: "Other Service" },
-];
-
-const formSchema = z.object({
-	name: z
-		.string()
-		.min(1, "Company name is required")
-		.max(100, "Company name must be less than 100 characters"),
-	email: z
-		.string()
-		.email("Invalid email address")
-		.refine((email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email), {
-			message: "Please enter a valid email address",
-		}),
-	phone: z
-		.string()
-		.min(1, "Phone number is required")
-		.refine(
-			(phone) => {
-				const euRegex = /^(\+[1-9]{1}[0-9]{1,2}|00[1-9]{1}[0-9]{1,2})[0-9]{6,12}$/;
-				const ukRegex = /^(\+44|0)7\d{9}$/;
-
-				return euRegex.test(phone.replace(/\s+/g, "")) || ukRegex.test(phone.replace(/\s+/g, ""));
-			},
-			{ message: "Please enter a valid EU or UK phone number" },
-		),
-	locationIds: z.array(z.string()).min(1, "At least one location is required"),
-	serviceType: z.array(z.string()).min(1, "At least one service type is required"),
-	website: z.string().optional(),
-});
-
-type FormValues = z.infer<typeof formSchema>;
-
-interface Location {
-	id: string;
-	city: string;
-	zipcodes?: string[];
-}
+type FormValues = RegistrationFormData;
 
 interface PartnerRegistrationFormProps {
 	initialEmail?: string;
@@ -92,130 +55,24 @@ export const PartnerRegistrationForm = ({
 	persistentLinkId,
 }: PartnerRegistrationFormProps) => {
 	const [areaCovered, setAreaCovered] = useState<string[]>([]);
-	const [postcodeInput, setPostcodeInput] = useState("");
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
-	const [locations, setLocations] = useState<Location[]>([]);
-	const [customServiceTypes, setCustomServiceTypes] = useState<string[]>([]);
-	const [customServiceInput, setCustomServiceInput] = useState("");
-	const [showCustomServiceInput, setShowCustomServiceInput] = useState(false);
+	const [selectedLocationCoords, setSelectedLocationCoords] = useState<LocationWithCoords[]>([]);
 
 	const router = useRouter();
 
 	const form = useForm<FormValues>({
-		resolver: zodResolver(formSchema),
+		resolver: zodResolver(registrationFormSchema),
 		mode: "onChange",
 		defaultValues: {
 			name: "",
 			email: initialEmail,
 			phone: "",
-			locationIds: [],
+			serviceLocations: [],
 			serviceType: [],
 			website: "",
 		},
 	});
-
-	const watchedValues = form.watch();
-	const selectedLocations = locations.filter((loc) => watchedValues.locationIds?.includes(loc.id));
-
-	useEffect(() => {
-		const getLocations = async () => {
-			try {
-				const result = await fetchLocations();
-				if (result.success && result.locations) {
-					setLocations(result.locations);
-				}
-			} catch (error) {
-				console.error("Error loading locations:", error);
-				toast.error("Failed to load locations");
-			}
-		};
-
-		getLocations();
-	}, []);
-
-	const handleAddPostcode = (e: React.KeyboardEvent<HTMLInputElement>) => {
-		if (["Enter", "Tab", ","].includes(e.key)) {
-			e.preventDefault();
-			addPostcode();
-		}
-	};
-
-	const addPostcode = () => {
-		if (postcodeInput.trim()) {
-			const postcode = postcodeInput.trim().toUpperCase();
-			if (!areaCovered.includes(postcode)) {
-				setAreaCovered([...areaCovered, postcode]);
-			}
-			setPostcodeInput("");
-		}
-	};
-
-	const removePostcode = (postcode: string) => {
-		setAreaCovered(areaCovered.filter((item) => item !== postcode));
-	};
-
-	const handleRemoveServiceType = (serviceType: string) => {
-		setCustomServiceTypes(customServiceTypes.filter((type) => type !== serviceType));
-		const currentTypes = form.getValues("serviceType");
-		form.setValue(
-			"serviceType",
-			currentTypes.filter((type) => type !== serviceType),
-		);
-	};
-
-	const handleAddCustomService = (e: React.KeyboardEvent<HTMLInputElement>) => {
-		if (["Enter", "Tab", ","].includes(e.key)) {
-			e.preventDefault();
-			addCustomService();
-		}
-	};
-
-	const addCustomService = () => {
-		if (customServiceInput.trim()) {
-			const standardTypes = SERVICE_TYPES.map((s) => s.value);
-			const serviceTypes = parseCustomServiceTypes(
-				customServiceInput,
-				customServiceTypes,
-				standardTypes,
-			);
-
-			if (serviceTypes.length > 0) {
-				const newCustomTypes = [...customServiceTypes, ...serviceTypes];
-				setCustomServiceTypes(newCustomTypes);
-
-				const currentFormTypes = form.getValues("serviceType");
-				const updatedFormTypes = [...currentFormTypes, ...serviceTypes];
-				form.setValue("serviceType", updatedFormTypes);
-			}
-			setCustomServiceInput("");
-		}
-	};
-
-	const handleServiceTypeClick = (serviceValue: string) => {
-		const field = form.getValues("serviceType");
-		const isSelected = field.includes(serviceValue);
-
-		if (serviceValue === "other") {
-			if (!showCustomServiceInput) {
-				setShowCustomServiceInput(true);
-			} else {
-				const newValue = field.filter((v) => !customServiceTypes.includes(v));
-				form.setValue("serviceType", newValue);
-				setShowCustomServiceInput(false);
-				setCustomServiceTypes([]);
-				setCustomServiceInput("");
-			}
-		} else {
-			const newValue = isSelected
-				? field.filter((v) => v !== serviceValue)
-				: [...field, serviceValue];
-
-			if (newValue.length > 0) {
-				form.setValue("serviceType", newValue);
-			}
-		}
-	};
 
 	const isFormValid = () => {
 		const errors = form.formState.errors;
@@ -226,12 +83,12 @@ export const PartnerRegistrationForm = ({
 			values.name.trim() !== "" &&
 			values.email.trim() !== "" &&
 			values.phone.trim() !== "" &&
-			values.locationIds.length > 0 &&
+			values.serviceLocations.length > 0 &&
 			values.serviceType.length > 0
 		);
 	};
 
-	async function onSubmit(values: FormValues) {
+	const onSubmit = async (values: FormValues) => {
 		if (!isFormValid()) {
 			toast.error("Please fill in all required fields correctly");
 			return;
@@ -243,8 +100,13 @@ export const PartnerRegistrationForm = ({
 			const formData = {
 				...values,
 				areaCovered: areaCovered.length > 0 ? areaCovered : ["all"],
+				serviceLocations: selectedLocationCoords.map((loc) => loc.city),
 				token: token,
 				persistentLinkId: persistentLinkId,
+				status: "pending" as const,
+				role: "partner" as const,
+				reputation: 0,
+				responseTime: 0,
 			};
 
 			const result = await registerPartner(formData);
@@ -263,17 +125,7 @@ export const PartnerRegistrationForm = ({
 		} finally {
 			setIsSubmitting(false);
 		}
-	}
-
-	const availableServiceTypes = [
-		...SERVICE_TYPES.filter(
-			(service) => !(service.value === "other" && customServiceTypes.length > 0),
-		),
-		...customServiceTypes.map((type) => ({
-			value: type,
-			label: type.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()),
-		})),
-	];
+	};
 
 	return (
 		<div className="container mx-auto py-10">
@@ -342,34 +194,24 @@ export const PartnerRegistrationForm = ({
 											/>
 											<FormField
 												control={form.control}
-												name="locationIds"
-												render={({ field }) => (
+												name="serviceLocations"
+												render={({ field, fieldState }) => (
 													<FormItem>
 														<FormLabel>Service Locations *</FormLabel>
 														<FormControl>
-															<MultiSelectLocations
-																value={field.value}
-																onChange={field.onChange}
-																placeholder="Select locations..."
-																required
-																onCreateLocation={async (cityName) => {
-																	const formData = new FormData();
-																	formData.append("city", cityName);
-																	formData.append("zipcodes", "all");
-
-																	const result = await createLocation(formData);
-																	if (result.success && result.location) {
-																		setLocations([...locations, result.location]);
-																		return { success: true, location: result.location };
-																	}
-																	return { success: false };
-																}}
+															<MultiSelectLocationSuggestions
+																name="serviceLocations"
+																control={form.control}
+																placeholder="Add cities where you provide service..."
+																onLocationChange={setSelectedLocationCoords}
 															/>
 														</FormControl>
 														<FormMessage />
-														<FormDescription>
-															Select all cities/regions where you provide service
-														</FormDescription>
+														{!fieldState.error && selectedLocationCoords.length === 0 && (
+															<FormDescription>
+																Select all cities/regions where you provide service
+															</FormDescription>
+														)}
 													</FormItem>
 												)}
 											/>
@@ -381,94 +223,16 @@ export const PartnerRegistrationForm = ({
 										<FormField
 											control={form.control}
 											name="serviceType"
-											render={({ field }) => (
+											render={({ field, fieldState }) => (
 												<FormItem>
-													<FormLabel>Service Types *</FormLabel>
-													<FormDescription>
-														Select the transportation services you provide
-													</FormDescription>
-													<div className="grid grid-cols-2 gap-2 md:grid-cols-3">
-														{availableServiceTypes.map((service) => (
-															<Button
-																key={service.value}
-																type="button"
-																variant={
-																	service.value === "other"
-																		? showCustomServiceInput
-																			? "default"
-																			: "outline"
-																		: field.value.includes(service.value)
-																			? "default"
-																			: "outline"
-																}
-																className="justify-start"
-																onClick={() => handleServiceTypeClick(service.value)}
-															>
-																{service.label}
-															</Button>
-														))}
-													</div>
-													{field.value.length === 0 && (
-														<p className="mt-1 text-sm text-destructive">
-															At least one service type is required
-														</p>
-													)}
-													<FormMessage />
+													<ServiceTypeSelector
+														value={field.value}
+														onChange={field.onChange}
+														error={fieldState.error?.message}
+													/>
 												</FormItem>
 											)}
 										/>
-
-										{showCustomServiceInput && (
-											<div className="mt-2">
-												<FormLabel>Specify Service Type</FormLabel>
-												<div className="mt-1 flex gap-3">
-													<Input
-														placeholder="e.g., Executive Van"
-														value={customServiceInput}
-														onChange={(e) => setCustomServiceInput(e.target.value)}
-														onKeyDown={handleAddCustomService}
-														onBlur={addCustomService}
-													/>
-													<Button
-														type="button"
-														variant="outline"
-														onClick={addCustomService}
-														className="shrink-0"
-													>
-														<Plus className="size-4" />
-													</Button>
-												</div>
-												<FormDescription>
-													You can add multiple service types by separating them with a comma.
-												</FormDescription>
-
-												{customServiceTypes.length > 0 && (
-													<div className="mt-3">
-														<div className="flex flex-wrap gap-2">
-															{customServiceTypes.map((serviceType, index) => (
-																<div
-																	key={index}
-																	className="flex items-center gap-1 rounded-full bg-secondary px-3 py-1 text-sm"
-																>
-																	<span>
-																		{serviceType
-																			.replace(/_/g, " ")
-																			.replace(/\b\w/g, (l) => l.toUpperCase())}
-																	</span>
-																	<button
-																		type="button"
-																		onClick={() => handleRemoveServiceType(serviceType)}
-																		className="ml-1 rounded-full text-muted-foreground hover:text-foreground"
-																	>
-																		<X className="size-3" />
-																	</button>
-																</div>
-															))}
-														</div>
-													</div>
-												)}
-											</div>
-										)}
 
 										<Separator />
 
@@ -498,52 +262,15 @@ export const PartnerRegistrationForm = ({
 											</div>
 
 											<CollapsibleContent className="space-y-4">
-												<div className="space-y-2">
-													<FormLabel htmlFor="postcodes">Service Areas</FormLabel>
-													<FormDescription>
-														{selectedLocations.length > 0
-															? `If left blank, all postcodes for ${selectedLocations.map((loc) => loc.city).join(", ")} will be considered`
-															: "Enter the postcodes where you provide service"}
-													</FormDescription>
-													<div className="flex gap-2">
-														<Input
-															id="postcodes"
-															placeholder="e.g. SW1A 1AA"
-															value={postcodeInput}
-															onChange={(e) => setPostcodeInput(e.target.value)}
-															onKeyDown={handleAddPostcode}
-															onBlur={addPostcode}
-														/>
-														<Button
-															type="button"
-															variant="outline"
-															onClick={addPostcode}
-															className="shrink-0"
-														>
-															<Plus className="size-4" />
-														</Button>
-													</div>
-
-													{areaCovered.length > 0 && (
-														<div className="mt-3 flex flex-wrap gap-2">
-															{areaCovered.map((postcode, index) => (
-																<div
-																	key={index}
-																	className="flex items-center gap-1 rounded-full bg-secondary px-3 py-1 text-sm"
-																>
-																	<span>{postcode}</span>
-																	<button
-																		type="button"
-																		onClick={() => removePostcode(postcode)}
-																		className="ml-1 rounded-full text-muted-foreground hover:text-foreground"
-																	>
-																		<X className="size-3" />
-																	</button>
-																</div>
-															))}
-														</div>
-													)}
-												</div>
+												<AreaCoverageInput
+													value={areaCovered}
+													onChange={setAreaCovered}
+													description={
+														selectedLocationCoords.length > 0
+															? `If left blank, all postcodes for ${selectedLocationCoords.map((loc) => loc.city).join(", ")} will be considered`
+															: "Enter the postcodes where you provide service"
+													}
+												/>
 											</CollapsibleContent>
 										</Collapsible>
 									</CardContent>

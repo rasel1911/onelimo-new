@@ -1,7 +1,9 @@
 "use server";
 
-import { z } from "zod";
-
+import {
+	ServiceProviderFormData,
+	ServiceProviderFormSchema,
+} from "@/app/(dashboard)/admin/service-providers/validations";
 import {
 	validatePersistentLink,
 	incrementLinkUsage,
@@ -9,43 +11,9 @@ import {
 import { markTokenAsUsed, validateToken } from "@/db/queries/registrationToken.queries";
 import { createServiceProvider } from "@/db/queries/serviceProvider.queries";
 
-const PartnerRegistrationSchema = z.object({
-	name: z
-		.string()
-		.min(1, "Company name is required")
-		.max(100, "Company name must be less than 100 characters"),
-	email: z
-		.string()
-		.email("Invalid email address")
-		.refine((email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email), {
-			message: "Please enter a valid email address",
-		}),
-	phone: z
-		.string()
-		.min(1, "Phone number is required")
-		.refine(
-			(phone) => {
-				// EU phone number format (with country code)
-				const euRegex = /^(\+[1-9]{1}[0-9]{1,2}|00[1-9]{1}[0-9]{1,2})[0-9]{6,12}$/;
-				// UK phone number formats
-				const ukRegex = /^(\+44|0)7\d{9}$/;
-
-				return euRegex.test(phone.replace(/\s+/g, "")) || ukRegex.test(phone.replace(/\s+/g, ""));
-			},
-			{ message: "Please enter a valid EU or UK phone number" },
-		),
-	locationIds: z.array(z.string()).min(1, "At least one location is required"),
-	serviceType: z.array(z.string()).min(1, "At least one service type is required"),
-	areaCovered: z.array(z.string()).optional(),
-	token: z.string().nullable().optional(),
-	persistentLinkId: z.string().nullable().optional(),
-});
-
-export type PartnerRegistrationFormData = z.infer<typeof PartnerRegistrationSchema>;
-
-export const registerPartner = async (formData: PartnerRegistrationFormData) => {
+export const registerPartner = async (formData: ServiceProviderFormData) => {
 	try {
-		const validatedFields = PartnerRegistrationSchema.safeParse(formData);
+		const validatedFields = ServiceProviderFormSchema.safeParse(formData);
 
 		if (!validatedFields.success) {
 			return {
@@ -74,8 +42,7 @@ export const registerPartner = async (formData: PartnerRegistrationFormData) => 
 			}
 		}
 
-		const locationIds = validatedFields.data.locationIds;
-
+		const serviceLocations = validatedFields.data.serviceLocations;
 		const normalizedServiceTypes = validatedFields.data.serviceType.filter((type) => {
 			return type !== "other";
 		});
@@ -84,8 +51,9 @@ export const registerPartner = async (formData: PartnerRegistrationFormData) => 
 			name: validatedFields.data.name,
 			email: validatedFields.data.email,
 			phone: validatedFields.data.phone,
-			locationId: locationIds[0], // For backward compatibility, deprecated
-			locationIds: locationIds,
+			locationId: null, // FIXME: Remove locationId and locationIds(deprecated)
+			locationIds: null,
+			serviceLocations: serviceLocations,
 			serviceType: normalizedServiceTypes,
 			areaCovered:
 				validatedFields.data.areaCovered && validatedFields.data.areaCovered.length > 0
