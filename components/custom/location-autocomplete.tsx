@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { MapPin, Loader2, X, Building2 } from "lucide-react";
+import { MapPin, Loader2, X, Building2, Check } from "lucide-react";
 import { useState, useRef, useEffect, forwardRef } from "react";
 import { Controller, type Control, type FieldPath, type FieldValues } from "react-hook-form";
 
@@ -22,6 +22,7 @@ export interface LocationAutocompleteProps<
 	onLocationSelect?: (location: LocationSuggestion) => void;
 	cityOnly?: boolean;
 	className?: string;
+	selectedLocations?: LocationSuggestion[];
 }
 
 interface SuggestionListProps {
@@ -31,6 +32,7 @@ interface SuggestionListProps {
 	onSelect: (suggestion: LocationSuggestion) => void;
 	onMouseEnter: (index: number) => void;
 	cityOnly: boolean;
+	selectedLocations?: LocationSuggestion[];
 }
 
 interface LocationInputProps {
@@ -51,6 +53,7 @@ const SuggestionList = ({
 	onSelect,
 	onMouseEnter,
 	cityOnly,
+	selectedLocations = [],
 }: SuggestionListProps) => {
 	return (
 		<AnimatePresence>
@@ -72,6 +75,13 @@ const SuggestionList = ({
 							const secondaryText = cityOnly ? suggestion.formatted : suggestion.address_line2;
 							const IconComponent = cityOnly ? Building2 : MapPin;
 
+							const isSelected = selectedLocations.some(
+								(selected) =>
+									selected.lat === suggestion.lat &&
+									selected.lon === suggestion.lon &&
+									selected.city === suggestion.city,
+							);
+
 							return (
 								<button
 									key={`${suggestion.lat}-${suggestion.lon}-${index}`}
@@ -81,6 +91,7 @@ const SuggestionList = ({
 									className={cn(
 										"w-full px-4 py-3 text-left transition-colors hover:bg-accent focus:bg-accent focus:outline-none",
 										index === highlightedIndex && "bg-accent",
+										isSelected && "bg-primary/10",
 									)}
 									role="option"
 									aria-selected={index === highlightedIndex}
@@ -95,6 +106,7 @@ const SuggestionList = ({
 												</div>
 											)}
 										</div>
+										{isSelected && <Check className="mt-1 size-4 shrink-0 text-primary" />}
 									</div>
 								</button>
 							);
@@ -163,6 +175,7 @@ export const LocationAutocomplete = <
 	onLocationSelect,
 	cityOnly = false,
 	className = "",
+	selectedLocations = [],
 }: LocationAutocompleteProps<TFieldValues, TName>) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [highlightedIndex, setHighlightedIndex] = useState(-1);
@@ -303,6 +316,7 @@ export const LocationAutocomplete = <
 									onSelect={(suggestion) => handleSuggestionSelect(suggestion, onChange)}
 									onMouseEnter={setHighlightedIndex}
 									cityOnly={cityOnly}
+									selectedLocations={selectedLocations}
 								/>
 							</div>
 						</div>

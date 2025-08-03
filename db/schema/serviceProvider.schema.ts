@@ -3,16 +3,6 @@ import { pgTable, timestamp, uuid, varchar, index, integer, pgEnum } from "drizz
 
 import { location } from "./location.schema";
 
-export const serviceTypeEnum = pgEnum("service_type", [
-	"suv",
-	"party_bus",
-	"stretch_limousine",
-	"sedan",
-	"hummer",
-	"other",
-	"not_specified",
-]);
-
 export const serviceProvider = pgTable(
 	"ServiceProvider",
 	{
@@ -20,8 +10,10 @@ export const serviceProvider = pgTable(
 		name: varchar("name", { length: 100 }).notNull(),
 		email: varchar("email", { length: 64 }).notNull().unique(),
 		phone: varchar("phone", { length: 20 }).notNull(),
+		// FIXME: Remove locationId and locationIds(deprecated later)
 		locationId: uuid("locationId").references(() => location.id), // deprecated
 		locationIds: uuid("locationIds").array(),
+		serviceLocations: varchar("serviceLocations", { length: 100 }).array(), // City names from location suggestions
 		serviceType: varchar("serviceType", { length: 50 }).array(),
 		areaCovered: varchar("areaCovered", { length: 100 }).array(),
 		status: varchar("status", { length: 20 }).notNull().default("pending"),
@@ -48,6 +40,7 @@ export const serviceProvider = pgTable(
 		index("sp_email_idx").on(table.email),
 		index("sp_location_idx").on(table.locationId),
 		index("sp_locations_idx").on(table.locationIds),
+		index("sp_service_locations_idx").on(table.serviceLocations),
 		index("sp_status_idx").on(table.status),
 		index("sp_role_idx").on(table.role),
 		index("sp_pin_reset_token_idx").on(table.pinResetToken),
