@@ -75,12 +75,18 @@ const SuggestionList = ({
 							const secondaryText = cityOnly ? suggestion.formatted : suggestion.address_line2;
 							const IconComponent = cityOnly ? Building2 : MapPin;
 
-							const isSelected = selectedLocations.some(
-								(selected) =>
-									selected.lat === suggestion.lat &&
-									selected.lon === suggestion.lon &&
-									selected.city === suggestion.city,
-							);
+							const isSelected = selectedLocations.some((selected) => {
+								if (
+									selected.lat !== 0 &&
+									selected.lon !== 0 &&
+									suggestion.lat !== 0 &&
+									suggestion.lon !== 0
+								) {
+									return selected.lat === suggestion.lat && selected.lon === suggestion.lon;
+								}
+
+								return selected.city?.toLowerCase() === suggestion.city?.toLowerCase();
+							});
 
 							return (
 								<button

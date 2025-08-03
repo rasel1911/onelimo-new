@@ -54,15 +54,20 @@ export const MultiSelectLocationSuggestions = <
 		(suggestion: LocationSuggestion, onChange: (value: string[]) => void) => {
 			if (!suggestion.city || !suggestion.lat || !suggestion.lon) return;
 
-			const locationKey = `${suggestion.lat}-${suggestion.lon}`;
-			const isAlreadySelected = selectedLocations.some(
-				(loc) => `${loc.lat}-${loc.lon}` === locationKey,
-			);
+			const isAlreadySelected = selectedLocations.some((loc) => {
+				if (loc.lat !== 0 && loc.lon !== 0 && suggestion.lat !== 0 && suggestion.lon !== 0) {
+					return `${loc.lat}-${loc.lon}` === `${suggestion.lat}-${suggestion.lon}`;
+				}
+				return loc.city.toLowerCase() === suggestion.city?.toLowerCase();
+			});
 
 			if (isAlreadySelected) {
-				const newLocations = selectedLocations.filter(
-					(loc) => `${loc.lat}-${loc.lon}` !== locationKey,
-				);
+				const newLocations = selectedLocations.filter((loc) => {
+					if (loc.lat !== 0 && loc.lon !== 0 && suggestion.lat !== 0 && suggestion.lon !== 0) {
+						return `${loc.lat}-${loc.lon}` !== `${suggestion.lat}-${suggestion.lon}`;
+					}
+					return loc.city.toLowerCase() !== suggestion.city?.toLowerCase();
+				});
 				setSelectedLocations(newLocations);
 
 				const cityNames = newLocations.map((loc) => loc.city);
@@ -91,10 +96,17 @@ export const MultiSelectLocationSuggestions = <
 
 	const handleRemoveLocation = useCallback(
 		(locationToRemove: LocationWithCoords, onChange: (value: string[]) => void) => {
-			const locationKey = `${locationToRemove.lat}-${locationToRemove.lon}`;
-			const newLocations = selectedLocations.filter(
-				(loc) => `${loc.lat}-${loc.lon}` !== locationKey,
-			);
+			const newLocations = selectedLocations.filter((loc) => {
+				if (
+					loc.lat !== 0 &&
+					loc.lon !== 0 &&
+					locationToRemove.lat !== 0 &&
+					locationToRemove.lon !== 0
+				) {
+					return `${loc.lat}-${loc.lon}` !== `${locationToRemove.lat}-${locationToRemove.lon}`;
+				}
+				return loc.city.toLowerCase() !== locationToRemove.city.toLowerCase();
+			});
 
 			setSelectedLocations(newLocations);
 
@@ -128,12 +140,14 @@ export const MultiSelectLocationSuggestions = <
 			watchedValue.length > 0 &&
 			selectedLocations.length === 0
 		) {
-			const initialLocations: LocationWithCoords[] = watchedValue.map((city: string) => ({
-				city,
-				lat: 0,
-				lon: 0,
-				formatted: city,
-			}));
+			const initialLocations: LocationWithCoords[] = watchedValue.map(
+				(city: string, index: number) => ({
+					city,
+					lat: 0,
+					lon: 0,
+					formatted: city,
+				}),
+			);
 			setSelectedLocations(initialLocations);
 			onLocationChange?.(initialLocations);
 		}
