@@ -174,8 +174,8 @@ export const BookingForm = ({ onSuccess }: BookingFormProps) => {
 			try {
 				const updatedData = {
 					...data,
-					pickupLocationDetails: selectedLocations.pickup,
-					dropoffLocationDetails: selectedLocations.dropoff,
+					pickupLocationDetails: selectedLocations.pickup || ({} as LocationSuggestion),
+					dropoffLocationDetails: selectedLocations.dropoff || ({} as LocationSuggestion),
 				};
 
 				const result = await createBookingFromForm(updatedData);

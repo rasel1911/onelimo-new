@@ -101,7 +101,10 @@ const calculateLocationScore = (
 	if (pickupCityMatch) {
 		locationScore += 25;
 	}
-	if (checkPostcodeMatch(pickupLocation.postcode, providerAreasCovered)) {
+	if (
+		pickupLocation.postcode &&
+		checkPostcodeMatch(pickupLocation.postcode, providerAreasCovered)
+	) {
 		locationScore += 10;
 	}
 
@@ -110,7 +113,10 @@ const calculateLocationScore = (
 	if (dropoffCityMatch) {
 		locationScore += 10;
 	}
-	if (checkPostcodeMatch(dropoffLocation.postcode, providerAreasCovered)) {
+	if (
+		dropoffLocation.postcode &&
+		checkPostcodeMatch(dropoffLocation.postcode, providerAreasCovered)
+	) {
 		locationScore += 5;
 	}
 

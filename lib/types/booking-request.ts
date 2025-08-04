@@ -76,10 +76,8 @@ export interface BookingWithStatus extends BookingRequest {
 export interface CreateBookingRequestInput {
 	userId: string;
 	customerName: string;
-	pickupCity: string;
-	pickupPostcode: string;
-	dropoffCity: string;
-	dropoffPostcode: string;
+	pickupLocation: LocationType;
+	dropoffLocation: LocationType;
 	pickupTime: Date | string;
 	estimatedDropoffTime: Date | string;
 	estimatedDuration: number;

@@ -10,7 +10,7 @@ export interface LocationSuggestion {
 	address_line2?: string;
 	lat: number;
 	lon: number;
-	city?: string;
+	city: string;
 	county?: string;
 	postcode?: string;
 	street?: string;

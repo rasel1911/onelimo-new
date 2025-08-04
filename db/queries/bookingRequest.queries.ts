@@ -4,7 +4,7 @@ import db from "@/db/connection";
 import { CreateBookingRequestInput } from "@/lib/types/booking-request";
 import { DecodedProviderLink } from "@/lib/workflow/types/provider-link";
 
-import { bookingRequest, BookingRequest, LocationType } from "../schema/bookingRequest.schema";
+import { bookingRequest, BookingRequest } from "../schema/bookingRequest.schema";
 import { workflowProvider } from "../schema/workflow/workflowProvider.schema";
 import { workflowRun } from "../schema/workflow/workflowRun.schema";
 
@@ -16,21 +16,11 @@ import { workflowRun } from "../schema/workflow/workflowRun.schema";
 export const createNewBookingRequest = async (
 	input: CreateBookingRequestInput,
 ): Promise<BookingRequest> => {
-	const pickupLocation: LocationType = {
-		city: input.pickupCity,
-		postcode: input.pickupPostcode,
-	};
-
-	const dropoffLocation: LocationType = {
-		city: input.dropoffCity,
-		postcode: input.dropoffPostcode,
-	};
-
 	return await createBookingRequest({
 		userId: input.userId,
 		customerName: input.customerName,
-		pickupLocation,
-		dropoffLocation,
+		pickupLocation: input.pickupLocation,
+		dropoffLocation: input.dropoffLocation,
 		pickupTime: input.pickupTime instanceof Date ? input.pickupTime : new Date(input.pickupTime),
 		estimatedDropoffTime:
 			input.estimatedDropoffTime instanceof Date

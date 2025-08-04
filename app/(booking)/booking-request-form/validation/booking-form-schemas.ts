@@ -103,7 +103,6 @@ export const createBookingSchema = baseBookingSchema
 	})
 	.refine(
 		(data) => {
-			// Ensure dropoff time is after pickup time
 			const pickupDate = new Date(data.pickupTime);
 			const dropoffDate = new Date(data.estimatedDropoffTime);
 			return dropoffDate > pickupDate;

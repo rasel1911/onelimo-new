@@ -1,8 +1,10 @@
 import { tool } from "ai";
 import { z } from "zod";
 
+import { LocationType } from "@/db/schema/bookingRequest.schema";
+
 import { createBookingAction } from "../../actions/booking-actions";
-import { SUCCESS_MESSAGES, ERROR_MESSAGES } from "../constants";
+import { ERROR_MESSAGES, SUCCESS_MESSAGES } from "../constants";
 
 export const BookingLocationSchema = z.object({
 	cityName: z.string().describe("The city name"),
@@ -71,10 +73,10 @@ export const confirmBookingTool = tool({
 
 		// Trigger the booking workflow
 		const result = await createBookingAction({
-			pickupLocation: finalBookingDetails.pickupLocation!,
-			dropoffLocation: finalBookingDetails.dropoffLocation!,
-			pickupDateTime: finalBookingDetails.pickupDateTime!,
-			dropoffDateTime: finalBookingDetails.dropoffDateTime,
+			pickupLocation: finalBookingDetails.pickupLocation as unknown as LocationType,
+			dropoffLocation: finalBookingDetails.dropoffLocation as unknown as LocationType,
+			pickupTime: finalBookingDetails.pickupDateTime!,
+			estimatedDropoffTime: finalBookingDetails.dropoffDateTime,
 			passengers: finalBookingDetails.passengers!,
 			vehicleType: finalBookingDetails.vehicleType!,
 			specialRequests: finalBookingDetails.specialRequests,
