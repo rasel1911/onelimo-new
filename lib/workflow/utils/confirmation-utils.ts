@@ -1,6 +1,7 @@
 import { BookingRequest } from "@/db/schema/bookingRequest.schema";
+import { formatLocation } from "@/lib/utils/formatting";
 
-import { CalendarEventData, WorkflowRunData, SelectedQuoteDetails } from "../types/confirmation";
+import { CalendarEventData, SelectedQuoteDetails } from "../types/confirmation";
 
 // ================================ //
 // FORMATTING UTILITIES
@@ -44,13 +45,6 @@ export const formatDuration = (minutes: number): string => {
 	return `${remainingMinutes}m`;
 };
 
-/**
- * Format address from location object
- */
-export const formatAddress = (location: { city: string; postcode: string }): string => {
-	return `${location.city}, ${location.postcode}`;
-};
-
 // ================================ //
 // CALENDAR UTILITIES
 // ================================ //
@@ -85,8 +79,8 @@ export const createCalendarEventData = (
 	const startTime = pickupTime.toISOString().replace(/[-:]/g, "").split(".")[0];
 	const endTime = dropoffTime.toISOString().replace(/[-:]/g, "").split(".")[0];
 
-	const pickupAddress = formatAddress(bookingRequest.pickupLocation);
-	const dropoffAddress = formatAddress(bookingRequest.dropoffLocation);
+	const pickupAddress = formatLocation(bookingRequest.pickupLocation);
+	const dropoffAddress = formatLocation(bookingRequest.dropoffLocation);
 
 	return {
 		title: `${bookingRequest.vehicleType} - ${customerName}`,

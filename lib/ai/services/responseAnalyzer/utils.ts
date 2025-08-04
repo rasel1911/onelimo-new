@@ -296,12 +296,12 @@ export function formatBookingContext(bookingRequest: BookingRequest): string {
    <customer>${bookingRequest.customerName}</customer>
    <route>
       <pickup>
-         <city>${bookingRequest.pickupLocation.city}</city>
-         <postcode>${bookingRequest.pickupLocation.postcode}</postcode>
-      </pickup>
-      <dropoff>
-         <city>${bookingRequest.dropoffLocation.city}</city>
-         <postcode>${bookingRequest.dropoffLocation.postcode}</postcode>
+         		<city>${bookingRequest.pickupLocation.city}</city>
+		<address>${bookingRequest.pickupLocation.address || `${bookingRequest.pickupLocation.city}${bookingRequest.pickupLocation.postcode ? ", " + bookingRequest.pickupLocation.postcode : ""}`}</address>
+	</pickup>
+	<dropoff>
+		<city>${bookingRequest.dropoffLocation.city}</city>
+		<address>${bookingRequest.dropoffLocation.address || `${bookingRequest.dropoffLocation.city}${bookingRequest.dropoffLocation.postcode ? ", " + bookingRequest.dropoffLocation.postcode : ""}`}</address>
       </dropoff>
    </route>
    <pickupTime>${bookingRequest.pickupTime.toLocaleString()}</pickupTime>

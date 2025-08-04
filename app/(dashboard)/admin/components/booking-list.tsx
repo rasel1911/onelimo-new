@@ -14,6 +14,7 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 import { BookingWithStatus } from "@/lib/types/booking-request";
+import { formatLocation } from "@/lib/utils/formatting";
 
 import { BookingListSkeleton } from "./booking-list-skeleton";
 
@@ -89,10 +90,6 @@ export const BookingList = forwardRef<BookingListRef, BookingListProps>(
 				default:
 					return <Badge variant="outline">{status}</Badge>;
 			}
-		};
-
-		const formatLocation = (location: { city: string; postcode: string }) => {
-			return `${location.city}, ${location.postcode}`;
 		};
 
 		const formatDate = (date: Date | string) => {

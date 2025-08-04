@@ -6,8 +6,8 @@ import { formatTime, formatDayDate, formatLocation } from "@/lib/utils/formattin
 
 interface JourneyVisualizationProps {
 	booking: {
-		pickupLocation: { city: string; postcode: string };
-		dropoffLocation: { city: string; postcode: string };
+		pickupLocation: { city: string; address: string; postcode: string };
+		dropoffLocation: { city: string; address: string; postcode: string };
 		pickupTime: string;
 		estimatedDropoffTime: string;
 		estimatedDuration: number;

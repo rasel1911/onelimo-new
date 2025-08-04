@@ -1,4 +1,5 @@
 import { BookingRequest } from "@/db/schema/bookingRequest.schema";
+import { formatLocation } from "@/lib/utils/formatting";
 import {
 	CustomerEmailTemplateContext,
 	QuoteSummaryEmailProps,
@@ -21,8 +22,8 @@ export const buildQuoteSummaryProps = (
 		minute: "2-digit",
 	});
 
-	const pickupAddress = `${bookingRequest.pickupLocation.city}, ${bookingRequest.pickupLocation.postcode}`;
-	const dropoffAddress = `${bookingRequest.dropoffLocation.city}, ${bookingRequest.dropoffLocation.postcode}`;
+	const pickupAddress = formatLocation(bookingRequest.pickupLocation);
+	const dropoffAddress = formatLocation(bookingRequest.dropoffLocation);
 
 	const quotesWithAmounts = selectedQuotes.filter((quote) => quote.amount && quote.amount > 0);
 	const bestQuoteAmount =
@@ -85,8 +86,8 @@ class CustomerEmailBuilder {
 		const estimatedDuration =
 			durationHours > 0 ? `${durationHours}h ${durationMinutes}m` : `${durationMinutes}m`;
 
-		const pickupAddress = `${bookingRequest.pickupLocation.city}, ${bookingRequest.pickupLocation.postcode}`;
-		const dropoffAddress = `${bookingRequest.dropoffLocation.city}, ${bookingRequest.dropoffLocation.postcode}`;
+		const pickupAddress = formatLocation(bookingRequest.pickupLocation);
+		const dropoffAddress = formatLocation(bookingRequest.dropoffLocation);
 
 		const serviceType = this.determineServiceType(bookingRequest.vehicleType);
 

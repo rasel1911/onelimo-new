@@ -1,4 +1,5 @@
 import { BookingRequest, LocationType } from "@/db/schema/bookingRequest.schema";
+import { formatLocation } from "@/lib/utils/formatting";
 
 import { SCORING_PENALTIES } from "./constants";
 import { ContactAnalysisResult } from "./types";
@@ -46,8 +47,8 @@ export function formatBookingDetails(
 
 	return `
 Customer: ${bookingRequest.customerName}
-Pickup Location: ${pickup.city}, ${pickup.postcode}
-Dropoff Location: ${dropoff.city}, ${dropoff.postcode}
+Pickup Location: ${formatLocation(pickup)}
+Dropoff Location: ${formatLocation(dropoff)}
 Pickup Time: ${new Date(bookingRequest.pickupTime).toLocaleString()}
 Estimated Dropoff Time: ${new Date(bookingRequest.estimatedDropoffTime).toLocaleString()}
 Estimated Duration: ${bookingRequest.estimatedDuration} minutes
