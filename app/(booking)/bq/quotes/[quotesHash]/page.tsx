@@ -16,11 +16,11 @@ interface QuoteSelectionPageProps {
 
 const AlreadySelectedState = ({ alreadySelected }: { alreadySelected: any }) => {
 	return (
-		<div className="container mx-auto mt-8 max-w-2xl px-4 py-8">
+		<div className="container mx-auto mt-4 max-w-2xl p-4 sm:mt-8 sm:py-8">
 			<div className="text-center">
-				<CheckCircle className="mx-auto size-16 text-green-600" />
-				<h1 className="mt-4 text-2xl font-bold">Quote Already Selected</h1>
-				<p className="mt-2 text-muted-foreground">
+				<CheckCircle className="mx-auto size-12 text-green-600 sm:size-16" />
+				<h1 className="mt-4 text-xl font-bold sm:text-2xl">Quote Already Selected</h1>
+				<p className="mt-2 text-sm text-muted-foreground sm:text-base">
 					You have already selected a quote for this booking.
 				</p>
 				<div className="mt-6 rounded-lg border bg-card p-4">
@@ -38,7 +38,7 @@ const AlreadySelectedState = ({ alreadySelected }: { alreadySelected: any }) => 
 
 const EmptyQuotesState = () => {
 	return (
-		<div className="container mx-auto max-w-2xl px-4 py-8">
+		<div className="container mx-auto max-w-2xl p-4 sm:py-8">
 			<Alert>
 				<AlertCircle className="size-4" />
 				<AlertDescription>No quotes available.</AlertDescription>
@@ -75,12 +75,12 @@ const QuoteContent = async ({ quotesHash }: { quotesHash: string }) => {
 
 const QuoteSelectionPage = ({ params }: QuoteSelectionPageProps) => {
 	return (
-		<div className="container mx-auto mt-8 px-4 py-8">
+		<div className="container mx-auto mt-4 p-4 sm:mt-8 sm:py-8">
 			<Suspense
 				fallback={
-					<div className="mb-8 text-center">
-						<h1 className="text-3xl font-bold">Select Your Ride</h1>
-						<p className="mt-2 text-muted-foreground">
+					<div className="mb-6 text-center sm:mb-8">
+						<h1 className="text-2xl font-bold sm:text-3xl">Select Your Ride</h1>
+						<p className="mt-2 text-sm text-muted-foreground sm:text-base">
 							Choose from our recommended quotes for your journey
 						</p>
 						<QuoteStatsLoading />
