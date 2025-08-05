@@ -2,6 +2,43 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.2] - 2025-08-06
+
+### Added
+
+- **Server Components with Suspense Streaming**: Complete architectural upgrade for enhanced UX
+  - Converted quote selection pages to use React Server Components for better performance
+  - Implemented Suspense boundaries for progressive loading and streaming UI
+  - Added skeleton loading states for smooth user experience during data fetching
+  - Static headers now render immediately while dynamic content streams in progressively
+  - Follows modern Next.js patterns similar to Vercel's UI for optimal perceived performance
+
+### Enhanced
+
+- **Quote Selection Architecture**: Modular component structure for better maintainability
+  - Separated static and dynamic content for optimal loading performance
+  - Created reusable server components for data fetching (`QuoteDataProvider`)
+  - Extracted interactive elements into dedicated client components (`QuoteCard`, `QuoteSelectionModal`, `QuoteList`)
+  - Added proper error boundaries and loading states throughout the application
+  - Maintained existing functionality while significantly improving performance and UX
+
+### Fixed
+
+- **Textarea Focus Issue**: Resolved modal textarea losing focus while typing
+  - Fixed React component re-creation issue that caused focus loss in quote confirmation modals
+  - Moved `MessageTab` component outside main component to prevent unnecessary re-renders
+  - Created reusable `QuoteConfirmationTab` component for consistent behavior
+  - Ensured smooth typing experience in both "Confirm Booking" and "Ask Questions" tabs
+
+### Technical Improvements
+
+- **Component Architecture**: Better separation of concerns with server/client components
+  - Server components handle data fetching and static content rendering
+  - Client components manage interactivity and user state
+  - Improved code reusability and maintainability
+  - Enhanced error handling and loading states
+  - Better performance through reduced JavaScript bundle size and faster initial page loads
+
 ## [0.2.1] - 2025-08-05
 
 ### Enhancements

@@ -3,6 +3,7 @@ import { persist } from "zustand/middleware";
 
 import { fetchCitiesAction } from "@/app/(booking)/actions/fetch-cities-action";
 
+// FIXME: This file need to be refactored and clean unused code
 export const VEHICLE_TYPES = [
 	{
 		value: "premium_suv",
