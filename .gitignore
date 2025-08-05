@@ -13,9 +13,10 @@ coverage
 .inspirations/
 .trunk/
 TODO*
-*.todo
+*.todo*
 out/
 build
+(test-*)/
 
 # misc
 .DS_Store
