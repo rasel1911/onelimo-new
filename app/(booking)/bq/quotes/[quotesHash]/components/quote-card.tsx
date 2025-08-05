@@ -23,26 +23,26 @@ export const QuoteCard = ({ quote, onSelect }: QuoteCardProps) => {
 			onClick={() => onSelect(quote)}
 		>
 			{quote.isRecommended && (
-				<div className="absolute -top-2 left-16 z-10">
-					<Badge className="bg-primary text-primary-foreground">
+				<div className="absolute -top-2 left-14 z-10 sm:left-16">
+					<Badge className="bg-primary text-xs text-primary-foreground">
 						<Sparkles className="mr-1 size-3" />
 						Recommended
 					</Badge>
 				</div>
 			)}
 			{quote.isSelectedByAi && (
-				<div className="absolute -top-2 left-4 z-10">
-					<Badge className="bg-teal-500 text-primary-foreground">
+				<div className="absolute -top-2 left-2 z-10 sm:left-4">
+					<Badge className="bg-teal-500 text-xs text-primary-foreground">
 						<Wand2 className="mr-1 size-4" />
 					</Badge>
 				</div>
 			)}
 
 			<CardHeader className="pb-4">
-				<div className="flex items-center justify-between">
-					<CardTitle className="text-xl">{quote.providerName}</CardTitle>
+				<div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+					<CardTitle className="text-lg sm:text-xl">{quote.providerName}</CardTitle>
 					<div className="flex items-center gap-2">
-						<span className="text-3xl font-bold">£{quote.amount}</span>
+						<span className="text-2xl font-bold sm:text-3xl">£{quote.amount}</span>
 					</div>
 				</div>
 				<CardDescription className="text-sm">

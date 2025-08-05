@@ -148,7 +148,7 @@ export const QuoteSelectionModal = ({
 
 	return (
 		<Dialog open={isOpen} onOpenChange={handleOpenChange}>
-			<DialogContent className="sm:max-w-lg">
+			<DialogContent className="mx-4 max-w-[calc(100vw-2rem)] sm:max-w-lg">
 				<DialogHeader>
 					<DialogTitle>Booking Options</DialogTitle>
 					<DialogDescription>

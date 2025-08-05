@@ -12,9 +12,9 @@ interface QuoteData {
 
 export const PageHeader = ({ quoteData }: { quoteData: QuoteData }) => {
 	return (
-		<div className="mb-8 text-center">
-			<h1 className="text-3xl font-bold">Select Your Ride</h1>
-			<p className="mt-2 text-muted-foreground">
+		<div className="mb-6 text-center sm:mb-8">
+			<h1 className="text-2xl font-bold sm:text-3xl">Select Your Ride</h1>
+			<p className="mt-2 text-sm text-muted-foreground sm:text-base">
 				Choose from our recommended quotes for your journey
 			</p>
 			<Suspense fallback={<QuoteStatsLoading />}>
