@@ -2,7 +2,26 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [0.2.1] - 2025-08-05
+
+### Enhancements
+
+- **QuoteDetailsModal Improvements**
+  - Introduced a reusable `formatScore` function to standardize the display of score values.
+  - Updated the display of **overall**, **viability**, **seriousness**, and **professionalism** scores to use the new formatting method for consistency.
+  - Improved conditional rendering of selection and rejection reasons based on AI selection status, offering clearer user insights.
+  - Adjusted recommendation reasons display to accurately reflect selection or rejection context.
+
+### Fixes & Improvements
+
+- **Quote Filtering**
+  - Resolved an issue where not all selected quotes were shown by using `Promise.all` for concurrent fetching of quote details and analysis.
+  - Enhanced `BookingTrackerContent` to show a loading indicator while fetching data, improving the user experience.
+  - Tweaked scoring thresholds in response analysis and AI recommendation prompts to allow a broader range of quotes to be included, encouraging inclusivity.
+  - Refined log messages in the communication factory for better clarity and easier debugging.
+  - Fixed `totalQuotes` calculation in `analyzeQuotesStep` to accurately reflect selected quote IDs, ensuring correct analytics.
+
+## [0.2.0] - 2025-08-05
 
 ### Added
 

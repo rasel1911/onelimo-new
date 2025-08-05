@@ -132,7 +132,6 @@ export interface CustomerNotificationResult {
 // ================================ //
 // SMS SERVICE TYPES
 // ================================ //
-
 export interface SMSTemplateContext extends ProviderNotificationData {
 	maxLength: number;
 }

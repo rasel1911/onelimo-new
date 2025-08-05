@@ -24,7 +24,7 @@ TASK: Select the best quotes for the customer.
 
 REQUIREMENTS:
 1. MUST select at least 1 quote ID from the available quotes
-2. Can select up to 3 quotes maximum
+2. Can select up to 5 quotes maximum
 3. Provide market insights (2-4 short phrases, 6-10 words each)
 4. Explain your selection strategy briefly
 5. Rate your confidence (0-100) on the recommendation
@@ -32,7 +32,8 @@ REQUIREMENTS:
 7. Rate recommendation strength: weak/moderate/strong
 
 SELECTION CRITERIA:
-- Prioritize quotes with scores: Overall ≥65, Viability ≥60, Seriousness ≥55, Professionalism ≥50
+- Prioritize quotes with scores: Overall ≥50, Viability ≥50, Seriousness ≥50, Professionalism ≥50
+- Do not be rude or mean while selecting quotes, aim to be as inclusive as possible
 - If no quotes meet thresholds, select the highest-scoring quote
 - Consider customer needs: "${bookingRequest.specialRequests || "Standard service"}"
 - Balance price, quality, and reliability

@@ -44,8 +44,10 @@ export const GET = async (request: NextRequest, { params }: { params: { quotesHa
 			return NextResponse.json({ error: "Quote link has expired" }, { status: 410 });
 		}
 
-		const selectedQuoteDetails = await getSelectedQuoteDetails(decodedLinkData.workflowRunId);
-		const quoteAnalysis = await getWorkflowQuoteAnalysis(decodedLinkData.workflowRunId);
+		const [selectedQuoteDetails, quoteAnalysis] = await Promise.all([
+			getSelectedQuoteDetails(decodedLinkData.workflowRunId),
+			getWorkflowQuoteAnalysis(decodedLinkData.workflowRunId),
+		]);
 
 		const availableQuotes = quoteAnalysis.quotes.filter(
 			(quote) => quote.isSelectedByAi || quote.isRecommended,

@@ -76,6 +76,11 @@ export const QuoteDetailsModal = ({
 			currency: "GBP",
 		}).format(amount);
 
+	const formatScore = (score: string | null) => {
+		if (!score) return 0;
+		return Number.parseInt(score, 10);
+	};
+
 	const getScoreColor = (score: number) => {
 		if (score >= 90) return "text-green-600 dark:text-green-400";
 		if (score >= 80) return "text-yellow-600 dark:text-yellow-400";
@@ -215,7 +220,7 @@ export const QuoteDetailsModal = ({
 					</div>
 					<div className="flex items-center gap-2">
 						<Badge variant="outline" className={getScoreColor(Number(quote.overallScore))}>
-							{quote.overallScore}% Match
+							{formatScore(quote.overallScore)}% Match
 						</Badge>
 						{quote.isRecommended && (
 							<Badge variant="default" className="bg-teal-600">
@@ -223,10 +228,15 @@ export const QuoteDetailsModal = ({
 								Recommended
 							</Badge>
 						)}
-						{quote.isSelectedByAi && (
+						{quote.isSelectedByAi ? (
 							<Badge variant="default" className="bg-green-600">
 								<Sparkles className="mr-1 size-3" />
 								Selected
+							</Badge>
+						) : (
+							<Badge variant="outline" className="bg-red-600">
+								<Sparkles className="mr-1 size-3" />
+								Rejected
 							</Badge>
 						)}
 					</div>
@@ -245,21 +255,21 @@ export const QuoteDetailsModal = ({
 					<div className="flex items-center gap-2">
 						<Target className="size-4 text-blue-600" />
 						<div>
-							<div className="font-semibold">{quote.viabilityScore}/100</div>
+							<div className="font-semibold">{formatScore(quote.viabilityScore)}/100</div>
 							<div className="text-xs text-muted-foreground">Viability</div>
 						</div>
 					</div>
 					<div className="flex items-center gap-2">
 						<Users className="size-4 text-purple-600" />
 						<div>
-							<div className="font-semibold">{quote.seriousnessScore}/100</div>
+							<div className="font-semibold">{formatScore(quote.seriousnessScore)}/100</div>
 							<div className="text-xs text-muted-foreground">Seriousness</div>
 						</div>
 					</div>
 					<div className="flex items-center gap-2">
 						<TrendingUp className="size-4 text-orange-600" />
 						<div>
-							<div className="font-semibold">{quote.professionalismScore}/100</div>
+							<div className="font-semibold">{formatScore(quote.professionalismScore)}/100</div>
 							<div className="text-xs text-muted-foreground">Professionalism</div>
 						</div>
 					</div>
@@ -270,7 +280,7 @@ export const QuoteDetailsModal = ({
 					<div className="flex justify-between text-sm">
 						<span>Overall Score</span>
 						<span className={getScoreColor(Number(quote.overallScore))}>
-							{quote.overallScore}/100
+							{formatScore(quote.overallScore)}/100
 						</span>
 					</div>
 					<Progress value={Number(quote.overallScore)} className="h-1" />
@@ -340,9 +350,13 @@ export const QuoteDetailsModal = ({
 						<Separator />
 						<div className="space-y-3">
 							<div>
-								<p className="mb-1 text-sm font-medium">Selection Reason</p>
+								<p className="mb-1 text-sm font-medium">
+									{quote.isSelectedByAi ? "Selection Reason" : "Rejection Reason"}
+								</p>
 								<p className="text-sm text-muted-foreground">
-									{quote.recommendationReason || "No recommendation reason provided"}
+									{quote.isSelectedByAi
+										? quote.recommendationReason || "No recommendation reason provided"
+										: quote.reason || "No rejection reason provided"}
 								</p>
 							</div>
 							<div className="flex items-center justify-between">
@@ -526,25 +540,25 @@ export const QuoteDetailsModal = ({
 										<div className="grid grid-cols-2 gap-4 md:grid-cols-4">
 											<div className="text-center">
 												<div className="text-xl font-bold text-blue-600">
-													{selectedQuoteForFeedback.overallScore}/100
+													{formatScore(selectedQuoteForFeedback.overallScore)}/100
 												</div>
 												<div className="text-sm text-muted-foreground">Overall Score</div>
 											</div>
 											<div className="text-center">
 												<div className="text-xl font-bold text-green-600">
-													{selectedQuoteForFeedback.viabilityScore}/100
+													{formatScore(selectedQuoteForFeedback.viabilityScore)}/100
 												</div>
 												<div className="text-sm text-muted-foreground">Viability</div>
 											</div>
 											<div className="text-center">
 												<div className="text-xl font-bold text-purple-600">
-													{selectedQuoteForFeedback.seriousnessScore}/100
+													{formatScore(selectedQuoteForFeedback.seriousnessScore)}/100
 												</div>
 												<div className="text-sm text-muted-foreground">Seriousness</div>
 											</div>
 											<div className="text-center">
 												<div className="text-xl font-bold text-orange-600">
-													{selectedQuoteForFeedback.professionalismScore}/100
+													{formatScore(selectedQuoteForFeedback.professionalismScore)}/100
 												</div>
 												<div className="text-sm text-muted-foreground">Professionalism</div>
 											</div>
@@ -559,7 +573,11 @@ export const QuoteDetailsModal = ({
 										</div>
 										{selectedQuoteForFeedback.recommendationReason && (
 											<div>
-												<h4 className="mb-2 font-medium">Recommendation Reason</h4>
+												<h4 className="mb-2 font-medium">
+													{selectedQuoteForFeedback.isSelectedByAi
+														? "Selection Reason"
+														: "Rejection Reason"}
+												</h4>
 												<p className="text-sm text-muted-foreground">
 													{selectedQuoteForFeedback.recommendationReason}
 												</p>
