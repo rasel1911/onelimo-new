@@ -77,8 +77,6 @@ export const GET = async (request: NextRequest) => {
 		const specificBookingId = searchParams.get("bookingId");
 
 		if (specificBookingId) {
-			console.log("🎯 Fetching specific booking workflow for:", specificBookingId);
-
 			const specificWorkflowRun = await getWorkflowRunByBookingRequestId(specificBookingId);
 
 			if (!specificWorkflowRun) {
@@ -116,17 +114,14 @@ export const GET = async (request: NextRequest) => {
 			const cacheAge = cacheEntry ? Date.now() - cacheEntry.timestamp : CACHE_TTL;
 
 			if (!hasActiveWorkflows || cacheAge < 15000) {
-				console.log("📋 Returning cached workflow tracking data");
 				return NextResponse.json({ workflowTracking: cachedData });
 			} else {
-				console.log("📋 Active workflows detected, refreshing cache");
 				cache.delete(cacheKey);
 			}
 		}
 
 		const workflowRuns = await getRecentWorkflowRuns(2);
 		const recentWorkflowRuns = workflowRuns.slice(0, 2);
-		console.log("recentWorkflowRuns", recentWorkflowRuns);
 
 		if (recentWorkflowRuns.length === 0) {
 			return NextResponse.json({ workflowTracking: [] });
@@ -135,7 +130,6 @@ export const GET = async (request: NextRequest) => {
 		const workflowTrackingData = await Promise.all(recentWorkflowRuns.map(processWorkflowRun));
 
 		setCachedData(cacheKey, workflowTrackingData);
-		console.log("📋 Cached optimized workflow tracking data for", session.user.id);
 
 		return NextResponse.json({ workflowTracking: workflowTrackingData });
 	} catch (error) {

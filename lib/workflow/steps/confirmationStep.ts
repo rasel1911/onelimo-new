@@ -1,4 +1,5 @@
 import { getWorkflowRunByWorkflowRunId } from "@/db/queries/workflow/workflowRun.queries";
+import { formatLocation } from "@/lib/utils/formatting";
 
 import { notificationService } from "../communication/communication-factory";
 import { WorkflowTrackingService } from "../services/workflowTrackingService";
@@ -7,7 +8,6 @@ import {
 	formatBookingDate,
 	formatBookingTime,
 	formatDuration,
-	formatAddress,
 	generateGoogleCalendarUrl,
 	createCalendarEventData,
 } from "../utils/confirmation-utils";
@@ -54,8 +54,8 @@ export const runConfirmationStep = async (
 		const dropoffTimeStr = formatBookingTime(dropoffTime);
 		const estimatedDuration = formatDuration(bookingRequest.estimatedDuration);
 
-		const pickupAddress = formatAddress(bookingRequest.pickupLocation);
-		const dropoffAddress = formatAddress(bookingRequest.dropoffLocation);
+		const pickupAddress = formatLocation(bookingRequest.pickupLocation);
+		const dropoffAddress = formatLocation(bookingRequest.dropoffLocation);
 
 		const customerName = workflowRun.customerName || bookingRequest.customerName;
 		const calendarEventData = createCalendarEventData(

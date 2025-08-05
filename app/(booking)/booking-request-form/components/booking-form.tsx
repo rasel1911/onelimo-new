@@ -1,22 +1,19 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { MapPin, MessageSquare, Loader2, AlertCircle } from "lucide-react";
+import { MapPin, MessageSquare, Loader2 } from "lucide-react";
 import { useState, useTransition, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 
 import { improveTextAction } from "@/app/(booking)/actions/ai-writer";
 import { createBookingFromForm } from "@/app/(booking)/actions/booking-actions";
-import { LocationSuggestions } from "@/app/(booking)/booking-request-form/components/location-suggestions";
-import { UK_CITIES } from "@/app/(booking)/booking-request-form/constants";
 import {
 	bookingFormSchema,
 	type BookingFormData,
 } from "@/app/(booking)/booking-request-form/validation/booking-form-schemas";
-import { isLocationServiced } from "@/app/(booking)/concierge/utils";
 import { useBookingStore } from "@/app/(booking)/store/booking-form-store";
+import { LocationAutocomplete } from "@/components/custom/location-autocomplete";
 import { AITextArea } from "@/components/ui/ai-text-area";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { DateTimePicker } from "@/components/ui/datetime-picker";
 import {
@@ -28,7 +25,6 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
 	Select,
 	SelectContent,
@@ -37,6 +33,7 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
+import { type LocationSuggestion } from "@/lib/services/geoapify";
 
 interface BookingFormProps {
 	onSuccess?: (requestCode: string) => void;
@@ -62,21 +59,12 @@ export const BookingForm = ({ onSuccess }: BookingFormProps) => {
 		});
 	};
 
-	const {
-		cities,
-		citiesLoading,
-		vehicleTypes,
-		locationValidation,
-		fetchCities,
-		refreshCities,
-		setLocationValidation,
-		resetLocationValidation,
-	} = useBookingStore();
+	const { vehicleTypes } = useBookingStore();
 
-	const [pickupSuggestions, setPickupSuggestions] = useState<string[]>([]);
-	const [dropoffSuggestions, setDropoffSuggestions] = useState<string[]>([]);
-	const [showPickupSuggestions, setShowPickupSuggestions] = useState(false);
-	const [showDropoffSuggestions, setShowDropoffSuggestions] = useState(false);
+	const [selectedLocations, setSelectedLocations] = useState<{
+		pickup?: LocationSuggestion;
+		dropoff?: LocationSuggestion;
+	}>({});
 
 	const [isCustomVehicleMode, setIsCustomVehicleMode] = useState(false);
 
@@ -84,10 +72,8 @@ export const BookingForm = ({ onSuccess }: BookingFormProps) => {
 		resolver: zodResolver(bookingFormSchema),
 		mode: "onChange",
 		defaultValues: {
-			pickupCity: "",
-			pickupPostcode: "",
-			dropoffCity: "",
-			dropoffPostcode: "",
+			pickupLocation: "",
+			dropoffLocation: "",
 			pickupTime: "",
 			estimatedDropoffTime: "",
 			estimatedDuration: 0,
@@ -97,14 +83,6 @@ export const BookingForm = ({ onSuccess }: BookingFormProps) => {
 			specialRequests: "",
 		},
 	});
-
-	useEffect(() => {
-		if (cities.length === 0) {
-			refreshCities();
-		} else {
-			fetchCities();
-		}
-	}, [cities.length, fetchCities, refreshCities]);
 
 	const watchedValues = form.watch();
 	const [isFormValidState, setIsFormValidState] = useState(false);
@@ -117,15 +95,9 @@ export const BookingForm = ({ onSuccess }: BookingFormProps) => {
 			return false;
 		}
 
-		if (locationValidation.isPickupServiced === false) {
-			return false;
-		}
-
 		const requiredFields = [
-			values.pickupCity?.trim(),
-			values.pickupPostcode?.trim(),
-			values.dropoffCity?.trim(),
-			values.dropoffPostcode?.trim(),
+			values.pickupLocation?.trim(),
+			values.dropoffLocation?.trim(),
 			values.pickupTime,
 			values.estimatedDropoffTime,
 		];
@@ -139,7 +111,7 @@ export const BookingForm = ({ onSuccess }: BookingFormProps) => {
 		} else {
 			return values.vehicleType && values.vehicleType.trim() !== "";
 		}
-	}, [form, locationValidation.isPickupServiced, isCustomVehicleMode]);
+	}, [form, isCustomVehicleMode]);
 
 	useEffect(() => {
 		const validState = isFormValid();
@@ -148,68 +120,19 @@ export const BookingForm = ({ onSuccess }: BookingFormProps) => {
 		setIsFormValidState(newValidState);
 	}, [
 		watchedValues,
-		locationValidation.isPickupServiced,
 		isCustomVehicleMode,
 		form.formState.errors,
 		form.formState.isValid,
 		isFormValid,
 	]);
 
-	const handleLocationChange = (value: string, type: "pickup" | "dropoff") => {
-		const setValue =
-			type === "pickup"
-				? (val: string) => form.setValue("pickupCity", val)
-				: (val: string) => form.setValue("dropoffCity", val);
-
-		const setSuggestions = type === "pickup" ? setPickupSuggestions : setDropoffSuggestions;
-		const setShow = type === "pickup" ? setShowPickupSuggestions : setShowDropoffSuggestions;
-
-		setValue(value);
-		if (value.length > 1) {
-			const availableCities = cities.length > 0 ? cities : UK_CITIES.map((loc) => loc.city);
-			const filtered = availableCities.filter((city) =>
-				city.toLowerCase().includes(value.toLowerCase()),
-			);
-			setSuggestions(filtered.slice(0, 5));
-			setShow(true);
-		} else {
-			setShow(false);
-		}
-	};
-
-	const selectLocation = (city: string, type: "pickup" | "dropoff") => {
+	const handleLocationSelect = (location: LocationSuggestion, type: "pickup" | "dropoff") => {
 		if (type === "pickup") {
-			form.setValue("pickupCity", city);
-			setShowPickupSuggestions(false);
-			checkLocationService(city);
+			form.setValue("pickupLocation", location.formatted);
+			setSelectedLocations((prev) => ({ ...prev, pickup: location }));
 		} else {
-			form.setValue("dropoffCity", city);
-			setShowDropoffSuggestions(false);
-		}
-	};
-
-	const checkLocationService = async (cityName: string) => {
-		if (!cityName.trim()) {
-			resetLocationValidation();
-			return;
-		}
-
-		try {
-			const availableCities = cities.length > 0 ? cities : UK_CITIES.map((loc) => loc.city);
-			const isServiced = isLocationServiced(cityName, availableCities);
-
-			if (isServiced) {
-				resetLocationValidation();
-			} else {
-				setLocationValidation(
-					cityName,
-					false,
-					`Sorry, we don't currently service ${cityName}. Please select a different pickup city.`,
-				);
-			}
-		} catch (error) {
-			console.error("Error checking location service:", error);
-			setLocationValidation(cityName, null, "Unable to verify location service. Please try again.");
+			form.setValue("dropoffLocation", location.formatted);
+			setSelectedLocations((prev) => ({ ...prev, dropoff: location }));
 		}
 	};
 
@@ -249,7 +172,13 @@ export const BookingForm = ({ onSuccess }: BookingFormProps) => {
 	const onSubmit = async (data: BookingFormData) => {
 		startTransition(async () => {
 			try {
-				const result = await createBookingFromForm(data);
+				const updatedData = {
+					...data,
+					pickupLocationDetails: selectedLocations.pickup || ({} as LocationSuggestion),
+					dropoffLocationDetails: selectedLocations.dropoff || ({} as LocationSuggestion),
+				};
+
+				const result = await createBookingFromForm(updatedData);
 
 				if (result.success) {
 					toast({
@@ -257,7 +186,7 @@ export const BookingForm = ({ onSuccess }: BookingFormProps) => {
 						description: "Your booking request has been submitted successfully.",
 					});
 					form.reset();
-					resetLocationValidation();
+					setSelectedLocations({});
 					if (result.requestCode) {
 						onSuccess?.(result.requestCode);
 					}
@@ -294,157 +223,66 @@ export const BookingForm = ({ onSuccess }: BookingFormProps) => {
 				onSubmit={form.handleSubmit(onSubmit)}
 				className="space-y-6 rounded-2xl border border-border bg-card p-6 shadow-lg backdrop-blur-sm"
 			>
-				{/* Location Error Message */}
-				{locationValidation.validationMessage && locationValidation.isPickupServiced === false && (
-					<Alert className="border-destructive">
-						<AlertCircle className="size-4 text-destructive" />
-						<AlertDescription className="text-destructive">
-							{locationValidation.validationMessage}
-						</AlertDescription>
-					</Alert>
-				)}
-
 				{/* Journey Details */}
 				<div className="space-y-4">
 					<div className="flex items-center space-x-2 pb-2">
 						<MapPin className="size-4 text-primary" />
 						<h3 className="font-semibold text-foreground">Journey Details</h3>
-						{citiesLoading && (
-							<div className="flex items-center space-x-1 text-xs text-muted-foreground">
-								<Loader2 className="size-3 animate-spin" />
-								<span>Loading cities...</span>
-							</div>
-						)}
 					</div>
 
 					<div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
 						{/* Pickup Section */}
 						<div className="space-y-3">
-							<Label className="text-sm font-medium text-muted-foreground">Pickup Location</Label>
-							<div className="grid grid-cols-2 gap-3">
-								<FormField
-									control={form.control}
-									name="pickupCity"
-									render={({ field }) => (
-										<FormItem className="relative">
-											<FormControl>
-												<Input
-													{...field}
-													placeholder={citiesLoading ? "Loading cities..." : "City"}
-													disabled={citiesLoading}
-													onChange={(e) => {
-														field.onChange(e);
-														handleLocationChange(e.target.value, "pickup");
-													}}
-													onBlur={() => {
-														if (field.value.trim()) {
-															checkLocationService(field.value);
-														}
-													}}
-													className={`h-10 rounded-md focus:border-primary focus:ring-1 focus:ring-primary ${
-														locationValidation.isPickupServiced === false
-															? "border-destructive focus:border-destructive focus:ring-destructive"
-															: ""
-													}`}
-												/>
-											</FormControl>
-											<LocationSuggestions
-												locations={pickupSuggestions}
-												onSelect={(city) => selectLocation(city, "pickup")}
-												show={showPickupSuggestions}
+							<FormField
+								control={form.control}
+								name="pickupLocation"
+								render={() => (
+									<FormItem>
+										<FormLabel className="text-sm font-medium text-muted-foreground">
+											Pickup Location
+										</FormLabel>
+										<FormControl>
+											<LocationAutocomplete
+												name="pickupLocation"
+												control={form.control}
+												placeholder="Enter pickup address, or postcode"
+												onLocationSelect={(location) => handleLocationSelect(location, "pickup")}
 											/>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-								<FormField
-									control={form.control}
-									name="pickupPostcode"
-									render={({ field }) => (
-										<FormItem>
-											<FormControl>
-												<Input
-													{...field}
-													placeholder="Postcode"
-													onBlur={() => {
-														if (field.value.trim()) {
-															form.trigger("pickupPostcode");
-														}
-													}}
-													className="h-10 rounded-md focus:border-primary focus:ring-1 focus:ring-primary"
-												/>
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-							</div>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
 						</div>
 
 						{/* Dropoff Section */}
 						<div className="space-y-3">
-							<Label className="text-sm font-medium text-muted-foreground">Dropoff Location</Label>
-							<div className="grid grid-cols-2 gap-3">
-								<FormField
-									control={form.control}
-									name="dropoffCity"
-									render={({ field }) => (
-										<FormItem className="relative">
-											<FormControl>
-												<Input
-													{...field}
-													placeholder={citiesLoading ? "Loading cities..." : "City"}
-													disabled={citiesLoading}
-													onChange={(e) => {
-														field.onChange(e);
-														handleLocationChange(e.target.value, "dropoff");
-													}}
-													onBlur={() => {
-														if (field.value.trim()) {
-															form.trigger("dropoffCity");
-														}
-													}}
-													className="h-10 rounded-md focus:border-primary focus:ring-1 focus:ring-primary"
-												/>
-											</FormControl>
-											<LocationSuggestions
-												locations={dropoffSuggestions}
-												onSelect={(city) => selectLocation(city, "dropoff")}
-												show={showDropoffSuggestions}
+							<FormField
+								control={form.control}
+								name="dropoffLocation"
+								render={() => (
+									<FormItem>
+										<FormLabel className="text-sm font-medium text-muted-foreground">
+											Dropoff Location
+										</FormLabel>
+										<FormControl>
+											<LocationAutocomplete
+												name="dropoffLocation"
+												control={form.control}
+												placeholder="Enter dropoff address, or postcode"
+												onLocationSelect={(location) => handleLocationSelect(location, "dropoff")}
 											/>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-								<FormField
-									control={form.control}
-									name="dropoffPostcode"
-									render={({ field }) => (
-										<FormItem>
-											<FormControl>
-												<Input
-													{...field}
-													placeholder="Postcode"
-													onBlur={() => {
-														if (field.value.trim()) {
-															form.trigger("dropoffPostcode");
-														}
-													}}
-													className="h-10 rounded-md focus:border-primary focus:ring-1 focus:ring-primary"
-												/>
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-							</div>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
 						</div>
 					</div>
 				</div>
 
 				{/* DateTime & Trip Details Grid */}
 				<div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-					{/* DateTime Section */}
 					<div className="space-y-3">
 						<FormField
 							control={form.control}

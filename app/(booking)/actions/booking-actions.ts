@@ -9,51 +9,42 @@ import {
 } from "@/app/(booking)/booking-request-form/validation/booking-form-schemas";
 import { createNewBookingRequest } from "@/db/queries/bookingRequest.queries";
 import { getUserById } from "@/db/queries/user.queries";
+import { LocationType } from "@/db/schema/bookingRequest.schema";
 import { User } from "@/db/schema/user.schema";
+import { type LocationSuggestion } from "@/lib/services/geoapify";
 import { triggerBookingWorkflow } from "@/lib/workflow/client";
 
 import { SUCCESS_MESSAGES } from "../concierge/constants";
 
-export interface BookingActionData {
-	pickupLocation: {
-		cityName: string;
-		postCode: string;
-	};
-	dropoffLocation: {
-		cityName: string;
-		postCode: string;
-	};
-	pickupDateTime: string;
-	dropoffDateTime: string;
+export interface BookingData {
+	pickupLocation: LocationType;
+	dropoffLocation: LocationType;
+	pickupTime: string;
+	estimatedDropoffTime: string;
 	passengers: number;
 	vehicleType: string;
 	specialRequests?: string;
 }
 
+/**
+ * Create a new booking request
+ * @param bookingData - The booking data
+ * @param currentUser - The current user
+ * @returns The booking request
+ */
 const createBookingRequestInternal = async (
-	bookingData: {
+	bookingData: BookingData & {
 		userId: string;
 		customerName: string;
-		pickupCity: string;
-		pickupPostcode: string;
-		dropoffCity: string;
-		dropoffPostcode: string;
-		pickupTime: string;
-		estimatedDropoffTime: string;
 		estimatedDuration: number;
-		passengers: number;
-		vehicleType: string;
-		specialRequests?: string;
 	},
 	currentUser: User,
 ) => {
 	const bookingRequest = await createNewBookingRequest({
 		userId: bookingData.userId,
 		customerName: bookingData.customerName,
-		pickupCity: bookingData.pickupCity,
-		pickupPostcode: bookingData.pickupPostcode,
-		dropoffCity: bookingData.dropoffCity,
-		dropoffPostcode: bookingData.dropoffPostcode,
+		pickupLocation: bookingData.pickupLocation,
+		dropoffLocation: bookingData.dropoffLocation,
 		pickupTime: bookingData.pickupTime,
 		estimatedDropoffTime: bookingData.estimatedDropoffTime,
 		estimatedDuration: bookingData.estimatedDuration,
@@ -62,7 +53,6 @@ const createBookingRequestInternal = async (
 		specialRequests: bookingData.specialRequests || undefined,
 	});
 
-	// Trigger workflow and handle failures more explicitly
 	try {
 		const workflowResult = await triggerBookingWorkflow(bookingRequest, currentUser);
 		if (!workflowResult.success) {
@@ -83,6 +73,10 @@ const createBookingRequestInternal = async (
 	return bookingRequest;
 };
 
+/**
+ * Get the authenticated user
+ * @returns The authenticated user
+ */
 const getAuthenticatedUser = async () => {
 	const session = await auth();
 	if (!session?.user?.id) {
@@ -112,7 +106,12 @@ const getAuthenticatedUser = async () => {
 	};
 };
 
-export const createBookingAction = async (bookingData: BookingActionData) => {
+/**
+ * Create a new booking request
+ * @param bookingData - The booking data
+ * @returns The booking request
+ */
+export const createBookingAction = async (bookingData: BookingData) => {
 	try {
 		const authResult = await getAuthenticatedUser();
 		if (!authResult.success || !authResult.user) {
@@ -125,8 +124,8 @@ export const createBookingAction = async (bookingData: BookingActionData) => {
 
 		const { session, record: currentUser } = authResult.user;
 
-		const pickupTime = new Date(bookingData.pickupDateTime);
-		const dropoffTime = new Date(bookingData.dropoffDateTime);
+		const pickupTime = new Date(bookingData.pickupTime);
+		const dropoffTime = new Date(bookingData.estimatedDropoffTime);
 		const estimatedDuration = Math.round(
 			(dropoffTime.getTime() - pickupTime.getTime()) / (1000 * 60),
 		);
@@ -135,12 +134,22 @@ export const createBookingAction = async (bookingData: BookingActionData) => {
 			{
 				userId: session.id!,
 				customerName: currentUser.name,
-				pickupCity: bookingData.pickupLocation.cityName,
-				pickupPostcode: bookingData.pickupLocation.postCode,
-				dropoffCity: bookingData.dropoffLocation.cityName,
-				dropoffPostcode: bookingData.dropoffLocation.postCode,
-				pickupTime: bookingData.pickupDateTime,
-				estimatedDropoffTime: bookingData.dropoffDateTime,
+				pickupLocation: {
+					city: bookingData.pickupLocation.city,
+					address: bookingData.pickupLocation.address,
+					postcode: bookingData.pickupLocation.postcode,
+					lat: bookingData.pickupLocation.lat,
+					lng: bookingData.pickupLocation.lng,
+				},
+				dropoffLocation: {
+					city: bookingData.dropoffLocation.city,
+					address: bookingData.dropoffLocation.address,
+					postcode: bookingData.dropoffLocation.postcode,
+					lat: bookingData.dropoffLocation.lat,
+					lng: bookingData.dropoffLocation.lng,
+				},
+				pickupTime: bookingData.pickupTime,
+				estimatedDropoffTime: bookingData.estimatedDropoffTime,
 				estimatedDuration,
 				passengers: bookingData.passengers,
 				vehicleType: bookingData.vehicleType,
@@ -167,7 +176,17 @@ export const createBookingAction = async (bookingData: BookingActionData) => {
 	}
 };
 
-export const createBookingFromForm = async (data: BookingFormData) => {
+/**
+ * Create a new booking request from form data
+ * @param data - The form data
+ * @returns The booking request
+ */
+export const createBookingFromForm = async (
+	data: BookingFormData & {
+		pickupLocationDetails: LocationSuggestion;
+		dropoffLocationDetails: LocationSuggestion;
+	},
+) => {
 	try {
 		const authResult = await getAuthenticatedUser();
 		if (!authResult.success || !authResult.user) {
@@ -206,10 +225,20 @@ export const createBookingFromForm = async (data: BookingFormData) => {
 			{
 				userId: validatedData.userId,
 				customerName: validatedData.customerName,
-				pickupCity: validatedData.pickupCity,
-				pickupPostcode: validatedData.pickupPostcode,
-				dropoffCity: validatedData.dropoffCity,
-				dropoffPostcode: validatedData.dropoffPostcode,
+				pickupLocation: {
+					city: data.pickupLocationDetails.city,
+					address: data.pickupLocationDetails.formatted,
+					postcode: data.pickupLocationDetails?.postcode,
+					lat: data.pickupLocationDetails.lat,
+					lng: data.pickupLocationDetails.lon,
+				},
+				dropoffLocation: {
+					city: data.dropoffLocationDetails.city,
+					address: data.dropoffLocationDetails.formatted,
+					postcode: data.dropoffLocationDetails?.postcode,
+					lat: data.dropoffLocationDetails.lat,
+					lng: data.dropoffLocationDetails.lon,
+				},
 				pickupTime: validatedData.pickupTime,
 				estimatedDropoffTime: validatedData.estimatedDropoffTime,
 				estimatedDuration: validatedData.estimatedDuration,

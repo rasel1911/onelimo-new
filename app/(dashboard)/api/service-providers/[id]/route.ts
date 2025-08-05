@@ -24,8 +24,7 @@ export const GET = async (request: Request, { params }: { params: { id: string }
 			role: serviceProvider.role,
 			reputation: serviceProvider.reputation ?? undefined,
 			responseTime: serviceProvider.responseTime ?? undefined,
-			locationId: serviceProvider.locationId,
-			locationIds: serviceProvider.locationIds,
+			serviceLocations: serviceProvider.serviceLocations,
 			createdAt: serviceProvider.createdAt.toISOString(),
 			updatedAt: serviceProvider.updatedAt.toISOString(),
 		};

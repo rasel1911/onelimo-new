@@ -32,9 +32,7 @@ const ServiceProviderEditSection = async ({ id }: { id: string }) => {
 					phone: serviceProvider.phone,
 					status: serviceProvider.status as "active" | "inactive" | "pending",
 					role: serviceProvider.role || "partner",
-					locationIds:
-						serviceProvider.locationIds ||
-						(serviceProvider.locationId ? [serviceProvider.locationId] : []),
+					serviceLocations: serviceProvider.serviceLocations || [],
 					areaCovered: serviceProvider.areaCovered || [],
 					serviceType: serviceProvider.serviceType || ["stretch_limousine"],
 					reputation: serviceProvider.reputation || 0,

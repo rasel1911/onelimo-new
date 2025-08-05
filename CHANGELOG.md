@@ -2,6 +2,45 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Added
+
+- **Location Autocomplete System**: Integrated Geoapify API for real-time location suggestions
+  - Added `LocationAutocomplete` component with address and city-only modes
+  - Implemented `useLocationSearch` hook with React Query for optimized API calls
+  - Added Geoapify service with client-side filtering for accurate city results
+  - Supports UK-specific location search with proper address formatting
+  - Features smooth animations, keyboard navigation, and full accessibility support
+  - Added comprehensive test page for both booking and partner registration use cases
+
+### Added
+
+- **Enhanced Location Support**: Added comprehensive location data structure with full address details
+  - Added support for complete address information including coordinates (lat/lng)
+  - Added centralized `formatLocation` utility function for consistent address display
+  - Added optional postcode field support throughout the system
+
+### Enhanced
+
+- **Location Data Structure**: Completely refactored location handling throughout the application
+  - Updated `LocationType` schema to include `address`, `city`, `postcode` (optional), `lat` (optional), and `lng` (optional)
+  - Migrated from simple city/postcode structure to comprehensive address-based system
+  - Enhanced booking actions to support full location details with coordinates
+  - Updated provider matching algorithm to handle optional postcode fields
+  - Improved location formatting across email templates, SMS notifications, and admin interfaces
+  - Updated all workflow steps, AI services, and communication templates to use new location structure
+  - Maintained backward compatibility for existing location data
+
+### Fixed
+
+- **Location Display Issues**: Resolved inconsistent location formatting across the application
+  - Fixed booking request creation to properly handle new location structure
+  - Fixed provider matching algorithm to work with service locations instead of deprecated location schema
+  - Fixed email and SMS templates to display complete address information
+  - Fixed admin booking list to show full address details instead of just city/postcode
+  - Fixed workflow steps to properly format location data for AI services and notifications
+
 ## [0.1.3] - 2025-01-16
 
 ### Added

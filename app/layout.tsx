@@ -5,6 +5,7 @@ import { Toaster } from "sonner";
 
 import { ThemeProvider } from "@/components/custom/theme-provider";
 import { Toaster as ShadcnToaster } from "@/components/ui/toaster";
+import { QueryProvider } from "@/lib/utils/query-client-provider";
 
 import "./globals.css";
 
@@ -27,19 +28,21 @@ export default async function RootLayout({
 		<html lang="en" className="dark">
 			<body className="antialiased">
 				<SessionProvider>
-					<ThemeProvider
-						attribute="class"
-						defaultTheme="dark"
-						enableSystem={false}
-						disableTransitionOnChange
-					>
-						<Toaster position="top-center" />
-						<ShadcnToaster />
-						{children}
-						{process.env.NODE_ENV === "development" && (
-							<StagewiseToolbar config={stagewiseConfig} />
-						)}
-					</ThemeProvider>
+					<QueryProvider>
+						<ThemeProvider
+							attribute="class"
+							defaultTheme="dark"
+							enableSystem={false}
+							disableTransitionOnChange
+						>
+							<Toaster position="top-center" />
+							<ShadcnToaster />
+							{children}
+							{process.env.NODE_ENV === "development" && (
+								<StagewiseToolbar config={stagewiseConfig} />
+							)}
+						</ThemeProvider>
+					</QueryProvider>
 				</SessionProvider>
 			</body>
 		</html>

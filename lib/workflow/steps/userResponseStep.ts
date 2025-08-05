@@ -6,6 +6,7 @@ import {
 import { BookingRequest } from "@/db/schema";
 import { analyzeConfirmationMessage } from "@/lib/ai/services/confirmationAnalyzer/analyzer";
 import { ConfirmationAnalyzerInput } from "@/lib/ai/services/confirmationAnalyzer/types";
+import { formatLocation } from "@/lib/utils/formatting";
 
 import { WorkflowTrackingService } from "../services/workflowTrackingService";
 
@@ -46,8 +47,8 @@ export const runUserResponseStep = async (
 				bookingId: bookingRequest.requestCode,
 				serviceName: bookingRequest.vehicleType,
 				pickupDate: new Date(bookingRequest.pickupTime).toLocaleDateString(),
-				pickupLocation: `${bookingRequest.pickupLocation.city}, ${bookingRequest.pickupLocation.postcode}`,
-				dropoffLocation: `${bookingRequest.dropoffLocation.city}, ${bookingRequest.dropoffLocation.postcode}`,
+				pickupLocation: formatLocation(bookingRequest.pickupLocation),
+				dropoffLocation: formatLocation(bookingRequest.dropoffLocation),
 				scheduledDate: new Date(bookingRequest.pickupTime).toLocaleDateString(),
 				providerName: provider.name,
 				amount: selectedQuoteDetails.amount,

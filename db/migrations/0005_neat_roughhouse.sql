@@ -1,0 +1,1 @@
+DROP TYPE "public"."service_type";

@@ -9,7 +9,7 @@ import {
 	getAllServiceProviders,
 } from "@/db/queries/serviceProvider.queries";
 
-import { ServiceProviderSchema } from "./validations";
+import { ServiceProviderFormSchema } from "./validations";
 
 /**
  * Create a new service provider
@@ -21,7 +21,9 @@ export const createServiceProviderAction = async (formData: FormData) => {
 
 	const areaCovered = formData.getAll("areaCovered").map((area) => area.toString());
 	const serviceType = formData.getAll("serviceType").map((type) => type.toString());
-	const locationIds = formData.getAll("locationIds").map((id) => id.toString());
+	const serviceLocations = formData
+		.getAll("serviceLocations")
+		.map((location) => location.toString());
 
 	if (serviceType.length === 0) {
 		return {
@@ -35,11 +37,11 @@ export const createServiceProviderAction = async (formData: FormData) => {
 	const reputation = parseInt(formData.get("reputation")?.toString() || "0");
 	const responseTime = parseInt(formData.get("responseTime")?.toString() || "0");
 
-	const validatedFields = ServiceProviderSchema.safeParse({
+	const validatedFields = ServiceProviderFormSchema.safeParse({
 		...rawData,
 		areaCovered,
 		serviceType,
-		locationIds,
+		serviceLocations,
 		reputation,
 		responseTime,
 	});
@@ -84,12 +86,13 @@ export const createServiceProviderAction = async (formData: FormData) => {
 			return type !== "other";
 		});
 
-		const locationIds = validatedFields.data.locationIds;
-
 		const dataToInsert = {
 			...validatedFields.data,
-			locationId: locationIds[0],
-			locationIds: locationIds,
+
+			// FIXME:Backward compatibility for deprecated fields
+			locationId: null,
+			locationIds: null,
+
 			areaCovered:
 				validatedFields.data.areaCovered && validatedFields.data.areaCovered.length > 0
 					? validatedFields.data.areaCovered
@@ -143,7 +146,9 @@ export const updateServiceProviderAction = async (id: string, formData: FormData
 
 	const areaCovered = formData.getAll("areaCovered").map((area) => area.toString());
 	const serviceType = formData.getAll("serviceType").map((type) => type.toString());
-	const locationIds = formData.getAll("locationIds").map((id) => id.toString());
+	const serviceLocations = formData
+		.getAll("serviceLocations")
+		.map((location) => location.toString());
 
 	if (serviceType.length === 0) {
 		return {
@@ -157,11 +162,11 @@ export const updateServiceProviderAction = async (id: string, formData: FormData
 	const reputation = parseInt(formData.get("reputation")?.toString() || "0");
 	const responseTime = parseInt(formData.get("responseTime")?.toString() || "0");
 
-	const validatedFields = ServiceProviderSchema.safeParse({
+	const validatedFields = ServiceProviderFormSchema.safeParse({
 		...rawData,
 		areaCovered,
 		serviceType,
-		locationIds,
+		serviceLocations,
 		reputation,
 		responseTime,
 	});
@@ -208,12 +213,13 @@ export const updateServiceProviderAction = async (id: string, formData: FormData
 			return type !== "other";
 		});
 
-		const locationIds = validatedFields.data.locationIds;
+		const serviceLocations = validatedFields.data.serviceLocations;
 
 		const dataToUpdate = {
 			...validatedFields.data,
-			locationId: locationIds[0], // FIXME: Use first location for backward compatibility, deprecated
-			locationIds: locationIds,
+			// Backward compatibility for deprecated fields
+			locationId: null,
+			locationIds: [],
 			areaCovered:
 				validatedFields.data.areaCovered && validatedFields.data.areaCovered.length > 0
 					? validatedFields.data.areaCovered

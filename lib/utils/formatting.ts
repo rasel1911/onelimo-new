@@ -74,8 +74,8 @@ export const formatDayDate = (dateString: string) => {
  * @param location - The location to format
  * @returns The formatted location
  */
-export const formatLocation = (location: { city: string; postcode: string }) => {
-	return `${location.city}, ${location.postcode}`;
+export const formatLocation = (location: { city: string; address: string; postcode?: string }) => {
+	return location.address || `${location.city}${location.postcode ? ", " + location.postcode : ""}`;
 };
 
 /**

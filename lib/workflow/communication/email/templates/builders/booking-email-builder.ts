@@ -1,4 +1,4 @@
-import { formatStatusText } from "@/lib/utils/formatting";
+import { formatLocation, formatStatusText } from "@/lib/utils/formatting";
 import {
 	BookingRequestEmailProps,
 	ProviderEmailTemplateContext,
@@ -37,8 +37,8 @@ class BookingEmailBuilder {
 		const estimatedDuration =
 			durationHours > 0 ? `${durationHours}h ${durationMinutes}m` : `${durationMinutes}m`;
 
-		const pickupAddress = `${bookingRequest.pickupLocation.city}, ${bookingRequest.pickupLocation.postcode}`;
-		const dropoffAddress = `${bookingRequest.dropoffLocation.city}, ${bookingRequest.dropoffLocation.postcode}`;
+		const pickupAddress = formatLocation(bookingRequest.pickupLocation);
+		const dropoffAddress = formatLocation(bookingRequest.dropoffLocation);
 
 		const serviceType = bookingRequest.vehicleType;
 		const specialNotes = analysis.cleanedMessage || "No special notes";

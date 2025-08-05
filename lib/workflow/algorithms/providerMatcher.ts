@@ -1,7 +1,5 @@
-import { getAllLocations } from "@/db/queries/location.queries";
 import { getAllServiceProviders } from "@/db/queries/serviceProvider.queries";
 import { BookingRequest, LocationType } from "@/db/schema/bookingRequest.schema";
-import { Location } from "@/db/schema/location.schema";
 import { ServiceProvider } from "@/db/schema/serviceProvider.schema";
 
 import { ServiceProviderMatch } from "../types";
@@ -21,24 +19,16 @@ export const findMatchingServiceProviders = async (
 	try {
 		console.log(`🔍 Finding service providers for booking ${bookingRequest.id}`);
 
-		const [allProviders, allLocations] = await Promise.all([
-			getAllServiceProviders(),
-			getAllLocations(),
-		]);
+		const allProviders = await getAllServiceProviders();
 
 		const activeProviders = allProviders.filter(
 			(provider) => provider.status === "active" && provider.isBlocked !== "true",
 		);
 
-		const locationMap = new Map<string, Location>();
-		allLocations.forEach((location) => {
-			locationMap.set(location.id, location);
-		});
-
 		const matches: ServiceProviderMatch[] = [];
 
 		for (const provider of activeProviders) {
-			const matchScore = calculateMatchScore(bookingRequest, provider, locationMap);
+			const matchScore = calculateMatchScore(bookingRequest, provider);
 
 			if (matchScore >= MIN_MATCH_SCORE) {
 				matches.push({
@@ -66,17 +56,12 @@ export const findMatchingServiceProviders = async (
  * Calculate comprehensive match score between booking request and service provider
  * @param bookingRequest - The booking request
  * @param provider - The service provider
- * @param locationMap - Map of location IDs to location objects
  * @returns The total match score
  */
-const calculateMatchScore = (
-	bookingRequest: BookingRequest,
-	provider: ServiceProvider,
-	locationMap: Map<string, Location>,
-): number => {
+const calculateMatchScore = (bookingRequest: BookingRequest, provider: ServiceProvider): number => {
 	let score = 0;
 
-	const locationScore = calculateLocationScore(bookingRequest, provider, locationMap);
+	const locationScore = calculateLocationScore(bookingRequest, provider);
 	score += locationScore;
 
 	const serviceTypeScore = calculateServiceTypeScore(bookingRequest, provider);
@@ -94,43 +79,44 @@ const calculateMatchScore = (
 
 /**
  * Calculate location-based score (50 points total)
- * - Pickup location match (provider.locationIds) = 25 points
+ * - Pickup city match (provider.serviceLocations) = 25 points
  * - Pickup postcode match (provider.areaCovered) = 10 points
- * - Dropoff location match (provider.locationIds) = 10 points
+ * - Dropoff city match (provider.serviceLocations) = 10 points
  * - Dropoff postcode match (provider.areaCovered) = 5 points
  */
 const calculateLocationScore = (
 	bookingRequest: BookingRequest,
 	provider: ServiceProvider,
-	locationMap: Map<string, Location>,
 ): number => {
 	const pickupLocation = bookingRequest.pickupLocation as LocationType;
 	const dropoffLocation = bookingRequest.dropoffLocation as LocationType;
 
 	let locationScore = 0;
 
-	const providerLocationIds = provider.locationIds || [];
+	const providerServiceLocations = provider.serviceLocations || [];
 	const providerAreasCovered = provider.areaCovered || [];
 
 	// Check pickup location matching
-	const pickupLocationMatch = checkLocationMatch(pickupLocation, providerLocationIds, locationMap);
-	if (pickupLocationMatch) {
+	const pickupCityMatch = checkCityMatch(pickupLocation.city, providerServiceLocations);
+	if (pickupCityMatch) {
 		locationScore += 25;
 	}
-	if (checkPostcodeMatch(pickupLocation.postcode, providerAreasCovered)) {
+	if (
+		pickupLocation.postcode &&
+		checkPostcodeMatch(pickupLocation.postcode, providerAreasCovered)
+	) {
 		locationScore += 10;
 	}
 
 	// Check dropoff location matching
-	const dropoffLocationMatch = checkLocationMatch(
-		dropoffLocation,
-		providerLocationIds,
-		locationMap,
-	);
-	if (dropoffLocationMatch) {
+	const dropoffCityMatch = checkCityMatch(dropoffLocation.city, providerServiceLocations);
+	if (dropoffCityMatch) {
 		locationScore += 10;
 	}
-	if (checkPostcodeMatch(dropoffLocation.postcode, providerAreasCovered)) {
+	if (
+		dropoffLocation.postcode &&
+		checkPostcodeMatch(dropoffLocation.postcode, providerAreasCovered)
+	) {
 		locationScore += 5;
 	}
 
@@ -138,21 +124,12 @@ const calculateLocationScore = (
 };
 
 /**
- * Check if a location matches any of the provider's location IDs
+ * Check if a city matches any of the provider's service locations
  */
-const checkLocationMatch = (
-	requestLocation: LocationType,
-	providerLocationIds: string[],
-	locationMap: Map<string, Location>,
-): boolean => {
-	return providerLocationIds.some((locationId) => {
-		const location = locationMap.get(locationId);
-		if (!location) return false;
-
-		const cityMatch = location.city.toLowerCase() === requestLocation.city.toLowerCase();
-
-		return cityMatch;
-	});
+const checkCityMatch = (requestedCity: string, providerServiceLocations: string[]): boolean => {
+	return providerServiceLocations.some(
+		(serviceLocation) => serviceLocation.toLowerCase() === requestedCity.toLowerCase(),
+	);
 };
 
 /**
@@ -184,11 +161,16 @@ const calculateServiceTypeScore = (
 
 	const requestedVehicleType = bookingRequest.vehicleType.toLowerCase();
 
-	const exactMatch = provider.serviceType.some(
-		(serviceType) => serviceType.toLowerCase() === requestedVehicleType,
-	);
+	const serviceTypeMatch = provider.serviceType.some((serviceType) => {
+		const serviceTypeLower = serviceType.toLowerCase();
+		const requestedVehicleTypeLower = requestedVehicleType.toLowerCase();
+		return (
+			serviceTypeLower.includes(requestedVehicleTypeLower) ||
+			requestedVehicleTypeLower.includes(serviceTypeLower)
+		);
+	});
 
-	if (exactMatch) {
+	if (serviceTypeMatch) {
 		return 20;
 	}
 
@@ -199,7 +181,6 @@ const calculateServiceTypeScore = (
 		party_bus: ["other"],
 		hummer: ["suv", "other"],
 		other: ["sedan", "suv", "stretch_limousine", "party_bus", "hummer"],
-		not_specified: ["sedan", "suv", "other"],
 	};
 
 	const compatible = compatibleTypes[requestedVehicleType] || [];
@@ -222,8 +203,6 @@ const calculateServiceTypeScore = (
 const calculateQualityScore = (provider: ServiceProvider): number => {
 	let qualityScore = 0;
 
-	// Response time scoring (10 points max)
-	// Lower response time in minutes = higher score
 	if (provider.responseTime !== null && provider.responseTime !== undefined) {
 		const responseTimeMinutes = provider.responseTime;
 		if (responseTimeMinutes <= 30) {

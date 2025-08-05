@@ -12,24 +12,6 @@ const VEHICLE_TYPES = [
 export const UK_POSTCODE_REGEX = /^[A-Z]{1,2}[0-9]{1,2}[A-Z]?\s?[0-9][A-Z]{2}$/i;
 export const EU_POSTCODE_REGEX = /^[0-9]{4,5}$/;
 
-const postcodeSchema = z
-	.string()
-	.min(1, "Postcode is required")
-	.refine(
-		(value) => UK_POSTCODE_REGEX.test(value.replace(/\s/g, "")),
-		"Please enter a valid postcode (e.g. SW1A 1AA)",
-	);
-
-const citySchema = z
-	.string()
-	.min(1, "City is required")
-	.min(2, "City name must be at least 2 characters")
-	.max(50, "City name must be less than 50 characters")
-	.regex(
-		/^[a-zA-Z\s\-']+$/,
-		"City name can only contain letters, spaces, hyphens, and apostrophes",
-	);
-
 const dateTimeSchema = z
 	.string()
 	.min(1, "Date and time is required")
@@ -51,10 +33,8 @@ const dateTimeSchema = z
 	}, "Booking date cannot be more than 1 year in the future");
 
 const baseBookingSchema = z.object({
-	pickupCity: citySchema,
-	pickupPostcode: postcodeSchema,
-	dropoffCity: citySchema,
-	dropoffPostcode: postcodeSchema,
+	pickupLocation: z.string().min(3, "Please enter a pickup location"),
+	dropoffLocation: z.string().min(3, "Please enter a dropoff location"),
 	pickupTime: dateTimeSchema,
 	estimatedDropoffTime: dateTimeSchema,
 	estimatedDuration: z
@@ -92,13 +72,13 @@ export const bookingFormSchema = baseBookingSchema
 	)
 	.refine(
 		(data) => {
-			const pickupLocation = `${data.pickupCity} ${data.pickupPostcode}`.toLowerCase();
-			const dropoffLocation = `${data.dropoffCity} ${data.dropoffPostcode}`.toLowerCase();
+			const pickupLocation = data.pickupLocation.toLowerCase();
+			const dropoffLocation = data.dropoffLocation.toLowerCase();
 			return pickupLocation !== dropoffLocation;
 		},
 		{
 			message: "Pickup and dropoff locations must be different",
-			path: ["dropoffCity"],
+			path: ["dropoffLocation"],
 		},
 	)
 	.refine(
@@ -123,7 +103,6 @@ export const createBookingSchema = baseBookingSchema
 	})
 	.refine(
 		(data) => {
-			// Ensure dropoff time is after pickup time
 			const pickupDate = new Date(data.pickupTime);
 			const dropoffDate = new Date(data.estimatedDropoffTime);
 			return dropoffDate > pickupDate;
@@ -135,14 +114,13 @@ export const createBookingSchema = baseBookingSchema
 	)
 	.refine(
 		(data) => {
-			// Ensure pickup and dropoff locations are different
-			const pickupLocation = `${data.pickupCity} ${data.pickupPostcode}`.toLowerCase();
-			const dropoffLocation = `${data.dropoffCity} ${data.dropoffPostcode}`.toLowerCase();
+			const pickupLocation = data.pickupLocation.toLowerCase();
+			const dropoffLocation = data.dropoffLocation.toLowerCase();
 			return pickupLocation !== dropoffLocation;
 		},
 		{
 			message: "Pickup and dropoff locations must be different",
-			path: ["dropoffCity"],
+			path: ["dropoffLocation"],
 		},
 	)
 	.refine(
