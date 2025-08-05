@@ -23,7 +23,7 @@ export const QuoteCard = ({ quote, onSelect }: QuoteCardProps) => {
 			onClick={() => onSelect(quote)}
 		>
 			{quote.isRecommended && (
-				<div className="absolute -top-2 left-16 z-10">
+				<div className="absolute -top-2 left-14 z-10 sm:left-16">
 					<Badge className="bg-primary text-xs text-primary-foreground">
 						<Sparkles className="mr-1 size-3" />
 						Recommended
@@ -31,7 +31,7 @@ export const QuoteCard = ({ quote, onSelect }: QuoteCardProps) => {
 				</div>
 			)}
 			{quote.isSelectedByAi && (
-				<div className="absolute -top-2 left-4 z-10">
+				<div className="absolute -top-2 left-2 z-10 sm:left-4">
 					<Badge className="bg-teal-500 text-xs text-primary-foreground">
 						<Wand2 className="mr-1 size-4" />
 					</Badge>
