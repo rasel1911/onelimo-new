@@ -25,7 +25,7 @@ TASK: Analyze each quote with consistent scoring criteria.
 REQUIREMENTS:
 1. MUST analyze ALL quotes in the provided list
 2. Use exact tracking IDs: 'id', 'providerId', 'workflowProviderId' from quote data
-3. Apply scoring thresholds: Overall ≥65, Viability ≥60, Seriousness ≥55, Professionalism ≥50
+3. Apply scoring thresholds: Overall ≥50, Viability ≥50, Seriousness ≥50, Professionalism ≥50
 4. Provide detailed analysis for each quote
 5. Include comprehensive batch summary
 

@@ -118,10 +118,16 @@ export const BookingTrackerContent = ({
 			<Card className="col-span-3">
 				<CardContent className="p-6">
 					<div className="text-center">
-						<p className="text-muted-foreground">No workflow tracking data available.</p>
-						<p className="mt-2 text-sm text-muted-foreground">
-							Start a booking request to see workflow tracking here.
-						</p>
+						{isLoading ? (
+							<p className="text-muted-foreground">Loading workflow tracking data...</p>
+						) : (
+							<>
+								<p className="text-muted-foreground">No workflow tracking data available.</p>
+								<p className="mt-2 text-sm text-muted-foreground">
+									Start a booking request to see workflow tracking here.
+								</p>
+							</>
+						)}
 						<Button
 							variant="outline"
 							size="sm"

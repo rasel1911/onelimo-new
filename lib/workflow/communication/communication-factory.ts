@@ -66,7 +66,7 @@ class WorkflowNotificationService implements NotificationService {
 				);
 
 				console.log("================================================");
-				console.log("urls", urls);
+				console.log("Booking Request URLs", urls);
 				console.log("================================================");
 
 				await createProviderLinkForWorkflow({
@@ -161,8 +161,7 @@ class WorkflowNotificationService implements NotificationService {
 				selectedQuoteIds,
 			);
 			console.log("================================================");
-			console.log("linkData", linkData);
-			console.log("urls", urls);
+			console.log("Quotes URLs", urls);
 			console.log("================================================");
 
 			await updateWorkflowQuotesLink(

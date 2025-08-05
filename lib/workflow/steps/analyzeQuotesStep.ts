@@ -65,7 +65,7 @@ export const analyzeQuotesStep = async (
 								{
 									bookingRequest,
 									selectedQuotes: createdQuotes,
-									totalQuotes: quoteAnalysis.totalQuotes,
+									totalQuotes: selectedQuoteIds.length,
 									bookingId: workflowRunId,
 									customerEmail: customerEmail || "",
 									customerName: workflowRun?.customerName || "",

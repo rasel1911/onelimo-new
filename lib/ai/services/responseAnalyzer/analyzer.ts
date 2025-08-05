@@ -148,7 +148,7 @@ async function analyzeResponsesBatch(
 ): Promise<ResponseAnalysisResult[]> {
 	try {
 		const result = await generateObject({
-			model: Gemini(MODEL_IDS.GEMINI_FLASH_2_0),
+			model: Gemini(MODEL_IDS.GEMINI_FLASH_2_5),
 			temperature: RESPONSE_ANALYZER_CONFIG.TEMPERATURE,
 			maxTokens: RESPONSE_ANALYZER_CONFIG.MAX_TOKENS,
 			maxRetries: RESPONSE_ANALYZER_CONFIG.MAX_RETRIES,
@@ -190,7 +190,7 @@ async function generateRecommendations(
 ): Promise<ResponseRecommendationResult> {
 	try {
 		const result = await generateObject({
-			model: Gemini(MODEL_IDS.GEMINI_FLASH_2_0),
+			model: Gemini(MODEL_IDS.GEMINI_FLASH_2_5),
 			temperature: RESPONSE_ANALYZER_CONFIG.TEMPERATURE,
 			maxTokens: RESPONSE_ANALYZER_CONFIG.MAX_TOKENS,
 			maxRetries: RESPONSE_ANALYZER_CONFIG.MAX_RETRIES,
