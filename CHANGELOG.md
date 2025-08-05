@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### TODO:
+
+* [ ] Investigate why only one quote is being displayed.
+* [ ] Ensure quote selection logic doesn't automatically hide other valid options.
+* [ ] Update UI to show all quotes when multiple are returned.
+* [ ] Ensure consistency between SMS message and in-app display.
+
+
+## [0.2.0] - 2025-08-05
+
 ### Added
 
 - **Location Autocomplete System**: Integrated Geoapify API for real-time location suggestions
