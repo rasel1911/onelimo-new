@@ -13,6 +13,7 @@ import { runNotificationStep } from "@/lib/workflow/steps/notificationStep";
 import { runUserResponseStep } from "@/lib/workflow/steps/userResponseStep";
 import { BookingWorkflowPayload } from "@/lib/workflow/types";
 import { checkProviderResponses } from "@/lib/workflow/utils/responseChecker";
+import { runMessageStep } from "@/lib/workflow/steps/communicationStep";
 
 export const { POST } = serve<BookingWorkflowPayload>(async (context) => {
 	const workflowSettings = (await getSettingsByCategory("workflow")) as WorkflowSettings;
@@ -235,7 +236,7 @@ export const { POST } = serve<BookingWorkflowPayload>(async (context) => {
 	/****************************************************
 	 * [STEP 6.1] Send booking confirmation or question
 	 ****************************************************/
-	const { userAction, isWaitingForReply } = await context.run("send-booking-question", async () => {
+	const isWaitingForReply = await context.run("send-booking-question", async () => {
 		const userAction = selectedQuoteDetails?.action;
 		const userIntent = confirmationAnalysis?.intent || confirmationAnalysis?.userAction;
 
@@ -244,17 +245,18 @@ export const { POST } = serve<BookingWorkflowPayload>(async (context) => {
 			// TODO: send booking question
 			// show the question on the same booking request received page(same booking hash)
 			// wait for reply
+			if (!confirmationAnalysis || !selectedQuoteDetails || !provider) {
+				throw new Error("Confirmation analysis, selected quote details, or provider not found");
+			}
 
-			return {
-				isWaitingForReply: true,
-				userAction,
-			};
+			return await runMessageStep({
+				workflowRunId,
+				bookingRequest,
+				confirmationAnalysis,
+				selectedQuoteDetails,
+				provider,
+			});
 		}
-
-		return {
-			isWaitingForReply: false,
-			userAction,
-		};
 	});
 
 	if (isWaitingForReply) {

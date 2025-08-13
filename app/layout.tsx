@@ -1,4 +1,4 @@
-import { StagewiseToolbar } from "@stagewise/toolbar-next";
+
 import { Metadata } from "next";
 import { SessionProvider } from "next-auth/react";
 import { Toaster } from "sonner";
@@ -15,9 +15,6 @@ export const metadata: Metadata = {
 	description: "Book a ride with Onelimo AI",
 };
 
-const stagewiseConfig = {
-	plugins: [],
-};
 
 export default async function RootLayout({
 	children,
@@ -38,9 +35,6 @@ export default async function RootLayout({
 							<Toaster position="top-center" />
 							<ShadcnToaster />
 							{children}
-							{process.env.NODE_ENV === "development" && (
-								<StagewiseToolbar config={stagewiseConfig} />
-							)}
 						</ThemeProvider>
 					</QueryProvider>
 				</SessionProvider>

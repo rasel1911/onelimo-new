@@ -1,28 +1,6 @@
-DO $$ BEGIN
- CREATE TYPE "public"."user_role" AS ENUM('user', 'admin', 'service_provider', 'support');
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- CREATE TYPE "public"."user_status" AS ENUM('active', 'inactive', 'deleted');
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- CREATE TYPE "public"."role_type" AS ENUM('user', 'customer', 'admin', 'support', 'partner');
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- CREATE TYPE "public"."service_type" AS ENUM('suv', 'party_bus', 'stretch_limousine', 'sedan', 'hummer', 'other', 'not_specified');
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "User" (
+CREATE TYPE "public"."user_role" AS ENUM('user', 'admin', 'service_provider', 'support');--> statement-breakpoint
+CREATE TYPE "public"."user_status" AS ENUM('active', 'inactive', 'deleted');--> statement-breakpoint
+CREATE TABLE "User" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" varchar(100) NOT NULL,
 	"email" varchar(64) NOT NULL,
@@ -34,14 +12,14 @@ CREATE TABLE IF NOT EXISTS "User" (
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "Chat" (
+CREATE TABLE "Chat" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"createdAt" timestamp NOT NULL,
 	"messages" json NOT NULL,
 	"userId" uuid NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "Reservation" (
+CREATE TABLE "Reservation" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"createdAt" timestamp NOT NULL,
 	"details" json NOT NULL,
@@ -49,7 +27,7 @@ CREATE TABLE IF NOT EXISTS "Reservation" (
 	"userId" uuid NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "Location" (
+CREATE TABLE "Location" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"city" varchar(50) NOT NULL,
 	"zipcodes" varchar(20)[] NOT NULL,
@@ -57,12 +35,14 @@ CREATE TABLE IF NOT EXISTS "Location" (
 	"updatedAt" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "ServiceProvider" (
+CREATE TABLE "ServiceProvider" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" varchar(100) NOT NULL,
 	"email" varchar(64) NOT NULL,
 	"phone" varchar(20) NOT NULL,
 	"locationId" uuid,
+	"locationIds" uuid[],
+	"serviceLocations" varchar(100)[],
 	"serviceType" varchar(50)[],
 	"areaCovered" varchar(100)[],
 	"status" varchar(20) DEFAULT 'pending' NOT NULL,
@@ -84,7 +64,7 @@ CREATE TABLE IF NOT EXISTS "ServiceProvider" (
 	CONSTRAINT "ServiceProvider_email_unique" UNIQUE("email")
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "Communication" (
+CREATE TABLE "Communication" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"serviceProviderId" uuid NOT NULL,
 	"subject" varchar(200) NOT NULL,
@@ -94,7 +74,7 @@ CREATE TABLE IF NOT EXISTS "Communication" (
 	"updatedAt" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "BookingRequest" (
+CREATE TABLE "BookingRequest" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"requestCode" varchar(20) NOT NULL,
 	"userId" uuid NOT NULL,
@@ -112,7 +92,7 @@ CREATE TABLE IF NOT EXISTS "BookingRequest" (
 	CONSTRAINT "BookingRequest_requestCode_unique" UNIQUE("requestCode")
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "RegistrationToken" (
+CREATE TABLE "RegistrationToken" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"token" varchar(100) NOT NULL,
 	"email" varchar(100),
@@ -123,7 +103,19 @@ CREATE TABLE IF NOT EXISTS "RegistrationToken" (
 	CONSTRAINT "RegistrationToken_token_unique" UNIQUE("token")
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "system_settings" (
+CREATE TABLE "PersistentRegistrationLink" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"linkId" varchar(50) NOT NULL,
+	"title" varchar(100) NOT NULL,
+	"description" text,
+	"isActive" boolean DEFAULT true NOT NULL,
+	"usageCount" integer DEFAULT 0 NOT NULL,
+	"createdAt" timestamp DEFAULT now() NOT NULL,
+	"updatedAt" timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT "PersistentRegistrationLink_linkId_unique" UNIQUE("linkId")
+);
+--> statement-breakpoint
+CREATE TABLE "system_settings" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"category" text NOT NULL,
 	"key" text NOT NULL,
@@ -134,7 +126,7 @@ CREATE TABLE IF NOT EXISTS "system_settings" (
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "WorkflowRun" (
+CREATE TABLE "WorkflowRun" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"workflow_run_id" varchar(255) NOT NULL,
 	"booking_request_id" varchar(255) NOT NULL,
@@ -166,7 +158,7 @@ CREATE TABLE IF NOT EXISTS "WorkflowRun" (
 	CONSTRAINT "WorkflowRun_workflow_run_id_unique" UNIQUE("workflow_run_id")
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "WorkflowStep" (
+CREATE TABLE "WorkflowStep" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"workflow_run_id" varchar(255) NOT NULL,
 	"step_number" integer NOT NULL,
@@ -191,7 +183,7 @@ CREATE TABLE IF NOT EXISTS "WorkflowStep" (
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "WorkflowProvider" (
+CREATE TABLE "WorkflowProvider" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"workflow_run_id" varchar(255) NOT NULL,
 	"service_provider_id" uuid,
@@ -207,7 +199,6 @@ CREATE TABLE IF NOT EXISTS "WorkflowProvider" (
 	"quote_amount" integer,
 	"quote_time" timestamp,
 	"quote_notes" text,
-	"refined_quote" text,
 	"response" jsonb,
 	"provider_link_hash" varchar(500),
 	"provider_link_encrypted_data" text,
@@ -216,7 +207,7 @@ CREATE TABLE IF NOT EXISTS "WorkflowProvider" (
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "WorkflowQuote" (
+CREATE TABLE "WorkflowQuote" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"workflow_run_id" varchar(255) NOT NULL,
 	"workflow_provider_id" uuid NOT NULL,
@@ -255,7 +246,7 @@ CREATE TABLE IF NOT EXISTS "WorkflowQuote" (
 	CONSTRAINT "WorkflowQuote_quote_id_unique" UNIQUE("quote_id")
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "WorkflowNotification" (
+CREATE TABLE "WorkflowNotification" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"workflow_run_id" varchar(255) NOT NULL,
 	"workflow_provider_id" uuid,
@@ -279,93 +270,30 @@ CREATE TABLE IF NOT EXISTS "WorkflowNotification" (
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "Chat" ADD CONSTRAINT "Chat_userId_User_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE no action ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "Reservation" ADD CONSTRAINT "Reservation_userId_User_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE no action ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "ServiceProvider" ADD CONSTRAINT "ServiceProvider_locationId_Location_id_fk" FOREIGN KEY ("locationId") REFERENCES "public"."Location"("id") ON DELETE no action ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "Communication" ADD CONSTRAINT "Communication_serviceProviderId_ServiceProvider_id_fk" FOREIGN KEY ("serviceProviderId") REFERENCES "public"."ServiceProvider"("id") ON DELETE no action ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "BookingRequest" ADD CONSTRAINT "BookingRequest_userId_User_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE no action ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "WorkflowRun" ADD CONSTRAINT "WorkflowRun_user_id_User_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."User"("id") ON DELETE no action ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "WorkflowStep" ADD CONSTRAINT "WorkflowStep_workflow_run_id_WorkflowRun_workflow_run_id_fk" FOREIGN KEY ("workflow_run_id") REFERENCES "public"."WorkflowRun"("workflow_run_id") ON DELETE no action ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "WorkflowProvider" ADD CONSTRAINT "WorkflowProvider_workflow_run_id_WorkflowRun_workflow_run_id_fk" FOREIGN KEY ("workflow_run_id") REFERENCES "public"."WorkflowRun"("workflow_run_id") ON DELETE no action ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "WorkflowProvider" ADD CONSTRAINT "WorkflowProvider_service_provider_id_ServiceProvider_id_fk" FOREIGN KEY ("service_provider_id") REFERENCES "public"."ServiceProvider"("id") ON DELETE no action ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "WorkflowQuote" ADD CONSTRAINT "WorkflowQuote_workflow_run_id_WorkflowRun_workflow_run_id_fk" FOREIGN KEY ("workflow_run_id") REFERENCES "public"."WorkflowRun"("workflow_run_id") ON DELETE no action ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "WorkflowQuote" ADD CONSTRAINT "WorkflowQuote_workflow_provider_id_WorkflowProvider_id_fk" FOREIGN KEY ("workflow_provider_id") REFERENCES "public"."WorkflowProvider"("id") ON DELETE no action ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "WorkflowNotification" ADD CONSTRAINT "WorkflowNotification_workflow_run_id_WorkflowRun_workflow_run_id_fk" FOREIGN KEY ("workflow_run_id") REFERENCES "public"."WorkflowRun"("workflow_run_id") ON DELETE no action ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "WorkflowNotification" ADD CONSTRAINT "WorkflowNotification_workflow_provider_id_WorkflowProvider_id_fk" FOREIGN KEY ("workflow_provider_id") REFERENCES "public"."WorkflowProvider"("id") ON DELETE no action ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-CREATE INDEX IF NOT EXISTS "sp_email_idx" ON "ServiceProvider" USING btree ("email");--> statement-breakpoint
-CREATE INDEX IF NOT EXISTS "sp_location_idx" ON "ServiceProvider" USING btree ("locationId");--> statement-breakpoint
-CREATE INDEX IF NOT EXISTS "sp_status_idx" ON "ServiceProvider" USING btree ("status");--> statement-breakpoint
-CREATE INDEX IF NOT EXISTS "sp_role_idx" ON "ServiceProvider" USING btree ("role");--> statement-breakpoint
-CREATE INDEX IF NOT EXISTS "sp_pin_reset_token_idx" ON "ServiceProvider" USING btree ("pinResetToken");--> statement-breakpoint
-CREATE INDEX IF NOT EXISTS "sp_is_blocked_idx" ON "ServiceProvider" USING btree ("isBlocked");--> statement-breakpoint
-CREATE INDEX IF NOT EXISTS "wp_workflow_run_idx" ON "WorkflowProvider" USING btree ("workflow_run_id");--> statement-breakpoint
-CREATE INDEX IF NOT EXISTS "wp_service_provider_idx" ON "WorkflowProvider" USING btree ("service_provider_id");--> statement-breakpoint
-CREATE INDEX IF NOT EXISTS "wp_contact_status_idx" ON "WorkflowProvider" USING btree ("contact_status");--> statement-breakpoint
-CREATE INDEX IF NOT EXISTS "wp_response_status_idx" ON "WorkflowProvider" USING btree ("response_status");--> statement-breakpoint
-CREATE INDEX IF NOT EXISTS "wp_has_responded_idx" ON "WorkflowProvider" USING btree ("has_responded");--> statement-breakpoint
-CREATE INDEX IF NOT EXISTS "wp_has_quoted_idx" ON "WorkflowProvider" USING btree ("has_quoted");
+ALTER TABLE "Chat" ADD CONSTRAINT "Chat_userId_User_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "Reservation" ADD CONSTRAINT "Reservation_userId_User_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "ServiceProvider" ADD CONSTRAINT "ServiceProvider_locationId_Location_id_fk" FOREIGN KEY ("locationId") REFERENCES "public"."Location"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "Communication" ADD CONSTRAINT "Communication_serviceProviderId_ServiceProvider_id_fk" FOREIGN KEY ("serviceProviderId") REFERENCES "public"."ServiceProvider"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "BookingRequest" ADD CONSTRAINT "BookingRequest_userId_User_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "WorkflowRun" ADD CONSTRAINT "WorkflowRun_user_id_User_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."User"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "WorkflowStep" ADD CONSTRAINT "WorkflowStep_workflow_run_id_WorkflowRun_workflow_run_id_fk" FOREIGN KEY ("workflow_run_id") REFERENCES "public"."WorkflowRun"("workflow_run_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "WorkflowProvider" ADD CONSTRAINT "WorkflowProvider_workflow_run_id_WorkflowRun_workflow_run_id_fk" FOREIGN KEY ("workflow_run_id") REFERENCES "public"."WorkflowRun"("workflow_run_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "WorkflowProvider" ADD CONSTRAINT "WorkflowProvider_service_provider_id_ServiceProvider_id_fk" FOREIGN KEY ("service_provider_id") REFERENCES "public"."ServiceProvider"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "WorkflowQuote" ADD CONSTRAINT "WorkflowQuote_workflow_run_id_WorkflowRun_workflow_run_id_fk" FOREIGN KEY ("workflow_run_id") REFERENCES "public"."WorkflowRun"("workflow_run_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "WorkflowQuote" ADD CONSTRAINT "WorkflowQuote_workflow_provider_id_WorkflowProvider_id_fk" FOREIGN KEY ("workflow_provider_id") REFERENCES "public"."WorkflowProvider"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "WorkflowNotification" ADD CONSTRAINT "WorkflowNotification_workflow_run_id_WorkflowRun_workflow_run_id_fk" FOREIGN KEY ("workflow_run_id") REFERENCES "public"."WorkflowRun"("workflow_run_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "WorkflowNotification" ADD CONSTRAINT "WorkflowNotification_workflow_provider_id_WorkflowProvider_id_fk" FOREIGN KEY ("workflow_provider_id") REFERENCES "public"."WorkflowProvider"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+CREATE INDEX "sp_email_idx" ON "ServiceProvider" USING btree ("email");--> statement-breakpoint
+CREATE INDEX "sp_location_idx" ON "ServiceProvider" USING btree ("locationId");--> statement-breakpoint
+CREATE INDEX "sp_locations_idx" ON "ServiceProvider" USING btree ("locationIds");--> statement-breakpoint
+CREATE INDEX "sp_service_locations_idx" ON "ServiceProvider" USING btree ("serviceLocations");--> statement-breakpoint
+CREATE INDEX "sp_status_idx" ON "ServiceProvider" USING btree ("status");--> statement-breakpoint
+CREATE INDEX "sp_role_idx" ON "ServiceProvider" USING btree ("role");--> statement-breakpoint
+CREATE INDEX "sp_pin_reset_token_idx" ON "ServiceProvider" USING btree ("pinResetToken");--> statement-breakpoint
+CREATE INDEX "sp_is_blocked_idx" ON "ServiceProvider" USING btree ("isBlocked");--> statement-breakpoint
+CREATE INDEX "wp_workflow_run_idx" ON "WorkflowProvider" USING btree ("workflow_run_id");--> statement-breakpoint
+CREATE INDEX "wp_service_provider_idx" ON "WorkflowProvider" USING btree ("service_provider_id");--> statement-breakpoint
+CREATE INDEX "wp_contact_status_idx" ON "WorkflowProvider" USING btree ("contact_status");--> statement-breakpoint
+CREATE INDEX "wp_response_status_idx" ON "WorkflowProvider" USING btree ("response_status");--> statement-breakpoint
+CREATE INDEX "wp_has_responded_idx" ON "WorkflowProvider" USING btree ("has_responded");--> statement-breakpoint
+CREATE INDEX "wp_has_quoted_idx" ON "WorkflowProvider" USING btree ("has_quoted");
