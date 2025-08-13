@@ -8,12 +8,12 @@ import { WorkflowTrackingService } from "@/lib/workflow/services/workflowTrackin
 import { runAnalyzeMessageStep } from "@/lib/workflow/steps/analyzeMessageStep";
 import { analyzeQuotesStep } from "@/lib/workflow/steps/analyzeQuotesStep";
 import { runBookingRequestStep } from "@/lib/workflow/steps/bookingRequestStep";
+import { runMessageStep } from "@/lib/workflow/steps/communicationStep";
 import { runConfirmationStep } from "@/lib/workflow/steps/confirmationStep";
 import { runNotificationStep } from "@/lib/workflow/steps/notificationStep";
 import { runUserResponseStep } from "@/lib/workflow/steps/userResponseStep";
 import { BookingWorkflowPayload } from "@/lib/workflow/types";
 import { checkProviderResponses } from "@/lib/workflow/utils/responseChecker";
-import { runMessageStep } from "@/lib/workflow/steps/communicationStep";
 
 export const { POST } = serve<BookingWorkflowPayload>(async (context) => {
 	const workflowSettings = (await getSettingsByCategory("workflow")) as WorkflowSettings;

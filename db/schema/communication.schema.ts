@@ -1,8 +1,8 @@
 import { InferSelectModel } from "drizzle-orm";
 import { integer, pgTable, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 
-import { serviceProvider } from "./serviceProvider.schema";
 import { bookingRequest } from "./bookingRequest.schema";
+import { serviceProvider } from "./serviceProvider.schema";
 
 export const communication = pgTable("Communication", {
 	id: uuid("id").primaryKey().notNull().defaultRandom(),

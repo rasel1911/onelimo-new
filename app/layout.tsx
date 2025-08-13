@@ -1,4 +1,3 @@
-
 import { Metadata } from "next";
 import { SessionProvider } from "next-auth/react";
 import { Toaster } from "sonner";
@@ -14,7 +13,6 @@ export const metadata: Metadata = {
 	title: "Onelimo AI Conceirge",
 	description: "Book a ride with Onelimo AI",
 };
-
 
 export default async function RootLayout({
 	children,

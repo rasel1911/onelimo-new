@@ -1,9 +1,10 @@
-import { getWorkflowRunByWorkflowRunId } from "@/db/queries/workflow/workflowRun.queries";
-import { formatLocation } from "@/lib/utils/formatting";
 import { 
     createCommunication,
     updateCommunicationProgress 
 } from "@/db/queries/communication.queries";
+import { getWorkflowRunByWorkflowRunId } from "@/db/queries/workflow/workflowRun.queries";
+import { formatLocation } from "@/lib/utils/formatting";
+
 import { notificationService } from "../communication/communication-factory";
 import { WorkflowTrackingService } from "../services/workflowTrackingService";
 import { 
